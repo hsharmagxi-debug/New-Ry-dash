@@ -177,10 +177,10 @@ input, select {
    01 HOME SCREEN & DOCK
    ========================================================================= */
 #screen-home {
-  background-color: #02040b;
-  background-image: linear-gradient(180deg, rgba(2, 4, 11, 0.55) 0%, rgba(2, 4, 11, 0.88) 60%, rgba(2, 4, 11, 0.98) 100%),
-                    url('/bg/rainy-traffic-city.jpg');
-  background-position: center 30%;
+  background-color: #0c1424;
+  background-image: linear-gradient(180deg, rgba(10, 16, 34, 0.28) 0%, rgba(8, 12, 26, 0.62) 55%, rgba(6, 9, 20, 0.88) 100%),
+                    url('/bg/atlanta-sunset-highway.jpg');
+  background-position: center 38%;
   background-size: cover;
   background-repeat: no-repeat;
   position: relative;
@@ -195,6 +195,14 @@ input, select {
   height: 100%;
   pointer-events: none;
   z-index: 0;
+}
+
+/* Home-only: quieter panels so the featured car photo and background stay the focal point
+   instead of competing card glow (Garage keeps the shared --panel tokens untouched). */
+#screen-home .glass-panel {
+  background: rgba(8, 13, 28, 0.68);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+  border-color: rgba(0, 229, 255, 0.12);
 }
 
 .hero-car-photo-wrap {

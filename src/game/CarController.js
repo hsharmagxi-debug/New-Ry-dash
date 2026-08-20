@@ -26,6 +26,9 @@ export class CarController {
     this.turnRate = 1.7 + this.stat.handling * 1.4;
     this.grip = 0.86 + this.stat.handling * 0.12;
 
+    this.lastSpeed = 0; // used to derive longitudinal acceleration for the suspension dip/squat
+    this.suspensionPitch = 0;
+
     this.lap = 1;
     this.nextCP = 1; // next checkpoint index the race loop expects this car to cross
     this.trackT = 0; // progress 0..1 along curve (approx, for lap/AI/position tracking)
@@ -164,8 +167,27 @@ this.position.addScaledVector(right, slip * dt);
     const leanTarget = -this.steerInput * 0.05 * speedFactor;
     this.rig.group.rotation.z += (leanTarget - this.rig.group.rotation.z) * Math.min(1, dt * 5);
     this.rig.group.rotation.y = this.heading - this.driftFactor * this.steerInput * 0.5;
-    const pitchTarget = this.airborne ? THREE.MathUtils.clamp(this.verticalVelocity * 0.02, -0.35, 0.25) : 0;
+    // Suspension squat/dive — a cheap "weight transfer" feel: nose dips under braking, tail
+    // squats under hard acceleration, proportional to how fast speed is actually changing
+    // (not just throttle input, so it also reacts to collisions/off-road drag).
+    const longAccel = dt > 0 ? (this.speed - this.lastSpeed) / dt : 0;
+    this.lastSpeed = this.speed;
+    const suspensionTarget = THREE.MathUtils.clamp(-longAccel * 0.006, -0.05, 0.05);
+    this.suspensionPitch += (suspensionTarget - this.suspensionPitch) * Math.min(1, dt * 5);
+
+    const pitchTarget = this.airborne
+      ? THREE.MathUtils.clamp(this.verticalVelocity * 0.02, -0.35, 0.25)
+      : this.suspensionPitch;
     this.rig.group.rotation.x += (pitchTarget - this.rig.group.rotation.x) * Math.min(1, dt * 4);
+
+    // Brake lights — flare brighter under braking or handbrake, independent per car (each car's
+    // taillight material is its own clone, see CarFactory.js).
+    if (this.rig.taillights && this.rig.taillights[0]) {
+      const braking = this.throttleInput < -0.05 || this.handbrake;
+      const targetIntensity = braking ? 4.5 : 2.6;
+      const mat = this.rig.taillights[0].material;
+      mat.emissiveIntensity += (targetIntensity - mat.emissiveIntensity) * Math.min(1, dt * 10);
+    }
 
     // wheel rotation + steer angle on front wheels
     [this.rig.wheels.fl, this.rig.wheels.fr].forEach((w) => {

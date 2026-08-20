@@ -212,15 +212,17 @@ export function buildCar(modelDef, liveryColor) {
     car.add(fin);
   }
 
-  // Exhaust tips
+  // Exhaust tips — positions captured so nitro flame particles can spawn exactly here
   const exhaustCount = modelDef.class === 'Muscle' ? 4 : 2;
   const exStep = 0.32;
+  const exhaustPositions = [];
   for (let i = 0; i < exhaustCount; i++) {
     const offset = (i - (exhaustCount - 1) / 2) * exStep;
     const ex = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 0.22, 10), exhaustMat);
     ex.rotation.x = Math.PI / 2;
     ex.position.set(offset * wide, 0.22 * low, -2.42);
     car.add(ex);
+    exhaustPositions.push(ex.position);
   }
 
   // Side skirts
@@ -281,9 +283,11 @@ export function buildCar(modelDef, liveryColor) {
     headlightSpots.push(spot);
   });
 
-  // Taillights — full-width LED strip look
+  // Taillights — full-width LED strip look. Own material clone per car (not the shared module
+  // instance) so brake intensity can be driven independently per car — 8 cars braking at
+  // different times need 8 different brightness levels, not one shared value.
   const taillights = [];
-  const tailStrip = new THREE.Mesh(new THREE.BoxGeometry(1.7 * wide, 0.1, 0.05), taillightMat);
+  const tailStrip = new THREE.Mesh(new THREE.BoxGeometry(1.7 * wide, 0.1, 0.05), taillightMat.clone());
   tailStrip.position.set(0, 0.74 * low, -2.38);
   car.add(tailStrip);
   taillights.push(tailStrip);
@@ -311,6 +315,7 @@ export function buildCar(modelDef, liveryColor) {
     headlights,
     headlightSpots,
     taillights,
+    exhaustPositions,
     underGlow,
   };
 }

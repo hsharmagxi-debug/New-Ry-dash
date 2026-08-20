@@ -311,6 +311,21 @@ function beginRace() {
     }
   }
 
+  // Nitro exhaust flames — small bright bursts from each exhaust tip while nitro is active.
+  // Reuses the same SparkSystem as collision sparks (bright/additive/short-lived reads as a
+  // flame here too) rather than a whole separate particle class.
+  function emitNitroFlame(ctrl) {
+    if (!ctrl.nitroActive || !ctrl.rig.exhaustPositions) return;
+    ctrl.rig.exhaustPositions.forEach((localPos) => {
+      const worldPos = ctrl.rig.group.localToWorld(localPos.clone());
+      sparks.emit(worldPos, 2);
+    });
+  }
+  function emitAllNitroFlames() {
+    emitNitroFlame(player);
+    opponents.forEach((o) => emitNitroFlame(o.ctrl));
+  }
+
   // Player car
   const modelDef = CAR_MODELS[state.carIndex];
   const livery = CAR_LIVERIES[state.liveryIndex];
@@ -388,7 +403,7 @@ function beginRace() {
   }
 
   const smoke = new SmokeSystem(scene, 100);
-  const sparks = new SparkSystem(scene, 80);
+  const sparks = new SparkSystem(scene, 220);
   const { composer, bloom, motionBlur } = buildComposer(renderer, scene, camera, width, height);
   bloom.enabled = state.quality !== 'low';
   motionBlur.enabled = state.quality !== 'low';
@@ -658,6 +673,7 @@ function beginRace() {
       updateNitroPickups(dt);
       checkNitroPickup(player);
       opponents.forEach((o) => checkNitroPickup(o.ctrl));
+      emitAllNitroFlames();
 
       ghostRecorder.record(elapsedMs, player.position.x, player.position.z, player.heading);
       if (ghostPlayer && !ghostPlayer.finished) ghostPlayer.update(elapsedMs);
@@ -715,6 +731,7 @@ function beginRace() {
       updateNitroPickups(dt);
       checkNitroPickup(player);
       opponents.forEach((o) => checkNitroPickup(o.ctrl));
+      emitAllNitroFlames();
       updateCamera(dt);
       updateHud(player, opponents, elapsedMs);
       if (motionBlur.enabled) {

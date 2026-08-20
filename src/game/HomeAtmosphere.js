@@ -309,9 +309,6 @@ export class HomeAtmosphere {
 
     // Traffic Headlights & Taillights
     this._drawTraffic(ctx, w, h);
-
-    // Dynamic Rain Layers
-    this._drawRain(ctx, w, h, 'rgba(140, 210, 255, 0.45)');
   }
 
   /* ------------------- 02 SUNSET HIGHWAY (VELORA) ------------------- */
@@ -699,6 +696,27 @@ export class HomeAtmosphere {
     ctx.lineTo(w, roadTop + (h - roadTop) * 0.5);
     ctx.stroke();
     ctx.setLineDash([]);
+  }
+
+  _drawSearchlights(ctx, w, h) {
+    // Faint distant beams sweeping the skyline behind the neon-city traffic layer.
+    for (const s of this.searchlights) {
+      ctx.save();
+      ctx.translate(s.x, h * 0.58);
+      ctx.rotate(s.angle);
+      const beam = ctx.createLinearGradient(0, 0, 0, -h * 0.5);
+      beam.addColorStop(0, s.color);
+      beam.addColorStop(1, 'transparent');
+      ctx.fillStyle = beam;
+      ctx.beginPath();
+      ctx.moveTo(-8, 0);
+      ctx.lineTo(8, 0);
+      ctx.lineTo(55, -h * 0.5);
+      ctx.lineTo(-55, -h * 0.5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
   }
 
   _drawTraffic(ctx, w, h) {

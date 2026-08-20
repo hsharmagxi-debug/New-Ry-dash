@@ -178,11 +178,9 @@ input, select {
    ========================================================================= */
 #screen-home {
   background-color: #02040b;
-  background-image: linear-gradient(180deg, rgba(2, 6, 18, 0.45) 0%, rgba(2, 6, 18, 0.85) 100%),
-                    url('/rydash-home-bg.jpg');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+  background-image: radial-gradient(ellipse at 78% 44%, rgba(0, 198, 255, 0.13), transparent 55%),
+                    radial-gradient(ellipse at 20% 30%, rgba(115, 32, 255, 0.13), transparent 55%),
+                    linear-gradient(180deg, #050916 0%, #03050c 55%, #020308 100%);
   position: relative;
   overflow-y: auto;
   overflow-x: hidden;
@@ -583,58 +581,36 @@ input, select {
   color: var(--neon-pink);
 }
 
-.live-status-box {
+.challenge-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  position: relative;
+  gap: 10px;
 }
-.live-status-header {
+.challenge-row-top {
   display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.live-title {
-  font-family: var(--font-display);
-  font-size: 0.7rem;
-  font-weight: 800;
-  color: #00ff88;
-  letter-spacing: 0.08em;
-}
-.live-count-big {
-  font-family: var(--font-display);
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: #fff;
-  line-height: 1.1;
-  margin: 2px 0;
-}
-.live-sub {
-  font-family: var(--font-display);
-  font-size: 0.65rem;
-  font-weight: 800;
+  justify-content: space-between;
+  font-size: 0.74rem;
   color: var(--text-dim);
-  letter-spacing: 0.1em;
+  margin-bottom: 4px;
 }
-.live-track-info {
-  font-family: var(--font-display);
+.challenge-row-top span:first-child {
+  color: #e7ecf6;
+  font-weight: 600;
+}
+.challenge-progress-num {
+  font-variant-numeric: tabular-nums;
   font-size: 0.68rem;
-  font-weight: 800;
-  color: var(--neon-cyan);
-  margin-top: 4px;
 }
-.live-radar-circle {
-  width: 50px;
-  height: 50px;
-  margin-top: 4px;
+.challenge-track {
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
 }
-.radar-svg {
-  width: 100%;
+.challenge-fill {
   height: 100%;
-}
-.radar-blip {
-  animation: pulseDot 1.4s infinite;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
 }
 
 .foot-credit-minimal {
@@ -1212,21 +1188,17 @@ input, select {
    04 WORLD SELECT - RYDASH MAP
    ========================================================================= */
 #screen-worldmap {
-  background-image: linear-gradient(180deg, rgba(2, 5, 15, 0.72) 0%, rgba(2, 5, 15, 0.94) 100%),
-                    url('/rydash-neon-home.png');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+  background-color: #02040b;
+  background-image: radial-gradient(ellipse at 50% 0%, rgba(0, 198, 255, 0.1), transparent 60%),
+                    linear-gradient(180deg, #050916 0%, #03050c 55%, #020308 100%);
   padding: 24px;
   align-items: center;
 }
 
 #screen-leaderboard, #screen-lobby, #screen-auth, #screen-howto, #screen-settings {
-  background-image: linear-gradient(180deg, rgba(2, 5, 15, 0.78) 0%, rgba(2, 5, 15, 0.96) 100%),
-                    url('/rydash-ui-master.jpg');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+  background-color: #02040b;
+  background-image: radial-gradient(ellipse at 50% 0%, rgba(115, 32, 255, 0.1), transparent 60%),
+                    linear-gradient(180deg, #050916 0%, #03050c 55%, #020308 100%);
 }
 .worldmap-header { text-align: center; margin-top: 10px; margin-bottom: 10px; }
 .world-map-8 {

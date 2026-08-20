@@ -8,11 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/png" href="./assets/rydash-neon-home-BiJGZRVJ.png" />
-  <link rel="modulepreload" crossorigin href="./assets/three-2HeBehdi-v65BUMiq.js">
-  <link rel="modulepreload" crossorigin href="./assets/supabase-DthfXWp1-De02ucZc.js">
-  <script type="module" crossorigin src="./assets/index-cowsIojp.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-DtqlTEHa.css">
+  <link rel="icon" type="image/png" href="/rydash-neon-home.png" />
+  <link rel="stylesheet" href="/src/styles/main.css" />
 </head>
 <body>
   <div id="app">
@@ -207,22 +204,18 @@
                 <span>DAILY CHALLENGES</span>
                 <span class="reset-timer">Resets in: 08:45:32</span>
               </div>
-              <div class="live-status-box">
-                <div class="live-status-header">
-                  <span class="pulse-dot-green"></span>
-                  <span class="live-title">LIVE RACES</span>
+              <div class="challenge-list">
+                <div class="challenge-row">
+                  <div class="challenge-row-top"><span>Win 3 Races</span><span class="challenge-progress-num">0 / 3</span></div>
+                  <div class="challenge-track"><div class="challenge-fill" style="width:0%"></div></div>
                 </div>
-                <div class="live-count-big">1,248</div>
-                <div class="live-sub">DRIVERS ONLINE</div>
-                <div class="live-track-info">
-                  <span>NEON DISTRICT</span> • <span>3 LAPS</span>
+                <div class="challenge-row">
+                  <div class="challenge-row-top"><span>Drift 5,000m</span><span class="challenge-progress-num">0 / 5,000</span></div>
+                  <div class="challenge-track"><div class="challenge-fill" style="width:0%"></div></div>
                 </div>
-                <div class="live-radar-circle">
-                  <svg viewBox="0 0 100 100" class="radar-svg">
-                    <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(0,229,255,0.3)" stroke-width="2" stroke-dasharray="4 3" />
-                    <circle cx="50" cy="50" r="28" fill="none" stroke="rgba(255,46,136,0.25)" stroke-width="1.5" />
-                    <circle cx="68" cy="35" r="4" fill="#00e5ff" class="radar-blip" />
-                  </svg>
+                <div class="challenge-row">
+                  <div class="challenge-row-top"><span>Use Nitro 10 Times</span><span class="challenge-progress-num">0 / 10</span></div>
+                  <div class="challenge-track"><div class="challenge-fill" style="width:0%"></div></div>
                 </div>
               </div>
             </div>
@@ -706,5 +699,7 @@
     <div id="fpsCounter" class="fps-counter hidden">0 FPS</div>
     <div id="toast" class="toast hidden"></div>
   </div>
+
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>

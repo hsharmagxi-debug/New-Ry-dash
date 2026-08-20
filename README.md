@@ -126,29 +126,19 @@ First push will ask you to sign in (browser popup, or a
 5. Restart `npm run dev` — the Multiplayer Lobby, global leaderboard, and email sign-in/sign-up
    now work. No code changes needed; the app auto-detects the env vars.
 
-### 2b. Enable Google / Microsoft sign-in (optional)
+### 2b. Enable Google sign-in (optional)
 
-The Driver Login screen has "Continue with Google" and "Continue with Microsoft" buttons
-already wired up — Microsoft's login also covers Outlook/Hotmail accounts under one button.
-**Yahoo isn't supported** — Supabase Auth doesn't offer a Yahoo provider, so Yahoo users sign in
-with email/password instead (their Yahoo address works fine as the email). To activate the two
-that are supported:
+The Driver Login screen has a "Continue with Google" button already wired up. It won't work
+until you activate the Google provider in Supabase:
 
-**Google:**
 1. [Google Cloud Console](https://console.cloud.google.com) → create a project (or use one) →
    **APIs & Services → Credentials** → **Create Credentials → OAuth client ID** → Web application.
 2. Authorized redirect URI: `https://YOUR-PROJECT-REF.supabase.co/auth/v1/callback`.
 3. Copy the generated **Client ID** and **Client Secret**.
 4. In Supabase: **Authentication → Providers → Google** → paste both → **Save**.
 
-**Microsoft:**
-1. [Azure Portal](https://portal.azure.com) → **App registrations → New registration**.
-2. Redirect URI (Web): `https://YOUR-PROJECT-REF.supabase.co/auth/v1/callback`.
-3. Under **Certificates & secrets**, create a new client secret and copy it, plus the
-   **Application (client) ID** from the Overview page.
-4. In Supabase: **Authentication → Providers → Azure** → paste the client ID/secret → **Save**.
-
-No code changes needed for either — the buttons already call the right provider once enabled.
+No code changes needed — the button already calls the right provider once this is enabled.
+Until then it shows a clear "provider not enabled" message instead of failing silently.
 
 ### 3. Deploy — Vercel (recommended, free)
 

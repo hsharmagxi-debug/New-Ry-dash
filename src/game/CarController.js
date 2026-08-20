@@ -27,6 +27,7 @@ export class CarController {
     this.grip = 0.86 + this.stat.handling * 0.12;
 
     this.lap = 1;
+    this.nextCP = 1; // next checkpoint index the race loop expects this car to cross
     this.trackT = 0; // progress 0..1 along curve (approx, for lap/AI/position tracking)
     this.finished = false;
     this.raceTimeMs = 0;
@@ -87,21 +88,57 @@ export class CarController {
     }
     this.speed = THREE.MathUtils.clamp(this.speed, -this.maxSpeed * 0.4, targetMax);
 
-    // Steering — speed-scaled, with drift when handbrake held
-    const speedFactor = THREE.MathUtils.clamp(Math.abs(this.speed) / this.maxSpeed, 0.08, 1);
-    const steerAmount = this.steerInput * this.turnRate * speedFactor * dt * (this.speed < 0 ? -1 : 1);
-    this.heading += steerAmount * (this.handbrake ? 1.6 : 1);
+    // Steering — responsive arcade handling
+const speedFactor = THREE.MathUtils.clamp(
+  Math.abs(this.speed) / this.maxSpeed,
+  0.12,
+  1
+);
 
-    // Drift factor drives visual slip / rear-wheel angle / smoke
-    const targetDrift = this.handbrake ? THREE.MathUtils.clamp(Math.abs(this.steerInput) * 0.9 + 0.15, 0, 1) : 0;
-    this.driftFactor += (targetDrift - this.driftFactor) * Math.min(1, dt * 6);
+const steerAmount =
+  this.steerInput *
+  this.turnRate *
+  speedFactor *
+  dt *
+  (this.speed < 0 ? -1 : 1);
 
-    // Move forward along heading, with slight sideways slip when drifting
-    const forward = new THREE.Vector3(Math.sin(this.heading), 0, Math.cos(this.heading));
-    const right = new THREE.Vector3(Math.cos(this.heading), 0, -Math.sin(this.heading));
-    const slip = this.handbrake ? this.steerInput * this.driftFactor * 6 : 0;
-    this.position.addScaledVector(forward, this.speed * dt);
-    this.position.addScaledVector(right, slip * dt);
+// Normal steering.
+// Handbrake gives only a modest steering boost.
+this.heading += steerAmount * (this.handbrake ? 1.25 : 1);
+
+// Drift factor — mainly visual, with controlled sideways movement.
+const targetDrift = this.handbrake
+  ? THREE.MathUtils.clamp(
+      Math.abs(this.steerInput) * 0.65 + 0.08,
+      0,
+      0.8
+    )
+  : 0;
+
+this.driftFactor +=
+  (targetDrift - this.driftFactor) *
+  Math.min(1, dt * 6);
+
+// Move forward along heading.
+const forward = new THREE.Vector3(
+  Math.sin(this.heading),
+  0,
+  Math.cos(this.heading)
+);
+
+const right = new THREE.Vector3(
+  Math.cos(this.heading),
+  0,
+  -Math.sin(this.heading)
+);
+
+// Smaller sideways drift = easier control.
+const slip = this.handbrake
+  ? this.steerInput * this.driftFactor * 3
+  : 0;
+
+this.position.addScaledVector(forward, this.speed * dt);
+this.position.addScaledVector(right, slip * dt);
 
     // Gravity / airborne — engaged only after launch() is called (ramp jumps).
     this.justLanded = false;

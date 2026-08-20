@@ -9,7 +9,7 @@ import { loadGhost, saveGhostIfBest, GhostRecorder, GhostPlayer } from './game/G
 
 const WORLDS = {
   neon: { label: 'Neon District', build: buildNeonWorld },
-  sunset: { label: 'Sunset Highway', build: buildSunsetWorld },
+  sunset: { label: 'Sunline Highway', build: buildSunsetWorld },
   desert: { label: 'Neon Desert', build: buildDesertWorld },
   underground: { label: 'Deep Run', build: buildUndergroundWorld },
   rooftop: { label: 'Skyline', build: buildRooftopWorld },
@@ -260,11 +260,65 @@ function beginRace() {
   const CP_COUNT = 10;
   const checkpoints = curve.getSpacedPoints(CP_COUNT).slice(0, CP_COUNT);
 
+  // Nitro pickups — glowing rings placed around every circuit (world-agnostic, unlike ramps).
+  // Driving through one instantly refills nitro; it goes on cooldown and reappears after a bit.
+  const NITRO_PICKUP_TS = [0.12, 0.32, 0.5, 0.68, 0.85];
+  const nitroPickups = NITRO_PICKUP_TS.map((t) => {
+    const p = curve.getPointAt(t);
+    const group = new THREE.Group();
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(1.1, 0.14, 10, 24),
+      new THREE.MeshStandardMaterial({ color: 0x39ff9d, emissive: 0x39ff9d, emissiveIntensity: 2.2, metalness: 0.3, roughness: 0.3 })
+    );
+    ring.rotation.x = Math.PI / 2;
+    ring.position.set(p.x, 1.0, p.z);
+    group.add(ring);
+    const glow = new THREE.PointLight(0x39ff9d, 1.4, 8, 2);
+    glow.position.copy(ring.position);
+    group.add(glow);
+    scene.add(group);
+    return { position: new THREE.Vector3(p.x, 0, p.z), group, ring, radius: 2.4, cooldown: 0 };
+  });
+  function updateNitroPickups(dt) {
+    nitroPickups.forEach((pk) => {
+      if (pk.cooldown > 0) {
+        pk.cooldown -= dt;
+        pk.group.visible = pk.cooldown <= 0;
+      }
+      pk.ring.rotation.z += dt * 1.2;
+      pk.ring.position.y = 1.0 + Math.sin(performance.now() * 0.003 + pk.position.x) * 0.15;
+    });
+  }
+  function checkNitroPickup(ctrl) {
+    if (ctrl.nitro >= 0.98) return; // already full, nothing to collect
+    for (const pk of nitroPickups) {
+      if (pk.cooldown > 0) continue;
+      const dx = ctrl.position.x - pk.position.x;
+      const dz = ctrl.position.z - pk.position.z;
+      if (Math.hypot(dx, dz) < pk.radius) {
+        ctrl.nitro = 1;
+        pk.cooldown = 10;
+        pk.group.visible = false;
+        smoke.emit(ctrl.rig.group.position, 0.8);
+        if (ctrl === player) toast('Nitro refilled!');
+        break;
+      }
+    }
+  }
+
   // Player car
   const modelDef = CAR_MODELS[state.carIndex];
   const livery = CAR_LIVERIES[state.liveryIndex];
   const playerRig = buildCar(modelDef, livery.color);
   scene.add(playerRig.group);
+  // Real dynamic headlights only for the player's car (perf-bounded — see CarFactory.js note).
+  if (state.quality !== 'low') {
+    playerRig.headlightSpots.forEach((spot) => {
+      spot.intensity = 3.2;
+      spot.castShadow = state.quality === 'high';
+      if (spot.castShadow) { spot.shadow.mapSize.set(512, 512); spot.shadow.bias = -0.003; }
+    });
+  }
   const player = new CarController({ carRig: playerRig, statDef: modelDef });
   const startPoint = checkpoints[0];
   const startTangent = curve.getTangentAt(0);
@@ -293,17 +347,23 @@ function beginRace() {
       }
     };
   } else {
-    const aiCount = 3;
+    // 7 AI opponents + the player = an 8-car grid (matches the "POS 03/08" HUD format).
+    const aiCount = 7;
+    const gridCols = 2;
     for (let i = 0; i < aiCount; i++) {
       const mDef = CAR_MODELS[(state.carIndex + i + 1) % CAR_MODELS.length];
       const lv = CAR_LIVERIES[(state.liveryIndex + i * 2 + 1) % CAR_LIVERIES.length];
       const rig = buildCar(mDef, lv.color);
       scene.add(rig.group);
       const ctrl = new CarController({ carRig: rig, statDef: mDef, isAI: true });
-      const t0 = ((i + 1) / (aiCount + 1)) * 0.06;
-      const p0 = curve.getPointAt(t0);
-      ctrl.setStartTransform(new THREE.Vector3(p0.x + (i - 1) * 3, 0, p0.z), startHeading);
-      const ai = new AIDriver(ctrl, curve, t0, 0.78 + i * 0.06);
+      // Stagger the grid back in rows of 2 so 8 cars don't spawn stacked on top of each other.
+      const row = Math.floor(i / gridCols);
+      const col = i % gridCols;
+      const t0 = -(row + 1) * 0.012;
+      const p0 = curve.getPointAt(((t0 % 1) + 1) % 1);
+      const lateral = (col === 0 ? -1 : 1) * 3;
+      ctrl.setStartTransform(new THREE.Vector3(p0.x + lateral, 0, p0.z), startHeading);
+      const ai = new AIDriver(ctrl, curve, ((t0 % 1) + 1) % 1, 0.74 + Math.random() * 0.22);
       opponents.push({ ctrl, ai, name: `CPU ${i + 1}`, nextCP: 1, lap: 1 });
     }
   }
@@ -397,24 +457,40 @@ function beginRace() {
     toast(`Camera: ${camMode}`);
   }
   const camOffset = new THREE.Vector3();
+  // Camera shake — an impulse-decay system. bumpShake() is called on collisions/landings;
+  // the offset decays back to zero each frame so it reads as a jolt, not constant jitter.
+  let shakeIntensity = 0;
+  function bumpShake(amount) {
+    shakeIntensity = Math.min(1.5, shakeIntensity + amount);
+  }
   function updateCamera(dt) {
     const carPos = player.rig.group.position;
     const heading = player.heading;
     const dir = new THREE.Vector3(Math.sin(heading), 0, Math.cos(heading));
+    let shakeX = 0, shakeY = 0;
+    if (shakeIntensity > 0.001) {
+      shakeX = (Math.random() - 0.5) * shakeIntensity * 0.6;
+      shakeY = (Math.random() - 0.5) * shakeIntensity * 0.4;
+      shakeIntensity *= Math.max(0, 1 - dt * 6);
+    } else {
+      shakeIntensity = 0;
+    }
     if (camMode === 'chase') {
       camOffset.set(-dir.x * 8.5, 3.4, -dir.z * 8.5);
       const target = carPos.clone().add(camOffset);
       camera.position.lerp(target, Math.min(1, dt * 4));
+      camera.position.x += shakeX; camera.position.y += shakeY;
       camera.lookAt(carPos.x, carPos.y + 1.1, carPos.z);
       camera.fov = THREE.MathUtils.lerp(camera.fov, 62 + Math.min(20, player.speedKmh / 12), 0.05);
       camera.updateProjectionMatrix();
     } else if (camMode === 'hood') {
       const hoodPos = carPos.clone().add(new THREE.Vector3(dir.x * 1.4, 1.15, dir.z * 1.4));
       camera.position.lerp(hoodPos, Math.min(1, dt * 10));
+      camera.position.x += shakeX; camera.position.y += shakeY;
       camera.lookAt(carPos.x + dir.x * 10, carPos.y + 1, carPos.z + dir.z * 10);
     } else {
       const t = performance.now() * 0.0003;
-      camera.position.set(carPos.x + Math.sin(t) * 12, 5, carPos.z + Math.cos(t) * 12);
+      camera.position.set(carPos.x + Math.sin(t) * 12 + shakeX, 5 + shakeY, carPos.z + Math.cos(t) * 12);
       camera.lookAt(carPos);
     }
   }
@@ -472,9 +548,34 @@ function beginRace() {
           b.position.x -= nx * overlap; b.position.z -= nz * overlap;
           a.rig.group.position.copy(a.position);
           b.rig.group.position.copy(b.position);
+          const impactSpeed = Math.abs(a.speed) + Math.abs(b.speed);
           a.speed *= 0.82; b.speed *= 0.82;
+          if (a === playerCtrl || b === playerCtrl) bumpShake(Math.min(1, impactSpeed / 60));
         }
       }
+    }
+  }
+
+  // Off-road penalty: cars straying outside the road surface get a speed drag, using the
+  // nearest checkpoint segment as a cheap approximation of distance-from-centerline.
+  function segmentDistance(px, pz, ax, az, bx, bz) {
+    const abx = bx - ax, abz = bz - az;
+    const apx = px - ax, apz = pz - az;
+    const abLenSq = abx * abx + abz * abz || 1;
+    const t = THREE.MathUtils.clamp((apx * abx + apz * abz) / abLenSq, 0, 1);
+    const cx = ax + abx * t, cz = az + abz * t;
+    return Math.hypot(px - cx, pz - cz);
+  }
+  function applyOffRoadDrag(ctrl, dt) {
+    const prevCP = checkpoints[(ctrl.nextCP - 1 + CP_COUNT) % CP_COUNT];
+    const nextCP = checkpoints[ctrl.nextCP];
+    const dist = segmentDistance(ctrl.position.x, ctrl.position.z, prevCP.x, prevCP.z, nextCP.x, nextCP.z);
+    const offRoad = dist > trackWidth / 2 + 1.5; // small buffer past the curb before it bites
+    if (offRoad && !ctrl.airborne) {
+      ctrl.speed *= Math.max(0.9, 1 - dt * 1.4); // sand/grass drag
+      ctrl.offRoad = true;
+    } else {
+      ctrl.offRoad = false;
     }
   }
 
@@ -493,6 +594,7 @@ function beginRace() {
     }
     if (ctrl.justLanded) {
       smoke.emit(ctrl.rig.group.position, 1.4);
+      if (ctrl === player) bumpShake(0.7);
     }
   }
 
@@ -539,6 +641,11 @@ function beginRace() {
       resolveCarCollisions(player, opponents);
       checkRamps(player);
       opponents.forEach((o) => checkRamps(o.ctrl));
+      applyOffRoadDrag(player, dt);
+      opponents.forEach((o) => applyOffRoadDrag(o.ctrl, dt));
+      updateNitroPickups(dt);
+      checkNitroPickup(player);
+      opponents.forEach((o) => checkNitroPickup(o.ctrl));
 
       ghostRecorder.record(elapsedMs, player.position.x, player.position.z, player.heading);
       if (ghostPlayer && !ghostPlayer.finished) ghostPlayer.update(elapsedMs);
@@ -585,6 +692,11 @@ function beginRace() {
       resolveCarCollisions(player, opponents);
       checkRamps(player);
       opponents.forEach((o) => checkRamps(o.ctrl));
+      applyOffRoadDrag(player, dt);
+      opponents.forEach((o) => applyOffRoadDrag(o.ctrl, dt));
+      updateNitroPickups(dt);
+      checkNitroPickup(player);
+      opponents.forEach((o) => checkNitroPickup(o.ctrl));
       updateCamera(dt);
       updateHud(player, opponents, elapsedMs);
       smoke.update(dt);
@@ -594,6 +706,8 @@ function beginRace() {
     setInput(i) { Object.assign(touchState, i); },
     player,
     ramps,
+    nitroPickups,
+    curve,
   };
 
   raceCtx = {
@@ -645,10 +759,20 @@ function updateHud(player, opponents, elapsedMs) {
   $('nitroFill').style.width = `${player.nitro * 100}%`;
   $('hudTimer').textContent = formatRaceTime(elapsedMs);
 
-  const standings = [{ name: state.playerName + ' (you)', lap: player.lap, me: true }]
-    .concat(opponents.map((o) => ({ name: o.name, lap: o.ctrl.lap || 1, me: false })));
-  standings.sort((a, b) => b.lap - a.lap);
+  // Speed lines ramp in at high speed, and go full intensity during nitro for a burst feel.
+  const speedFrac = THREE.MathUtils.clamp((player.speedKmh - 110) / 100, 0, 1);
+  const linesOpacity = player.nitroActive ? 0.85 : speedFrac * 0.5;
+  $('speedLines').style.opacity = linesOpacity;
+
+  // Position = lap first, then how many checkpoints into the current lap (nextCP) as a proxy
+  // for track progress — cheap and accurate enough for standings without a curve-projection.
+  const standings = [{ name: state.playerName + ' (you)', lap: player.lap, cp: player.nextCP || 0, me: true }]
+    .concat(opponents.map((o) => ({ name: o.name, lap: o.ctrl.lap || 1, cp: o.ctrl.nextCP || 0, me: false })));
+  standings.sort((a, b) => (b.lap - a.lap) || (b.cp - a.cp));
   $('hudPositions').innerHTML = standings.map((s, i) => `<div class="pos-row ${s.me ? 'me' : ''}">${i + 1}. ${s.name}</div>`).join('');
+  const myRank = standings.findIndex((s) => s.me) + 1;
+  $('hudPos').textContent = String(myRank).padStart(2, '0');
+  $('hudPosTotal').textContent = String(standings.length).padStart(2, '0');
 }
 
 function showResults(timeMs, opponents) {

@@ -4,54 +4,59 @@ Created by **Urvashi Chandan**.
 
 A free, browser-based **3D multiplayer street racing game** — built from scratch with Three.js
 (WebGL), real-time multiplayer over Supabase Realtime, a Supabase Auth + Postgres leaderboard,
-and two fully animated worlds.
+and five fully animated worlds, each with its own weather, lighting, and hazards.
 
 > **Honest scope note:** true GTA/NFS-level visuals come from licensed car models, motion capture,
 > and photogrammetry built by hundreds of artists over years — not reachable from scratch for
-> free. What this build has instead: original stylized cars with glossy clear-coat paint, flared
-> wide-body arches, quad LED lighting and chrome wheels; two procedurally built circuits; bloom
-> post-processing; drift particles; and real-time multiplayer — a genuine arcade racer, not a
-> tech demo.
+> free. What this build has instead: 10 original stylized cars with glossy clear-coat paint,
+> flared wide-body arches, quad LED lighting and chrome wheels; five procedurally built circuits;
+> bloom post-processing; drift particles; dynamic headlights; camera shake; and real-time
+> multiplayer — a genuine arcade racer, not a tech demo.
 
 ## What's in it
 
 - **3D driving** — Three.js scene, arcade drift physics (accelerate/brake/steer/handbrake-drift/nitro),
-  chase / hood / orbit cameras, checkpoint-based lap tracking, 3 AI opponents in single-player,
-  car-vs-car collisions (cars physically bump/push each other on contact), gamepad support
-  (auto-detected — left stick steers, triggers for gas/brake, face buttons for nitro/handbrake).
+  chase / hood / orbit cameras, checkpoint-based lap tracking, **7 AI opponents (8-car grid,
+  live POS X/8 standings)**, car-vs-car collisions (cars physically bump/push each other on
+  contact), **off-road slowdown** (stray off the track surface and sand/grass drag kicks in),
+  **nitro pickups** (glowing rings placed around every circuit — drive through one for an instant
+  refill, then it's on a 10s cooldown), **camera shake** on collisions and hard landings, gamepad
+  support (auto-detected — left stick steers, triggers for gas/brake, face buttons for nitro/handbrake).
+- **Dynamic headlights** — the player's car casts a real forward-aimed spotlight that lights up
+  the road ahead (not just an emissive mesh); AI/ghost/remote cars keep the cheaper look to
+  control performance with 8 cars on screen at once.
+- **Speed lines** — a screen-space streak overlay ramps in above ~110 km/h and goes full
+  intensity during nitro, for a burst-of-speed feel.
 - **Ghost replay** — your fastest single-player run per world+car is saved locally and replays as
   a translucent ghost car next time, so you're always racing your own best. No backend needed.
-- **Four worlds** (pick in Settings):
+- **Five worlds** (pick in Settings):
   - **Neon District** — rain, flickering neon billboards, glossy reflective wet asphalt (env-mapped),
     passing background traffic light-streaks, occasional lightning, bloom-lit signs/headlights.
-  - **Sunset Highway** — golden-hour mountain pass, snow-capped peaks, distant city skyline, palm
+  - **Sunline Highway** — golden-hour mountain pass, snow-capped peaks, distant city skyline, palm
     trees, warm bloom-lit sun.
   - **Neon Desert** — Vegas × Dubai × Cyberpunk: a glowing futuristic skyline across a vast desert
     highway, cacti, drifting drone lights tracing loops across the sky.
   - **Deep Run** — abandoned underground tunnels/metro: concrete girders with neon strip lighting,
     a distant train light that sweeps past on a parallel track.
   - **Skyline** — rooftop racing across a dense futuristic city: towers crowd close on both sides,
-    holographic billboards glow, distant helipad rings glimmer below.
-  - All five share red/white apex curbing + guardrails and the same physics/AI/collisions.
-
-> **Update — Skyline now has real jumps.** `CarController` has proper airborne physics (gravity,
-> vertical velocity, landing detection, nose-tilt while airborne), and Skyline places two physical
-> ramps on the circuit that launch any car crossing them above ~14 units/s. Landing kicks up a
-> dust puff. AI opponents use ramps too. Verified: launched a car at a ramp trigger and confirmed
-> the full arc (liftoff → peak height → clean landing, `airborne` flag toggling correctly) with no
-> errors. Other worlds don't have ramps yet — easy to add following the same pattern.
-- **6 original car models × 9 liveries** — Apex GT (Hypercar/Legendary), Raptor X (Muscle/Epic),
-  Ghost RS (Sport/Rare), Titan AWD (Off-Road/Common), Viper ZX (Drift/Epic), Storm Evo (Rally/Rare)
-  — each with clear-coat/pearlescent paint, flared wide-body arches, chrome forged wheels with
-  visible brake calipers, canards, multi-tip exhausts, and a rotating 3D garage preview you can
-  drag to orbit. Garage shows rarity badge + Speed/Handling/Drift/Nitro stat bars.
+    holographic billboards glow, distant helipad rings glimmer below, and two physical **launch
+    ramps** send any car crossing them above ~14 units/s airborne (real gravity/airborne physics,
+    not a scripted hop — AI opponents use them too).
+  - All five share red/white apex curbing + guardrails, nitro pickups, and the same physics/AI.
+- **10 original car models × 9 liveries** — Shadow GT (Hypercar/Legendary), Inferno X
+  (Supercar/Epic), Cyber Veloce (Electric Hypercar/Rare), Nighthawk (Drift Coupe/Epic), Vortex RS
+  (Track/Rare), Phantom R (Highway GT/Legendary), Pulse GT (Sport/Epic), Fury ZX (Street
+  Racer/Epic), Aeron X (Track Coupe/Rare), Titan RS (Muscle/Legendary) — each with clear-coat/
+  pearlescent paint, flared wide-body arches, chrome forged wheels with visible brake calipers,
+  canards, multi-tip exhausts, and a rotating 3D garage preview you can drag to orbit. Garage
+  shows rarity badge + Speed/Handling/Drift/Nitro stat bars.
 - **Real-time multiplayer** — create/join a 5-letter room code, race live against other browsers
   via Supabase Realtime Broadcast (no custom game server to host/pay for).
 - **Auth + global leaderboard** — Supabase Auth (email) or guest play; best lap times saved to a
   Postgres table with row-level security; falls back to local `localStorage` if Supabase isn't
   configured yet, so the game works immediately with zero setup.
-- **Full page flow** — Home, Sign in/Guest, Garage, Multiplayer Lobby, Race HUD (lap/timer/speedo/
-  nitro/positions), Results, Leaderboard, Settings (quality/camera/world/sound/FPS), How to Play.
+- **Full page flow** — Home, Sign in/Guest, Garage, Multiplayer Lobby, Race HUD (position/lap/timer/
+  speedo/nitro/positions), Results, Leaderboard, Settings (quality/camera/world/sound/FPS), How to Play.
 - Mobile touch controls + responsive layout.
 
 ## Run it locally
@@ -152,7 +157,7 @@ velocity-x/
 │   ├── game/
 │   │   ├── CarFactory.js         6 procedural car models × 9 liveries (clear-coat paint, chrome, arches)
 │   │   ├── World.js               "Neon District" world: sky, city, rain, road, curbing, lights
-│   │   ├── World_Sunset.js         "Sunset Highway" world: mountains, skyline, golden-hour sun
+│   │   ├── World_Sunset.js         "Sunline Highway" world: mountains, skyline, golden-hour sun
 │   │   ├── World_Desert.js         "Neon Desert" world: glowing skyline, cacti, drone lights
 │   │   ├── World_Underground.js     "Deep Run" world: tunnel girders, neon strips, passing train
 │   │   ├── World_Rooftop.js          "Skyline" world: rooftop circuit, dense tower skyline

@@ -21,27 +21,216 @@ export const RARITY = {
   common:    { label: 'Common',    color: 0x9fb0c9 },
 };
 
-export const CAR_MODELS = [
-  { id: 'apex',   name: 'APEX GT',    class: 'Hypercar', rarity: 'legendary',
-    topSpeed: 0.97, accel: 0.72, handling: 0.68, drift: 0.6,  nitro: 0.9,
-    scale: 1.0,  lowSlung: 1.15, wide: 1.02, wing: true,  quadLights: false, hoodScoop: true,  arches: true },
-  { id: 'raptor', name: 'RAPTOR X',   class: 'Muscle', rarity: 'epic',
-    topSpeed: 0.82, accel: 0.9,  handling: 0.6,  drift: 0.75, nitro: 1.0,
-    scale: 1.1,  lowSlung: 0.92, wide: 1.12, wing: false, quadLights: true,  hoodScoop: true,  arches: true },
-  { id: 'ghost',  name: 'GHOST RS',   class: 'Sport', rarity: 'rare',
-    topSpeed: 0.88, accel: 0.8,  handling: 0.86, drift: 0.9,  nitro: 0.75,
-    scale: 0.96, lowSlung: 1.0,  wide: 0.96, wing: true,  quadLights: true,  hoodScoop: false, arches: true },
-  { id: 'titan',  name: 'TITAN AWD',  class: 'Off-Road', rarity: 'common',
-    topSpeed: 0.7,  accel: 0.65, handling: 0.92, drift: 0.55, nitro: 0.6,
-    scale: 1.18, lowSlung: 0.58, wide: 1.14, wing: false, quadLights: false, hoodScoop: true,  arches: true },
-  { id: 'viper',  name: 'VIPER ZX',   class: 'Drift', rarity: 'epic',
-    topSpeed: 0.8,  accel: 0.78, handling: 0.7,  drift: 1.0,  nitro: 0.85,
-    scale: 0.98, lowSlung: 1.05, wide: 1.06, wing: true,  quadLights: true,  hoodScoop: true,  arches: true },
-  { id: 'storm',  name: 'STORM EVO',  class: 'Rally', rarity: 'rare',
-    topSpeed: 0.75, accel: 0.85, handling: 0.95, drift: 0.7,  nitro: 0.8,
-    scale: 1.04, lowSlung: 0.78, wide: 1.04, wing: true,  quadLights: false, hoodScoop: true,  arches: true },
-];
+ export const CAR_MODELS = [
+  {
+    id: 'shadow-gt',
+    name: 'SHADOW GT',
+    class: 'Hypercar',
+    rarity: 'legendary',
+    topSpeed: 0.88,
+    accel: 0.86,
+    handling: 0.88,
+    drift: 0.82,
+    nitro: 0.86,
+    scale: 1.0,
+    lowSlung: 1.15,
+    wide: 1.08,
+    wing: true,
+    quadLights: false,
+    hoodScoop: true,
+    arches: true
+  },
 
+  {
+    id: 'inferno-x',
+    name: 'INFERNO X',
+    class: 'Supercar',
+    rarity: 'epic',
+    topSpeed: 0.84,
+    accel: 0.98,
+    handling: 0.72,
+    drift: 0.78,
+    nitro: 0.88,
+    scale: 0.98,
+    lowSlung: 1.18,
+    wide: 1.06,
+    wing: true,
+    quadLights: false,
+    hoodScoop: true,
+    arches: true
+  },
+
+  {
+    id: 'cyber-veloce',
+    name: 'CYBER VELOCE',
+    class: 'Electric Hypercar',
+    rarity: 'rare',
+    topSpeed: 0.82,
+    accel: 0.84,
+    handling: 0.98,
+    drift: 0.86,
+    nitro: 0.84,
+    scale: 0.99,
+    lowSlung: 1.12,
+    wide: 1.04,
+    wing: true,
+    quadLights: true,
+    hoodScoop: false,
+    arches: true
+  },
+
+  {
+    id: 'nighthawk',
+    name: 'NIGHTHAWK',
+    class: 'Drift Coupe',
+    rarity: 'epic',
+    topSpeed: 0.8,
+    accel: 0.82,
+    handling: 0.88,
+    drift: 1.0,
+    nitro: 0.82,
+    scale: 1.02,
+    lowSlung: 1.02,
+    wide: 1.02,
+    wing: false,
+    quadLights: true,
+    hoodScoop: false,
+    arches: true
+  },
+
+  {
+    id: 'vortex-rs',
+    name: 'VORTEX RS',
+    class: 'Track',
+    rarity: 'rare',
+    topSpeed: 1.0,
+    accel: 0.82,
+    handling: 0.76,
+    drift: 0.74,
+    nitro: 0.9,
+    scale: 0.97,
+    lowSlung: 1.2,
+    wide: 1.1,
+    wing: true,
+    quadLights: false,
+    hoodScoop: true,
+    arches: true
+  },
+
+  {
+    id: 'apex-r9',
+    name: 'APEX R9',
+    class: 'Grand Tourer',
+    rarity: 'epic',
+    topSpeed: 0.9,
+    accel: 0.82,
+    handling: 0.88,
+    drift: 0.68,
+    nitro: 0.84,
+    scale: 1.04,
+    lowSlung: 1.0,
+    wide: 1.04,
+    wing: false,
+    quadLights: true,
+    hoodScoop: false,
+    arches: true
+  },
+
+  {
+    id: 'phantom-r',
+    name: 'PHANTOM R',
+    class: 'Highway GT',
+    rarity: 'legendary',
+    topSpeed: 0.98,
+    accel: 0.88,
+    handling: 0.78,
+    drift: 0.76,
+    nitro: 0.94,
+    scale: 1.06,
+    lowSlung: 1.1,
+    wide: 1.04,
+    wing: false,
+    quadLights: false,
+    hoodScoop: true,
+    arches: true
+  },
+
+  {
+    id: 'pulse-gt',
+    name: 'PULSE GT',
+    class: 'Sport',
+    rarity: 'epic',
+    topSpeed: 0.86,
+    accel: 0.9,
+    handling: 0.84,
+    drift: 0.8,
+    nitro: 1.0,
+    scale: 0.97,
+    lowSlung: 1.0,
+    wide: 0.98,
+    wing: true,
+    quadLights: true,
+    hoodScoop: false,
+    arches: true
+  },
+
+  {
+    id: 'fury-zx',
+    name: 'FURY ZX',
+    class: 'Street Racer',
+    rarity: 'epic',
+    topSpeed: 0.9,
+    accel: 0.96,
+    handling: 0.78,
+    drift: 0.88,
+    nitro: 0.86,
+    scale: 1.04,
+    lowSlung: 0.9,
+    wide: 1.1,
+    wing: false,
+    quadLights: true,
+    hoodScoop: true,
+    arches: true
+  },
+
+  {
+    id: 'aeron-x',
+    name: 'AERON X',
+    class: 'Track Coupe',
+    rarity: 'rare',
+    topSpeed: 0.84,
+    accel: 0.86,
+    handling: 1.0,
+    drift: 0.9,
+    nitro: 0.82,
+    scale: 0.95,
+    lowSlung: 1.15,
+    wide: 0.97,
+    wing: true,
+    quadLights: false,
+    hoodScoop: false,
+    arches: true
+  },
+
+  {
+    id: 'titan-rs',
+    name: 'TITAN RS',
+    class: 'Muscle',
+    rarity: 'legendary',
+    topSpeed: 0.92,
+    accel: 0.88,
+    handling: 0.86,
+    drift: 0.7,
+    nitro: 0.92,
+    scale: 1.12,
+    lowSlung: 0.85,
+    wide: 1.16,
+    wing: false,
+    quadLights: true,
+    hoodScoop: true,
+    arches: true
+  }
+];
 function paintMaterial(liveryColor) {
   return new THREE.MeshPhysicalMaterial({
     color: liveryColor,
@@ -231,6 +420,22 @@ export function buildCar(modelDef, liveryColor) {
     });
   }
 
+  // Dynamic headlight spotlights — real light sources that actually illuminate the road ahead,
+  // not just emissive meshes. Built for every car but left at intensity 0 by default; main.js
+  // turns the player's up (keeping AI/ghost/remote cars cheap — real-time shadowed spotlights
+  // on all 8 cars at once would be a real perf hit).
+  const headlightSpots = [];
+  headlights.forEach((hl) => {
+    const spot = new THREE.SpotLight(0xdfefff, 0, 26, Math.PI / 6.5, 0.4, 1.4);
+    spot.position.copy(hl.position);
+    const target = new THREE.Object3D();
+    target.position.set(hl.position.x * 0.3, hl.position.y - 0.3, hl.position.z + 20);
+    car.add(target);
+    spot.target = target;
+    car.add(spot);
+    headlightSpots.push(spot);
+  });
+
   // Taillights — full-width LED strip look
   const taillights = [];
   const tailStrip = new THREE.Mesh(new THREE.BoxGeometry(1.7 * wide, 0.1, 0.05), taillightMat);
@@ -259,7 +464,9 @@ export function buildCar(modelDef, liveryColor) {
     group: car,
     wheels: { fl, fr, rl, rr },
     headlights,
+    headlightSpots,
     taillights,
     underGlow,
   };
 }
+

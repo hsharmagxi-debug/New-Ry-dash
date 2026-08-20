@@ -24,6 +24,33 @@
 
     <!-- ===================== HOME ===================== -->
     <section id="screen-home" class="screen">
+      <!-- RYDASH ORIGINAL NEON DISTRICT: animated scene layers live independently from the UI -->
+      <div class="home-world" aria-hidden="true">
+        <div class="world-sky"></div>
+        <div class="world-buildings world-buildings-back"></div>
+        <div class="world-buildings world-buildings-mid"></div>
+        <div class="world-haze"></div>
+        <div class="world-road"></div>
+        <div class="world-lane lane-a"></div>
+        <div class="world-lane lane-b"></div>
+        <div class="world-lane lane-c"></div>
+        <div class="world-traffic traffic-a"></div>
+        <div class="world-traffic traffic-b"></div>
+        <div class="world-traffic traffic-c"></div>
+        <div class="rain rain-a"></div>
+        <div class="rain rain-b"></div>
+        <div class="rain rain-c"></div>
+        <div class="lightning"></div>
+      </div>
+      <div class="home-fx" aria-hidden="true">
+        <span class="fx-rain fx-rain-1"></span>
+        <span class="fx-rain fx-rain-2"></span>
+        <span class="fx-rain fx-rain-3"></span>
+        <span class="fx-headlight fx-headlight-1"></span>
+        <span class="fx-headlight fx-headlight-2"></span>
+        <span class="fx-fog fx-fog-1"></span>
+        <span class="fx-fog fx-fog-2"></span>
+      </div>
       <div class="bg-grid"></div>
       <div class="bg-glow"></div>
       <nav class="topnav">
@@ -35,8 +62,9 @@
       </nav>
 
       <div class="hero">
+        <div class="hero-kicker"><span class="status-dot"></span> LIVE STREET RACING <span class="kicker-divider"></span> SEASON 01</div>
         <h1 class="hero-title">STREET RACING<br /><span class="accent">REDEFINED</span></h1>
-        <p class="hero-sub">Real-time 3D multiplayer racing. Pick your ride, tune your drift, race the world — free, in your browser.</p>
+        <p class="hero-sub">Race the city. Own the night. Choose your ride, hit the neon streets and leave your rivals in the neon.</p>
         <div class="hero-actions">
           <button id="playBtn" class="btn btn-primary btn-lg">▶ QUICK RACE</button>
           <button id="multiplayerBtn" class="btn btn-secondary btn-lg">🌐 MULTIPLAYER</button>
@@ -49,10 +77,19 @@
         </div>
       </div>
 
+      <aside class="live-card">
+        <div class="live-card-top"><span>LIVE RACES</span><span class="live-dot"></span></div>
+        <div class="live-number">1,248</div>
+        <div class="live-label">DRIVERS ONLINE</div>
+        <div class="track-mini" aria-hidden="true"><span></span><i></i></div>
+        <div class="live-meta"><span>NEON DISTRICT</span><span>3 LAPS</span></div>
+      </aside>
+
       <div id="homeCarPreview" class="home-car-preview"></div>
+      <div class="hero-bottomline"><span>🌃 NEON DISTRICT</span><span>•</span><span>AI TRAFFIC</span><span>•</span><span>NITRO ON</span></div>
       <footer class="foot-credit">
-        <p class="foot-tagline">RYD<span class="accent">ASH</span> — Drive. Drift. Dominate.</p>
-        <p class="foot-sub">Created by Urvashi Chandan · Built with Three.js · Supabase Realtime</p>
+        <p class="foot-tagline">RYD<span class="accent">ASH</span> <span class="tagline-dash">—</span> DRIVE. DRIFT. DOMINATE.</p>
+        <p class="foot-sub">Created by Urvashi Chandan</p>
       </footer>
     </section>
 
@@ -131,9 +168,11 @@
     <!-- ===================== RACE (GAME) ===================== -->
     <section id="screen-race" class="screen">
       <canvas id="gameCanvas"></canvas>
+      <div id="speedLines" class="speed-lines"></div>
 
       <div id="raceHud" class="race-hud">
         <div class="hud-top-left">
+          <div class="hud-pos">POS <span id="hudPos">01</span>/<span id="hudPosTotal">08</span></div>
           <div class="hud-lap">LAP <span id="hudLap">1</span>/<span id="hudTotalLaps">3</span></div>
           <div class="hud-timer" id="hudTimer">00:00.000</div>
         </div>
@@ -211,7 +250,7 @@
           <select id="settingCamera"><option value="chase">Chase</option><option value="hood">Hood</option><option value="orbit">Orbit</option></select>
         </div>
         <div class="setting-row"><label>World</label>
-          <select id="settingWorld"><option value="neon">Neon District (rain, night city)</option><option value="sunset">Sunset Highway (mountains, golden hour)</option><option value="desert">Neon Desert (Vegas-style skyline, drones)</option><option value="underground">Deep Run (underground tunnels, passing train)</option><option value="rooftop">Skyline (rooftop racing, towers)</option></select>
+          <select id="settingWorld"><option value="neon">Neon District (rain, night city)</option><option value="sunset">Sunline Highway (mountains, golden hour)</option><option value="desert">Neon Desert (Vegas-style skyline, drones)</option><option value="underground">Deep Run (underground tunnels, passing train)</option><option value="rooftop">Skyline (rooftop racing, towers)</option></select>
         </div>
         <div class="setting-row"><label>Sound Effects</label>
           <input id="settingSound" type="checkbox" checked />

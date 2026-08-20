@@ -309,6 +309,9 @@ export class HomeAtmosphere {
 
     // Traffic Headlights & Taillights
     this._drawTraffic(ctx, w, h);
+
+    // Subtle rain, kept light so it reads as atmosphere, not a downpour
+    this._drawRain(ctx, w, h, 'rgba(140, 210, 255, 0.18)');
   }
 
   /* ------------------- 02 SUNSET HIGHWAY (VELORA) ------------------- */

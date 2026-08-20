@@ -50,7 +50,6 @@ const state = {
 const $ = (id) => document.getElementById(id);
 const qs = (sel) => document.querySelector(sel);
 
-let homeStage = null;
 let garageStage = null;
 let homeAtmosphere = null;
 
@@ -65,6 +64,11 @@ function initHomeAtmosphere() {
 
 function updateHomeHeroCardUI() {
   const m = CAR_MODELS[state.carIndex] || CAR_MODELS[0];
+  const photoEl = $('heroCarPhoto');
+  if (photoEl) {
+    photoEl.src = `/cars/car-${state.carIndex}.jpg`;
+    photoEl.alt = m.name;
+  }
   const nameEl = $('heroCarName');
   if (nameEl) nameEl.textContent = m.name;
   const rarityEl = $('heroCarRarity');
@@ -108,21 +112,7 @@ function updateHomeHeroCardUI() {
 }
 
 function updatePreviewStages() {
-  if (homeStage) homeStage.setCarByIndex(state.carIndex, state.liveryIndex);
   if (garageStage) garageStage.setCarByIndex(state.carIndex, state.liveryIndex);
-  updateHomeHeroCardUI();
-}
-
-function initHomeHeroStage() {
-  const container = $('homeHeroStage');
-  if (container && !homeStage) {
-    homeStage = new PreviewStage(container, { interactive: false });
-    homeStage.setCarByIndex(state.carIndex, state.liveryIndex);
-    homeStage.start();
-  } else if (homeStage) {
-    homeStage.setCarByIndex(state.carIndex, state.liveryIndex);
-    homeStage.start();
-  }
   updateHomeHeroCardUI();
 }
 
@@ -158,15 +148,12 @@ function showScreen(id) {
   }
 
   if (id === 'screen-home') {
-    initHomeHeroStage();
-    homeStage?.start();
+    updateHomeHeroCardUI();
     garageStage?.stop();
   } else if (id === 'screen-garage') {
     initGarageStage();
     garageStage?.start();
-    homeStage?.stop();
   } else {
-    homeStage?.stop();
     garageStage?.stop();
   }
 }
@@ -241,6 +228,21 @@ async function boot() {
 
   const howtoBtn = $('howtoBtn') || $('dockHowToBtn');
   if (howtoBtn) howtoBtn.onclick = () => showScreen('screen-howto');
+
+  // Nav tabs / quick-launch shortcuts share one action via data-nav, so the same
+  // destination can be reachable from more than one button without id collisions.
+  document.querySelectorAll('[data-nav]').forEach((btn) => {
+    const target = btn.dataset.nav;
+    btn.onclick = () => {
+      if (target === 'garage') { showScreen('screen-garage'); openGarage(() => showScreen('screen-home')); }
+      else if (target === 'leaderboard') { showScreen('screen-leaderboard'); loadLeaderboard(); }
+      else if (target === 'world') { showScreen('screen-worldmap'); setWorld(state.worldId); updateLapPillsUI(); }
+      else if (target === 'settings') showScreen('screen-settings');
+      else if (target === 'howto') showScreen('screen-howto');
+      else if (target === 'multiplayer') { sound.init(); showScreen('screen-lobby'); }
+      else if (target === 'home') showScreen('screen-home');
+    };
+  });
 
   // Quick Car Strip Buttons on Home
   document.querySelectorAll('.quick-car-btn').forEach((btn) => {

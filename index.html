@@ -32,14 +32,20 @@
     <section id="screen-home" class="screen">
       <!-- 60fps Live Atmospheric Background Canvas (8 World Concepts) -->
       <canvas id="homeAtmosphereCanvas" class="home-atmosphere-canvas" aria-hidden="true"></canvas>
-      <div class="bg-grid"></div>
-      <div class="bg-glow"></div>
 
-      <!-- Top Nav Bar with Socials & Auth Status -->
+      <!-- Top Nav Bar: Brand, Primary Tabs, Socials & Auth Status -->
       <nav class="topnav">
         <div class="brand">
-          <span class="screen-idx-tag">01 HOME</span>
           RYD<span class="accent">ASH</span>
+        </div>
+        <div class="nav-tabs">
+          <button class="nav-tab active" data-nav="home">HOME</button>
+          <button class="nav-tab" data-nav="garage">GARAGE</button>
+          <button class="nav-tab" data-nav="world">WORLD</button>
+          <button class="nav-tab" data-nav="leaderboard">LEADERBOARD</button>
+          <button class="nav-tab" data-nav="multiplayer">MULTIPLAYER</button>
+          <button class="nav-tab" data-nav="settings">SETTINGS</button>
+          <button class="nav-tab" data-nav="howto">HOW TO PLAY</button>
         </div>
         <div class="nav-socials">
           <a href="https://discord.com" target="_blank" rel="noopener noreferrer" class="social-icon" title="Discord" aria-label="Discord">
@@ -70,12 +76,14 @@
             <span class="pulse-dot-green"></span>
             <span>LIVE STREET RACING • SEASON 01</span>
           </div>
-          
+
           <h1 class="hero-massive-title">
             STREET<br />
             RACING<br />
             <span class="accent">REDEFINED</span>
           </h1>
+
+          <p class="hero-identity">RYDASH — RACE THE CITY. OWN THE NIGHT.</p>
 
           <p class="hero-desc">
             Race the city. Own the night. Choose your ride, hit the neon streets and leave your rivals in the neon.
@@ -83,29 +91,23 @@
 
           <!-- Main CTA Buttons -->
           <div class="hero-cta-row">
-            <button id="playBtn" class="btn btn-primary btn-cyan-glow">
-              <span class="btn-icon">▶</span> QUICK RACE
+            <button id="playBtn" class="btn btn-primary btn-cyan-glow btn-game">
+              <span class="btn-icon">▶</span>
+              <span class="btn-text"><span class="btn-label">QUICK RACE</span><span class="btn-sub"><span id="homeCurrentWorldLabel">NEON DISTRICT</span> · AI TRAFFIC</span></span>
             </button>
-            <button id="multiplayerBtn" class="btn btn-secondary btn-purple-outline">
-              <span class="btn-icon">🌐</span> MULTIPLAYER
+            <button id="multiplayerBtn" class="btn btn-secondary btn-purple-outline btn-game">
+              <span class="btn-icon">🌐</span>
+              <span class="btn-text"><span class="btn-label">MULTIPLAYER</span><span class="btn-sub">NITRO ON</span></span>
             </button>
           </div>
 
-          <!-- 4-Button Action Dock -->
+          <!-- Quick-launch shortcuts (secondary to the top nav) -->
           <div class="hero-dock-row">
-            <button id="garageBtn" class="dock-btn-compact"><span class="dock-icon">🚗</span> GARAGE</button>
-            <button id="leaderboardBtn" class="dock-btn-compact"><span class="dock-icon">🏆</span> LEADERBOARD</button>
-            <button id="settingsBtn" class="dock-btn-compact"><span class="dock-icon">⚙️</span> SETTINGS</button>
-            <button id="howtoBtn" class="dock-btn-compact"><span class="dock-icon">❓</span> HOW TO PLAY</button>
-          </div>
-
-          <!-- Status Bar -->
-          <div class="hero-status-chips">
-            <button id="worldmapBtn" class="status-chip active" title="Change Circuit Map">
-              <span class="chip-icon">🌌</span> <span id="homeCurrentWorldLabel">NEON DISTRICT</span>
-            </button>
-            <span class="status-chip"><span class="chip-icon">🚗</span> AI TRAFFIC</span>
-            <span class="status-chip"><span class="chip-icon">🔥</span> NITRO ON</span>
+            <button id="garageBtn" class="dock-btn-compact" data-nav="garage"><span class="dock-icon">🚗</span> GARAGE</button>
+            <button id="leaderboardBtn" class="dock-btn-compact" data-nav="leaderboard"><span class="dock-icon">🏆</span> LEADERBOARD</button>
+            <button class="dock-btn-compact" data-nav="world"><span class="dock-icon">🌐</span> WORLD</button>
+            <button id="settingsBtn" class="dock-btn-compact" data-nav="settings"><span class="dock-icon">⚙️</span> SETTINGS</button>
+            <button id="howtoBtn" class="dock-btn-compact" data-nav="howto"><span class="dock-icon">❓</span> HOW TO PLAY</button>
           </div>
         </div>
 
@@ -124,8 +126,10 @@
               </div>
             </div>
 
-            <!-- Live 3D Turntable Container -->
-            <div id="homeHeroStage" class="home-hero-stage"></div>
+            <!-- Featured Car Photo -->
+            <div class="hero-car-photo-wrap">
+              <img id="heroCarPhoto" class="hero-car-photo" src="/cars/car-0.jpg" alt="SHADOW GT" />
+            </div>
 
             <!-- Real-time Stat Bars -->
             <div class="hero-stats-grid">

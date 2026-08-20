@@ -9,6 +9,7 @@ import { buildWorld as buildStormWorld } from './game/World_Storm.js';
 import { buildWorld as buildCoastalWorld } from './game/World_Coastal.js';
 import { buildWorld as buildVerticalWorld } from './game/World_Vertical.js';
 import { loadGhost, saveGhostIfBest, GhostRecorder, GhostPlayer } from './game/Ghost.js';
+import { HomeAtmosphere } from './game/HomeAtmosphere.js';
 
 const WORLDS = {
   neon: { label: 'Neon Rain City', build: buildNeonWorld },
@@ -51,6 +52,16 @@ const qs = (sel) => document.querySelector(sel);
 
 let homeStage = null;
 let garageStage = null;
+let homeAtmosphere = null;
+
+function initHomeAtmosphere() {
+  const canvas = $('homeAtmosphereCanvas');
+  if (canvas && !homeAtmosphere) {
+    homeAtmosphere = new HomeAtmosphere(canvas);
+    homeAtmosphere.setWorld(state.worldId);
+    homeAtmosphere.start();
+  }
+}
 
 function updateHomeHeroCardUI() {
   const m = CAR_MODELS[state.carIndex] || CAR_MODELS[0];
@@ -138,6 +149,13 @@ function showScreen(id) {
   document.querySelectorAll('[data-back]').forEach((btn) => {
     btn.onclick = () => showScreen(btn.dataset.back);
   });
+
+  if (id === 'screen-home' || id === 'screen-worldmap') {
+    initHomeAtmosphere();
+    homeAtmosphere?.start();
+  } else {
+    homeAtmosphere?.stop();
+  }
 
   if (id === 'screen-home') {
     initHomeHeroStage();
@@ -1310,6 +1328,8 @@ function setWorld(id) {
   const label = (WORLDS[id] || WORLDS.neon).label;
   const sel = $('worldMapSelected');
   if (sel) sel.textContent = `Selected: ${label}`;
+  if (homeAtmosphere) homeAtmosphere.setWorld(id);
+  updateHomeHeroCardUI();
 }
 
 function updateLapPillsUI() {

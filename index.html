@@ -176,20 +176,33 @@
 
       <div id="raceHud" class="race-hud">
         <div class="hud-top-left">
-          <div class="hud-pos">POS <span id="hudPos">01</span>/<span id="hudPosTotal">08</span></div>
-          <div class="hud-lap">LAP <span id="hudLap">1</span>/<span id="hudTotalLaps">3</span></div>
-          <div class="hud-timer" id="hudTimer">00:00.000</div>
-        </div>
-        <div class="hud-top-right">
+          <div class="hud-pos-lap-row">
+            <div class="hud-chip"><span class="hud-chip-label">POS</span><span id="hudPos">01</span><span class="hud-chip-sep">/</span><span id="hudPosTotal">08</span></div>
+            <div class="hud-chip"><span class="hud-chip-label">LAP</span><span id="hudLap">1</span><span class="hud-chip-sep">/</span><span id="hudTotalLaps">3</span></div>
+          </div>
           <div id="hudPositions" class="hud-positions"></div>
         </div>
+        <div class="hud-top-right">
+          <div class="hud-chip hud-chip-time"><span class="hud-chip-label">TIME</span><span id="hudTimer">00:00.000</span></div>
+          <div class="hud-chip hud-chip-time"><span class="hud-chip-label">BEST</span><span id="hudBest">--:--.---</span></div>
+        </div>
+        <div class="hud-bottom-left">
+          <canvas id="minimapCanvas" width="140" height="140"></canvas>
+        </div>
         <div class="hud-bottom-right">
-          <div class="speedo">
-            <div class="speedo-value"><span id="hudSpeed">0</span><span class="speedo-unit">km/h</span></div>
-            <div class="gear-nitro">
-              <span id="hudGear" class="gear">D</span>
-              <div class="nitro-bar"><div id="nitroFill" class="nitro-fill"></div></div>
+          <div class="speedo-circular">
+            <svg viewBox="0 0 160 160" class="speedo-ring">
+              <circle cx="80" cy="80" r="70" class="speedo-track" />
+              <circle cx="80" cy="80" r="70" class="speedo-fill" id="speedoFillRing" />
+            </svg>
+            <div class="speedo-center">
+              <span id="hudSpeed" class="speedo-value">0</span>
+              <span class="speedo-unit">KM/H</span>
             </div>
+          </div>
+          <div class="gear-nitro">
+            <span id="hudGear" class="gear">D</span>
+            <div class="nitro-bar"><div id="nitroFill" class="nitro-fill"></div></div>
           </div>
         </div>
         <div id="countdownOverlay" class="countdown-overlay hidden"><span id="countdownNum">3</span></div>

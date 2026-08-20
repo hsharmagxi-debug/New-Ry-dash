@@ -265,6 +265,60 @@ function beginRace() {
   const CP_COUNT = 10;
   const checkpoints = curve.getSpacedPoints(CP_COUNT).slice(0, CP_COUNT);
 
+  // Minimap — a live top-down radar. Track outline + the world->map transform are computed once
+  // (the curve never changes mid-race); car dots are re-projected with that same transform and
+  // redrawn every frame.
+  const minimapCanvas = $('minimapCanvas');
+  const minimapCtx = minimapCanvas ? minimapCanvas.getContext('2d') : null;
+  let minimapPoints = null;
+  let mapProject = null;
+  if (minimapCtx) {
+    const raw = curve.getSpacedPoints(48).map((p) => ({ x: p.x, z: p.z }));
+    const xs = raw.map((p) => p.x), zs = raw.map((p) => p.z);
+    const minX = Math.min(...xs), maxX = Math.max(...xs), minZ = Math.min(...zs), maxZ = Math.max(...zs);
+    const span = Math.max(maxX - minX, maxZ - minZ) || 1;
+    const pad = 18, size = minimapCanvas.width;
+    const scale = (size - pad * 2) / span;
+    const centerX = (minX + maxX) / 2, centerZ = (minZ + maxZ) / 2;
+    mapProject = (wx, wz) => ({ x: size / 2 + (wx - centerX) * scale, y: size / 2 + (wz - centerZ) * scale });
+    minimapPoints = raw.map((p) => mapProject(p.x, p.z));
+  }
+  function updateMinimap() {
+    if (!minimapCtx) return;
+    const size = minimapCanvas.width;
+    minimapCtx.clearRect(0, 0, size, size);
+    minimapCtx.save();
+    minimapCtx.beginPath();
+    minimapCtx.arc(size / 2, size / 2, size / 2 - 1, 0, Math.PI * 2);
+    minimapCtx.clip(); // circular clip so the track/dots never poke past the round canvas edge
+
+    minimapCtx.beginPath();
+    minimapPoints.forEach((p, i) => (i === 0 ? minimapCtx.moveTo(p.x, p.y) : minimapCtx.lineTo(p.x, p.y)));
+    minimapCtx.closePath();
+    minimapCtx.strokeStyle = 'rgba(0,229,255,.55)';
+    minimapCtx.lineWidth = 3;
+    minimapCtx.stroke();
+
+    opponents.forEach((o) => {
+      const p = mapProject(o.ctrl.position.x, o.ctrl.position.z);
+      minimapCtx.fillStyle = '#ff2e88';
+      minimapCtx.beginPath();
+      minimapCtx.arc(p.x, p.y, 2.6, 0, Math.PI * 2);
+      minimapCtx.fill();
+    });
+
+    const pp = mapProject(player.position.x, player.position.z);
+    minimapCtx.fillStyle = '#00e5ff';
+    minimapCtx.shadowColor = '#00e5ff';
+    minimapCtx.shadowBlur = 6;
+    minimapCtx.beginPath();
+    minimapCtx.arc(pp.x, pp.y, 4, 0, Math.PI * 2);
+    minimapCtx.fill();
+    minimapCtx.shadowBlur = 0;
+
+    minimapCtx.restore();
+  }
+
   // Nitro pickups — glowing rings placed around every circuit (world-agnostic, unlike ramps).
   // Driving through one instantly refills nitro; it goes on cooldown and reappears after a bit.
   const NITRO_PICKUP_TS = [0.12, 0.32, 0.5, 0.68, 0.85];
@@ -522,6 +576,8 @@ function beginRace() {
   let raceFinished = false;
   let elapsedMs = 0;
   let lastFrame = performance.now();
+  let lastLapStartMs = 0;
+  let bestLapMs = null;
   runCountdown(() => { raceStarted = true; lastFrame = performance.now(); });
 
   $('hudTotalLaps').textContent = state.totalLaps;
@@ -651,6 +707,12 @@ function beginRace() {
       player.step(dt);
       if (checkpointAdvance(player, player.rig.group.position)) {
         $('hudLap').textContent = Math.min(player.lap, state.totalLaps);
+        const lapTime = elapsedMs - lastLapStartMs;
+        lastLapStartMs = elapsedMs;
+        if (bestLapMs === null || lapTime < bestLapMs) {
+          bestLapMs = lapTime;
+          $('hudBest').textContent = formatRaceTime(bestLapMs);
+        }
         if (player.lap > state.totalLaps) finishRace();
       }
       if (player.driftFactor > 0.15 && Math.abs(player.speed) > 4) {
@@ -684,6 +746,7 @@ function beginRace() {
 
       updateCamera(dt);
       updateHud(player, opponents, elapsedMs);
+      updateMinimap();
       if (motionBlur.enabled) {
         const speedFrac = THREE.MathUtils.clamp((player.speedKmh - 130) / 120, 0, 1);
         const targetBlur = player.nitroActive ? 1 : speedFrac;
@@ -722,7 +785,16 @@ function beginRace() {
       readInput();
       player.applyPlayerInput(input, dt);
       player.step(dt);
-      opponents.forEach((o) => { o.ai.step(dt); o.ctrl.step(dt); });
+      if (checkpointAdvance(player, player.rig.group.position)) {
+        $('hudLap').textContent = Math.min(player.lap, state.totalLaps);
+        const lapTime = elapsedMs - lastLapStartMs;
+        lastLapStartMs = elapsedMs;
+        if (bestLapMs === null || lapTime < bestLapMs) {
+          bestLapMs = lapTime;
+          $('hudBest').textContent = formatRaceTime(bestLapMs);
+        }
+      }
+      opponents.forEach((o) => { o.ai.step(dt); o.ctrl.step(dt); checkpointAdvance(o.ctrl, o.ctrl.rig.group.position); });
       resolveCarCollisions(player, opponents);
       checkRamps(player);
       opponents.forEach((o) => checkRamps(o.ctrl));
@@ -734,6 +806,7 @@ function beginRace() {
       emitAllNitroFlames();
       updateCamera(dt);
       updateHud(player, opponents, elapsedMs);
+      updateMinimap();
       if (motionBlur.enabled) {
         const speedFrac = THREE.MathUtils.clamp((player.speedKmh - 130) / 120, 0, 1);
         const targetBlur = player.nitroActive ? 1 : speedFrac;
@@ -796,11 +869,21 @@ function formatRaceTime(ms) {
   return `${m}:${s.padStart(6, '0')}`;
 }
 
+const SPEEDO_MAX_KMH = 320; // dial's full-sweep speed — matches the highest realistic top speed
+const SPEEDO_CIRCUMFERENCE = 2 * Math.PI * 70; // r=70, matches the SVG circle radius
+
 function updateHud(player, opponents, elapsedMs) {
   $('hudSpeed').textContent = Math.round(player.speedKmh);
   $('hudGear').textContent = player.speed < -0.2 ? 'R' : 'D';
   $('nitroFill').style.width = `${player.nitro * 100}%`;
   $('hudTimer').textContent = formatRaceTime(elapsedMs);
+
+  // Circular speedo — arc fills clockwise with speed, color shifts cyan -> orange -> red as a
+  // cheap "redline" cue.
+  const speedoFrac = THREE.MathUtils.clamp(player.speedKmh / SPEEDO_MAX_KMH, 0, 1);
+  const ring = $('speedoFillRing');
+  ring.style.strokeDashoffset = SPEEDO_CIRCUMFERENCE * (1 - speedoFrac);
+  ring.style.stroke = speedoFrac > 0.85 ? '#ff2e2e' : speedoFrac > 0.6 ? '#ff7a1a' : '#00e5ff';
 
   // Speed lines ramp in at high speed, and go full intensity during nitro for a burst feel.
   const speedFrac = THREE.MathUtils.clamp((player.speedKmh - 110) / 100, 0, 1);

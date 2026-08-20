@@ -15,7 +15,7 @@ const WORLDS = {
   rooftop: { label: 'Skyline', build: buildRooftopWorld },
 };
 import { CarController, AIDriver } from './game/CarController.js';
-import { buildComposer, SmokeSystem } from './game/Effects.js';
+import { buildComposer, SmokeSystem, SparkSystem } from './game/Effects.js';
 import { PreviewStage } from './game/PreviewStage.js';
 import { MultiplayerRoom } from './net/multiplayer.js';
 import { supabaseReady } from './net/supabaseClient.js';
@@ -61,7 +61,7 @@ function toast(msg, ms = 2600) {
 
 /* ============================== LOADING ============================== */
 async function boot() {
-  const steps = ['Loading assets…', 'Building world…', 'Warming up engine…', 'Connecting services…', 'Ready.'];
+  const steps = ['Initializing street network…', 'Loading garage…', 'Connecting racers…', 'Warming up engine…', 'Ready.'];
   for (let i = 0; i < steps.length; i++) {
     $('loaderLabel').textContent = steps[i];
     $('loaderFill').style.width = `${((i + 1) / steps.length) * 100}%`;
@@ -383,8 +383,10 @@ function beginRace() {
   }
 
   const smoke = new SmokeSystem(scene, 100);
-  const { composer, bloom } = buildComposer(renderer, scene, camera, width, height);
+  const sparks = new SparkSystem(scene, 80);
+  const { composer, bloom, motionBlur } = buildComposer(renderer, scene, camera, width, height);
   bloom.enabled = state.quality !== 'low';
+  motionBlur.enabled = state.quality !== 'low';
 
   // Input
   const input = { throttle: 0, steer: 0, handbrake: false, nitro: false };
@@ -550,6 +552,11 @@ function beginRace() {
           b.rig.group.position.copy(b.position);
           const impactSpeed = Math.abs(a.speed) + Math.abs(b.speed);
           a.speed *= 0.82; b.speed *= 0.82;
+          if (impactSpeed > 8) {
+            const contactPoint = a.rig.group.position.clone().lerp(b.rig.group.position, 0.5);
+            contactPoint.y += 0.4;
+            sparks.emit(contactPoint, Math.min(16, Math.round(impactSpeed)));
+          }
           if (a === playerCtrl || b === playerCtrl) bumpShake(Math.min(1, impactSpeed / 60));
         }
       }
@@ -656,9 +663,15 @@ function beginRace() {
 
       updateCamera(dt);
       updateHud(player, opponents, elapsedMs);
+      if (motionBlur.enabled) {
+        const speedFrac = THREE.MathUtils.clamp((player.speedKmh - 130) / 120, 0, 1);
+        const targetBlur = player.nitroActive ? 1 : speedFrac;
+        motionBlur.uniforms.uIntensity.value = THREE.MathUtils.lerp(motionBlur.uniforms.uIntensity.value, targetBlur, Math.min(1, dt * 6));
+      }
     }
 
     smoke.update(dt);
+    sparks.update(dt);
     updateWorld(dt);
     composer.render();
 
@@ -699,7 +712,13 @@ function beginRace() {
       opponents.forEach((o) => checkNitroPickup(o.ctrl));
       updateCamera(dt);
       updateHud(player, opponents, elapsedMs);
+      if (motionBlur.enabled) {
+        const speedFrac = THREE.MathUtils.clamp((player.speedKmh - 130) / 120, 0, 1);
+        const targetBlur = player.nitroActive ? 1 : speedFrac;
+        motionBlur.uniforms.uIntensity.value = THREE.MathUtils.lerp(motionBlur.uniforms.uIntensity.value, targetBlur, Math.min(1, dt * 6));
+      }
       smoke.update(dt);
+      sparks.update(dt);
       updateWorld(dt);
       composer.render();
     },
@@ -708,6 +727,8 @@ function beginRace() {
     ramps,
     nitroPickups,
     curve,
+    motionBlur,
+    sparks,
   };
 
   raceCtx = {

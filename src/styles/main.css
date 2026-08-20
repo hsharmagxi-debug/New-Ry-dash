@@ -34,6 +34,8 @@ input,select{font-family:var(--font-body)}
 .loader-bar{width:min(360px,70vw);height:6px;background:rgba(255,255,255,.08);border-radius:4px;margin:28px auto 12px;overflow:hidden}
 .loader-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-pink));box-shadow:0 0 12px var(--neon-cyan);transition:width .25s ease}
 .loader-label{color:var(--text-dim);font-size:.95rem;letter-spacing:.04em}
+.trademark{font-size:.4em;vertical-align:super;color:var(--text-dim);margin-left:2px}
+.loader-copyright{position:absolute;bottom:24px;left:0;right:0;text-align:center;color:var(--text-dim);font-size:.72rem;letter-spacing:.03em;line-height:1.6}
 
 /* ---------- home ---------- */
 #screen-home{background:linear-gradient(180deg,#0b0f1c,#05060a 60%)}

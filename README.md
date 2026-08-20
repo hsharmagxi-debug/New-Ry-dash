@@ -149,7 +149,7 @@ Vercel/Render both auto-redeploy on every push to `main` — no extra step neede
 ## Project structure
 
 ```
-velocity-x/
+rydash/
 ├── index.html                 All screens/pages markup (SPA, router in main.js)
 ├── src/
 │   ├── main.js                 Router, race loop, input, HUD, screen wiring, world selection

@@ -211,7 +211,7 @@
         <!-- Daily Challenges / News / Recent Activity / Start Engine -->
         <section class="rd-bottom-grid">
           <article class="rd-info-card glass-panel">
-            <h3>DAILY CHALLENGES <span class="reset-timer">Resets in: 08:45:32</span></h3>
+            <h3>DAILY CHALLENGES <span class="reset-timer">Resets in: <span id="challengeResetTimer">--:--:--</span></span></h3>
             <div class="challenge-list">
               <div class="challenge-row">
                 <div class="challenge-row-top"><span>Win 3 Races</span><span class="challenge-progress-num">0 / 3</span></div>
@@ -503,12 +503,10 @@
               <th>PLAYER</th>
               <th>CAR</th>
               <th>BEST LAP</th>
-              <th>RACES</th>
-              <th>WINS</th>
             </tr>
           </thead>
           <tbody id="leaderboardBody">
-            <tr><td colspan="6" class="muted center">Loading race records…</td></tr>
+            <tr><td colspan="4" class="muted center">Loading race records…</td></tr>
           </tbody>
         </table>
       </div>

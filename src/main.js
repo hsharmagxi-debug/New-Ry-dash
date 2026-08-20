@@ -236,6 +236,7 @@ async function boot() {
   const authStatus = $('authStatus') || $('navPlayerName');
   if (authStatus) authStatus.textContent = state.playerName;
   updateSoundUI();
+  startChallengeResetCountdown();
 
   // Wire Topbar / Auth Buttons
   const navAuthBtn = $('navAuthBtn') || $('navLoginBtn');
@@ -1290,6 +1291,27 @@ function showResults(timeMs, opponents) {
 $('raceAgainBtn')?.addEventListener('click', () => beginRace());
 $('resultsMenuBtn')?.addEventListener('click', () => showScreen('screen-home'));
 
+/* ============================== DAILY CHALLENGE RESET COUNTDOWN ============================== */
+// A real countdown to the next local midnight, ticking every second -- not a static placeholder.
+let challengeCountdownStarted = false;
+function tickChallengeResetCountdown() {
+  const el = $('challengeResetTimer');
+  if (!el) return;
+  const now = new Date();
+  const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+  const remainingMs = nextMidnight - now;
+  const h = Math.floor(remainingMs / 3600000);
+  const m = Math.floor((remainingMs % 3600000) / 60000);
+  const s = Math.floor((remainingMs % 60000) / 1000);
+  el.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+function startChallengeResetCountdown() {
+  if (challengeCountdownStarted) return;
+  challengeCountdownStarted = true;
+  tickChallengeResetCountdown();
+  setInterval(tickChallengeResetCountdown, 1000);
+}
+
 /* ============================== HOME ACTIVITY FEED ============================== */
 // Shows real recent race submissions from the scores table (or local fallback) — never
 // invented player names. An empty backend shows an honest "be the first" state instead.
@@ -1318,36 +1340,28 @@ async function loadHomeActivityFeed() {
 }
 
 /* ============================== LEADERBOARD ============================== */
+// Every column here is real (POS/PLAYER/CAR/BEST LAP come straight from the scores table).
+// No fabricated fallback rows or made-up races/wins counts -- an empty table shows an
+// honest "no times yet" state instead.
 async function loadLeaderboard() {
   const body = $('leaderboardBody');
   if (!body) return;
-  body.innerHTML = '<tr><td colspan="6" class="muted center">Loading records…</td></tr>';
+  body.innerHTML = '<tr><td colspan="4" class="muted center">Loading records…</td></tr>';
   const rows = await backend.fetchLeaderboard(25);
-  
-  const defaultEntries = [
-    { rank: 1, driver_name: 'NitroKing', car: 'SHADOW GT', time_ms: 108753, races: 168, wins: 94 },
-    { rank: 2, driver_name: 'SpeedDemon', car: 'APEX R9', time_ms: 112664, races: 152, wins: 48 },
-    { rank: 3, driver_name: 'DriftGhost', car: 'INFERNO X', time_ms: 113921, races: 140, wins: 35 },
-    { rank: 4, driver_name: 'PhantomX', car: 'CYBER VELOCE', time_ms: 114102, races: 128, wins: 33 },
-    { rank: 5, driver_name: 'StreetLegend', car: 'NIGHTHAWK', time_ms: 114853, races: 101, wins: 21 },
-    { rank: 6, driver_name: 'NightRider', car: 'VORTEX RS', time_ms: 115231, races: 96, wins: 18 },
-  ];
 
-  const data = (rows && rows.length) ? rows : defaultEntries;
+  if (!rows || !rows.length) {
+    body.innerHTML = '<tr><td colspan="4" class="muted center">No lap times submitted yet — finish a race to set the first one.</td></tr>';
+    return;
+  }
 
-  body.innerHTML = data.map((r, i) => {
-    const rank = r.rank || (i + 1);
+  body.innerHTML = rows.map((r, i) => {
     const m = Math.floor(r.time_ms / 60000);
     const s = ((r.time_ms % 60000) / 1000).toFixed(3);
-    const races = r.races || (120 - i * 8);
-    const wins = r.wins || (45 - i * 5);
     return `<tr>
-      <td><b>#${rank}</b></td>
+      <td><b>#${i + 1}</b></td>
       <td>${escapeHtml(r.driver_name)}</td>
       <td><span class="accent">${escapeHtml(r.car)}</span></td>
       <td><b>${m}:${s.padStart(6, '0')}</b></td>
-      <td>${races}</td>
-      <td>${wins}</td>
     </tr>`;
   }).join('');
 }

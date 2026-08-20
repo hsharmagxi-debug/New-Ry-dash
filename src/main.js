@@ -354,7 +354,7 @@ function buildGarageCards() {
         <span class="rarity-tag ${rarityClass}">${(m.rarity || 'RARE').toUpperCase()}</span>
       </div>
       <div class="car-class">${(m.class || 'EXOTIC GT').toUpperCase()}</div>
-      <div class="car-card-img"></div>
+      <img src="./cars/car-${idx}.jpg" alt="${m.name}" class="car-card-img" />
       <div class="car-stats">
         <div class="stat-row">
           <span class="stat-name">SPEED</span>

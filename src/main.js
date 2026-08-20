@@ -49,6 +49,38 @@ const state = {
 const $ = (id) => document.getElementById(id);
 const qs = (sel) => document.querySelector(sel);
 
+let homeStage = null;
+let garageStage = null;
+
+function updatePreviewStages() {
+  if (homeStage) homeStage.setCarByIndex(state.carIndex, state.liveryIndex);
+  if (garageStage) garageStage.setCarByIndex(state.carIndex, state.liveryIndex);
+}
+
+function initHomeHeroStage() {
+  const container = $('homeHeroStage');
+  if (container && !homeStage) {
+    homeStage = new PreviewStage(container, { interactive: false });
+    homeStage.setCarByIndex(state.carIndex, state.liveryIndex);
+    homeStage.start();
+  } else if (homeStage) {
+    homeStage.setCarByIndex(state.carIndex, state.liveryIndex);
+    homeStage.start();
+  }
+}
+
+function initGarageStage() {
+  const container = $('garageStageWrap');
+  if (container && !garageStage) {
+    garageStage = new PreviewStage(container, { interactive: true });
+    garageStage.setCarByIndex(state.carIndex, state.liveryIndex);
+    garageStage.start();
+  } else if (garageStage) {
+    garageStage.setCarByIndex(state.carIndex, state.liveryIndex);
+    garageStage.start();
+  }
+}
+
 /* ============================== SCREEN ROUTER ============================== */
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach((el) => el.classList.remove('active'));
@@ -60,6 +92,19 @@ function showScreen(id) {
   document.querySelectorAll('[data-back]').forEach((btn) => {
     btn.onclick = () => showScreen(btn.dataset.back);
   });
+
+  if (id === 'screen-home') {
+    initHomeHeroStage();
+    homeStage?.start();
+    garageStage?.stop();
+  } else if (id === 'screen-garage') {
+    initGarageStage();
+    garageStage?.start();
+    homeStage?.stop();
+  } else {
+    homeStage?.stop();
+    garageStage?.stop();
+  }
 }
 
 function toast(msg, ms = 2400) {
@@ -204,11 +249,11 @@ if (authGuestBtn) {
 }
 
 /* ============================== GARAGE ============================== */
-let garageStage = null;
 let garageOnConfirm = null;
 
 function openGarage(onConfirm) {
   garageOnConfirm = onConfirm;
+  initGarageStage();
   buildGarageCards();
   buildColorSwatches();
 }
@@ -234,6 +279,7 @@ function buildGarageCards() {
     card.onclick = () => {
       state.carIndex = idx;
       localStorage.setItem('rydash_car', idx);
+      updatePreviewStages();
       buildGarageCards();
     };
     grid.appendChild(card);
@@ -254,6 +300,7 @@ function buildColorSwatches() {
     b.onclick = () => {
       state.liveryIndex = i;
       localStorage.setItem('rydash_livery', i);
+      updatePreviewStages();
       buildColorSwatches();
     };
     wrap.appendChild(b);

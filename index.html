@@ -283,27 +283,23 @@
       </div>
     </section>
 
-    <!-- ===================== 02 GARAGE - MIDNIGHT WORKSHOP ===================== -->
+    <!-- ===================== 02 GARAGE - SELECT YOUR RIDE ===================== -->
     <section id="screen-garage" class="screen garage-screen">
-      <button class="btn-back" data-back="screen-home">← Back</button>
-      <div class="garage-topbar">
-        <div class="brand-mini"><span class="screen-idx-tag">02 GARAGE</span> MIDNIGHT WORKSHOP</div>
-        <div class="garage-currencies">
-          <div class="currency-pill"><span class="currency-icon">🪙</span> <span id="userCredits">125,600</span></div>
-          <div class="currency-pill"><span class="currency-icon">💎</span> <span id="userGems">2,550</span></div>
-          <div class="currency-pill"><span class="currency-icon">⭐</span> <span id="userLevel">Level 32</span></div>
+      <div class="garage-topbar-master">
+        <div class="garage-brand-block">
+          <div class="brand-title">RYD<span class="accent">ASH</span></div>
+          <div class="brand-tagline">OWN THE NIGHT</div>
+        </div>
+        <div class="garage-center-header">
+          <h2 class="garage-main-title">SELECT YOUR <span class="accent">RIDE</span></h2>
+          <span class="garage-sub-tag">10 UNIQUE RIDES</span>
+        </div>
+        <div class="garage-rarity-legend">
+          <span class="rarity-pill pill-legendary"><span class="rarity-box gold"></span> LEGENDARY</span>
+          <span class="rarity-pill pill-epic"><span class="rarity-box purple"></span> EPIC</span>
+          <span class="rarity-pill pill-rare"><span class="rarity-box blue"></span> RARE</span>
         </div>
       </div>
-
-      <div class="garage-tabs">
-        <button class="garage-tab-btn active" data-tab="cars">MY CARS</button>
-        <button class="garage-tab-btn" data-tab="upgrades">UPGRADES</button>
-        <button class="garage-tab-btn" data-tab="customize">CUSTOMIZE</button>
-        <button class="garage-tab-btn" data-tab="performance">PERFORMANCE</button>
-      </div>
-
-      <h2 class="panel-title center">SELECT YOUR <span class="accent">RIDE</span></h2>
-      <p class="muted center garage-sub">10 UNIQUE RIDES • LEGENDARY, EPIC &amp; RARE</p>
 
       <!-- 3D Interactive Turntable Stage -->
       <div id="garageStageWrap" class="garage-stage-wrap"></div>
@@ -317,6 +313,22 @@
           <div class="color-swatches" id="colorSwatches"></div>
         </div>
         <button id="selectCarBtn" class="btn btn-primary btn-lg">SELECT &amp; CONTINUE</button>
+      </div>
+
+      <!-- Bottom Dock Bar -->
+      <div class="garage-bottom-dock">
+        <div class="dock-left-items">
+          <button class="g-dock-btn" data-back="screen-home"><span class="g-dock-icon">🏠</span> HOME</button>
+          <button class="g-dock-btn active"><span class="g-dock-icon">🚗</span> GARAGE</button>
+          <button id="garageWorldBtn" class="g-dock-btn"><span class="g-dock-icon">🌐</span> WORLD</button>
+          <button id="garageLeadBtn" class="g-dock-btn"><span class="g-dock-icon">📊</span> LEADERBOARD</button>
+          <button id="garageMultiBtn" class="g-dock-btn"><span class="g-dock-icon">👥</span> MULTIPLAYER</button>
+          <button id="garageSettingsBtn" class="g-dock-btn"><span class="g-dock-icon">⚙️</span> SETTINGS</button>
+          <button id="garageHowtoBtn" class="g-dock-btn"><span class="g-dock-icon">❓</span> HOW TO PLAY</button>
+        </div>
+        <button id="garageQuickRaceBtn" class="btn btn-primary garage-quick-race-btn">
+          <span class="btn-icon">⚡</span> QUICK RACE <span class="btn-sub">JUMP INTO THE ACTION</span>
+        </button>
       </div>
 
       <div id="garageViewport" class="garage-viewport-offscreen" aria-hidden="true"></div>

@@ -323,7 +323,7 @@ function buildGarageCards() {
   CAR_MODELS.forEach((m, idx) => {
     const card = document.createElement('div');
     const rarityClass = 'rarity-' + (m.rarity || 'rare');
-    card.className = `car-card ${rarityClass} ${idx === state.carIndex ? 'active selected' : ''}`;
+    card.className = `car-card car-card-${idx} ${rarityClass} ${idx === state.carIndex ? 'active selected' : ''}`;
     const num = String(idx + 1).padStart(2, '0');
     const spd = Math.round(m.topSpeed * 100);
     const hnd = Math.round(m.handling * 100);
@@ -336,6 +336,7 @@ function buildGarageCards() {
         <span class="rarity-tag ${rarityClass}">${(m.rarity || 'RARE').toUpperCase()}</span>
       </div>
       <div class="car-class">${(m.class || 'EXOTIC GT').toUpperCase()}</div>
+      <div class="car-card-img"></div>
       <div class="car-stats">
         <div class="stat-row">
           <span class="stat-name">SPEED</span>
@@ -398,6 +399,14 @@ if (selectCarBtn) {
     else showScreen('screen-worldmap');
   });
 }
+
+// Garage Bottom Dock Buttons
+$('garageWorldBtn')?.addEventListener('click', () => { showScreen('screen-worldmap'); setWorld(state.worldId); updateLapPillsUI(); });
+$('garageLeadBtn')?.addEventListener('click', () => { showScreen('screen-leaderboard'); loadLeaderboard(); });
+$('garageMultiBtn')?.addEventListener('click', () => { showScreen('screen-lobby'); });
+$('garageSettingsBtn')?.addEventListener('click', () => { showScreen('screen-settings'); });
+$('garageHowtoBtn')?.addEventListener('click', () => { showScreen('screen-howto'); });
+$('garageQuickRaceBtn')?.addEventListener('click', () => { sound.init(); startRaceFlow(false); });
 
 /* ============================== LOBBY (MULTIPLAYER) ============================== */
 const createRoomBtn = $('createRoomBtn');

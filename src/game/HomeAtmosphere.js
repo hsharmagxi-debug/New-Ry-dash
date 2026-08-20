@@ -288,18 +288,9 @@ export class HomeAtmosphere {
 
   /* ------------------- 01 NEON RAIN CITY (RYDASH) ------------------- */
   _renderNeonCity(ctx, w, h) {
-    // Sky
-    const sky = ctx.createLinearGradient(0, 0, 0, h);
-    sky.addColorStop(0, '#020308');
-    sky.addColorStop(0.55, '#070b1e');
-    sky.addColorStop(0.85, '#120a28');
-    sky.addColorStop(1, '#050711');
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, w, h);
-
-    // Lightning Flash
+    // Lightning Flash over the background
     if (this.lightningAlpha > 0) {
-      ctx.fillStyle = `rgba(180, 220, 255, ${this.lightningAlpha * 0.4})`;
+      ctx.fillStyle = `rgba(180, 220, 255, ${this.lightningAlpha * 0.35})`;
       ctx.fillRect(0, 0, w, h);
       ctx.strokeStyle = `rgba(255, 255, 255, ${this.lightningAlpha})`;
       ctx.lineWidth = 2.5;
@@ -313,20 +304,13 @@ export class HomeAtmosphere {
       }
     }
 
-    // Distant Skyscrapers
-    this._drawSkyscrapers(ctx, w, h, 0.45, '#060a18', '#00e5ff', 0.25);
-    this._drawSkyscrapers(ctx, w, h, 0.60, '#090f26', '#ff2e88', 0.45);
-
-    // Neon Billboards
-    this._drawNeonBillboards(ctx, w, h);
-
-    // Wet Reflective Road
-    this._drawWetRoad(ctx, w, h, '#060a1a');
+    // Distant searchlight sweeps
+    this._drawSearchlights(ctx, w, h);
 
     // Traffic Headlights & Taillights
     this._drawTraffic(ctx, w, h);
 
-    // Rain
+    // Dynamic Rain Layers
     this._drawRain(ctx, w, h, 'rgba(140, 210, 255, 0.45)');
   }
 

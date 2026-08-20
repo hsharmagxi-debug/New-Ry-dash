@@ -177,9 +177,15 @@ input, select {
    01 HOME SCREEN & DOCK
    ========================================================================= */
 #screen-home {
-  background: #02040b;
+  background-color: #02040b;
+  background-image: linear-gradient(180deg, rgba(2, 6, 18, 0.45) 0%, rgba(2, 6, 18, 0.85) 100%),
+                    url('/rydash-home-bg.jpg');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .home-atmosphere-canvas {
@@ -493,17 +499,29 @@ input, select {
   gap: 8px;
 }
 .quick-car-btn {
-  background: rgba(10, 16, 36, 0.8);
+  background: rgba(10, 16, 36, 0.85);
   border: 1.5px solid rgba(255, 255, 255, 0.12);
-  padding: 10px 4px;
+  padding: 6px 4px;
   border-radius: 10px;
   font-family: var(--font-display);
-  font-size: 0.66rem;
+  font-size: 0.64rem;
   font-weight: 800;
   color: var(--text-dim);
   cursor: pointer;
   text-align: center;
   transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.qc-thumb {
+  width: 100%;
+  max-width: 90px;
+  height: 46px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .quick-car-btn:hover {
   border-color: var(--neon-cyan);
@@ -512,9 +530,9 @@ input, select {
 }
 .quick-car-btn.active {
   border-color: #a855f7;
-  background: rgba(168, 85, 247, 0.2);
+  background: rgba(168, 85, 247, 0.25);
   color: #fff;
-  box-shadow: 0 0 14px rgba(168, 85, 247, 0.45);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.55);
 }
 
 .home-bottom-widgets {

@@ -178,19 +178,18 @@ async function boot() {
   const howtoBtn = $('howtoBtn') || $('dockHowToBtn');
   if (howtoBtn) howtoBtn.onclick = () => showScreen('screen-howto');
 
-  // Supabase Auth
-  try {
-    const user = await backend.getCurrentUser();
+  // Immediately display the home screen without waiting for auth network
+  showScreen('screen-home');
+
+  // Supabase Auth (non-blocking in background)
+  backend.getCurrentUser().then((user) => {
     if (user) {
       state.session = user;
       state.playerName = user.user_metadata?.driver_name || user.email?.split('@')[0] || state.playerName;
       if (authStatus) authStatus.textContent = state.playerName;
       if (navAuthBtn) navAuthBtn.textContent = '👤 ' + state.playerName;
     }
-  } catch (_) {}
-
-  // Immediately display the home screen
-  showScreen('screen-home');
+  }).catch(() => {});
 }
 
 /* ============================== AUTH HANDLERS ============================== */

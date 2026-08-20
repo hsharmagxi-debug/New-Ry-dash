@@ -147,10 +147,16 @@ Until then it shows a clear "provider not enabled" message instead of failing si
 3. Framework preset: **Vite**. Build command: `npm run build`. Output directory: `dist` (Vercel
    usually auto-detects all three).
 4. Under **Environment Variables**, add:
-   - `VITE_SUPABASE_URL` = your project URL
+   - `VITE_SUPABASE_URL` = your project URL — the plain one, no `/rest/v1/` on the end
    - `VITE_SUPABASE_ANON_KEY` = your anon key
-5. Click **Deploy**. You get a public `https://rydash-xxxx.vercel.app` URL anyone can play at,
+5. Click **Deploy**. You get a public `https://rydash-xxxx.vercel.app` URL — **this is the link
+   you share with friends**, not `localhost`. Anyone can open it on any device, no install needed,
    with multiplayer + leaderboard fully live.
+6. **If you enabled Google sign-in**, one more step so it works on the live site: in Supabase go
+   to **Authentication → URL Configuration** and add your Vercel URL (e.g.
+   `https://rydash-xxxx.vercel.app`) to **Redirect URLs** — otherwise Google sign-in will work
+   locally but fail on the deployed site with a redirect error. (Google Cloud Console's redirect
+   URI doesn't need to change — it always points at Supabase, not at Vercel.)
 
 ### 3-alt. Deploy — Render (alternative, free)
 

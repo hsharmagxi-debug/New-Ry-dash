@@ -147,17 +147,65 @@ $('authSignOutBtn').addEventListener('click', async () => { await backend.signOu
 
 /* ============================== GARAGE ============================== */
 let garageStage = null;
-function openGarage(onContinue) {
-  if (!garageStage) {
-    garageStage = new PreviewStage($('garageViewport'), { interactive: true });
-    garageStage.start();
-    window.__vxGarageStage = garageStage;
-  }
-  renderGarageInfo();
+let garageThumbnails = null; // cached data-URLs, one per CAR_MODELS index — generated once
+// A representative "signature" livery per car for its grid thumbnail (color variety, matches
+// the reference card layout's visual mix). Selecting a different color swatch still only
+// affects the actual race car, not the thumbnail — regenerating 10 renders per swatch click
+// wasn't worth the complexity for a grid that's mainly about picking the *car*, not the paint.
+const GARAGE_THUMB_LIVERY = [4, 1, 0, 5, 3, 0, 8, 5, 0, 4];
+
+function hex(n) { return `#${n.toString(16).padStart(6, '0')}`; }
+
+async function generateGarageThumbnails() {
+  if (garageThumbnails) return garageThumbnails;
+  const stage = new PreviewStage($('garageViewport'), { interactive: false });
+  $('garageViewport').style.width = '400px';
+  $('garageViewport').style.height = '300px';
+  stage._resize();
+  garageThumbnails = CAR_MODELS.map((modelDef, i) => {
+    const livery = CAR_LIVERIES[GARAGE_THUMB_LIVERY[i] % CAR_LIVERIES.length];
+    stage.setCarByIndex(i, GARAGE_THUMB_LIVERY[i] % CAR_LIVERIES.length);
+    stage.carRig.group.rotation.y = 0.55; // a flattering 3/4 angle, not straight-on
+    stage.renderOnce();
+    return stage.renderer.domElement.toDataURL('image/png');
+  });
+  stage.dispose();
+  return garageThumbnails;
+}
+
+async function openGarage(onContinue) {
+  const thumbs = await generateGarageThumbnails();
+  const grid = $('garageGrid');
+  grid.innerHTML = CAR_MODELS.map((modelDef, i) => {
+    const rarity = RARITY[modelDef.rarity] || RARITY.common;
+    return `
+      <button class="garage-card ${i === state.carIndex ? 'selected' : ''}" data-index="${i}" style="--rarity-color:${hex(rarity.color)}">
+        <div class="garage-card-top">
+          <span class="garage-card-num">${String(i + 1).padStart(2, '0')}</span>
+          <span class="garage-card-rarity">${rarity.label}</span>
+        </div>
+        <img class="garage-card-img" src="${thumbs[i]}" alt="${modelDef.name}" />
+        <h3 class="garage-card-name">${modelDef.name}</h3>
+        <p class="garage-card-class">${modelDef.class}</p>
+        <div class="garage-card-stats">
+          <div class="mini-stat-row"><span>SPEED</span><div class="mini-bar"><div style="width:${modelDef.topSpeed * 100}%"></div></div><b>${Math.round(modelDef.topSpeed * 100)}</b></div>
+          <div class="mini-stat-row"><span>HANDLING</span><div class="mini-bar mini-bar-cyan"><div style="width:${modelDef.handling * 100}%"></div></div><b>${Math.round(modelDef.handling * 100)}</b></div>
+          <div class="mini-stat-row"><span>ACCEL</span><div class="mini-bar mini-bar-purple"><div style="width:${modelDef.accel * 100}%"></div></div><b>${Math.round(modelDef.accel * 100)}</b></div>
+          <div class="mini-stat-row"><span>NITRO</span><div class="mini-bar mini-bar-green"><div style="width:${modelDef.nitro * 100}%"></div></div><b>${Math.round(modelDef.nitro * 100)}</b></div>
+        </div>
+      </button>`;
+  }).join('');
+
+  grid.querySelectorAll('.garage-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      state.carIndex = Number(card.dataset.index);
+      grid.querySelectorAll('.garage-card').forEach((c) => c.classList.toggle('selected', c === card));
+      buildColorSwatches();
+    });
+  });
+
   buildColorSwatches();
 
-  $('carPrev').onclick = () => { state.carIndex = (state.carIndex - 1 + CAR_MODELS.length) % CAR_MODELS.length; renderGarageInfo(); };
-  $('carNext').onclick = () => { state.carIndex = (state.carIndex + 1) % CAR_MODELS.length; renderGarageInfo(); };
   $('selectCarBtn').onclick = () => {
     localStorage.setItem('vx_car', state.carIndex);
     localStorage.setItem('vx_livery', state.liveryIndex);
@@ -166,31 +214,16 @@ function openGarage(onContinue) {
   };
 }
 
-function renderGarageInfo() {
-  const { modelDef, livery } = garageStage.setCarByIndex(state.carIndex, state.liveryIndex);
-  const rarity = RARITY[modelDef.rarity] || RARITY.common;
-  $('carName').textContent = modelDef.name;
-  $('carClass').textContent = `${modelDef.class} · ${livery.name}`;
-  $('carRarity').textContent = rarity.label;
-  $('carRarity').style.color = `#${rarity.color.toString(16).padStart(6, '0')}`;
-  $('carRarity').style.borderColor = `#${rarity.color.toString(16).padStart(6, '0')}`;
-  $('statSpeed').style.width = `${modelDef.topSpeed * 100}%`;
-  $('statHandling').style.width = `${modelDef.handling * 100}%`;
-  $('statAccel').style.width = `${modelDef.accel * 100}%`;
-  $('statNitro').style.width = `${modelDef.nitro * 100}%`;
-  buildColorSwatches();
-}
-
 function buildColorSwatches() {
   const wrap = $('colorSwatches');
   wrap.innerHTML = '';
   CAR_LIVERIES.forEach((l, i) => {
     const b = document.createElement('button');
     b.className = 'swatch' + (i === state.liveryIndex ? ' active' : '');
-    b.style.background = `#${l.color.toString(16).padStart(6, '0')}`;
+    b.style.background = hex(l.color);
     b.style.color = b.style.background;
     b.title = l.name;
-    b.onclick = () => { state.liveryIndex = i; renderGarageInfo(); };
+    b.onclick = () => { state.liveryIndex = i; buildColorSwatches(); };
     wrap.appendChild(b);
   });
 }

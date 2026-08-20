@@ -125,29 +125,22 @@
     </section>
 
     <!-- ===================== GARAGE ===================== -->
-    <section id="screen-garage" class="screen">
+    <section id="screen-garage" class="screen garage-screen">
+      <div class="ambient-bg"></div>
       <button class="btn-back" data-back="screen-home">← Back</button>
       <h2 class="panel-title center">SELECT YOUR <span class="accent">RIDE</span></h2>
-      <div class="garage-layout">
-        <button id="carPrev" class="garage-arrow left" aria-label="Previous car">‹</button>
-        <div id="garageViewport" class="garage-viewport"></div>
-        <button id="carNext" class="garage-arrow right" aria-label="Next car">›</button>
-      </div>
-      <div class="garage-info">
-        <div class="car-title-row">
-          <h3 id="carName" class="car-name">—</h3>
-          <span id="carRarity" class="rarity-badge">—</span>
-        </div>
-        <p id="carClass" class="car-class">—</p>
-        <div class="stat-bars">
-          <div class="stat-row"><span>Speed</span><div class="bar"><div id="statSpeed" class="bar-fill"></div></div></div>
-          <div class="stat-row"><span>Handling</span><div class="bar"><div id="statHandling" class="bar-fill"></div></div></div>
-          <div class="stat-row"><span>Acceleration</span><div class="bar"><div id="statAccel" class="bar-fill"></div></div></div>
-          <div class="stat-row"><span>Nitro</span><div class="bar"><div id="statNitro" class="bar-fill"></div></div></div>
-        </div>
+      <p class="muted center garage-sub">10 unique rides</p>
+
+      <div id="garageGrid" class="garage-grid"></div>
+
+      <div class="garage-detail">
         <div class="color-swatches" id="colorSwatches"></div>
         <button id="selectCarBtn" class="btn btn-primary btn-lg">SELECT &amp; CONTINUE</button>
       </div>
+
+      <!-- Hidden offscreen stage used once per car to render a static thumbnail into each card
+           (avoids running 10 live WebGL contexts at once — one renderer captures 10 PNGs). -->
+      <div id="garageViewport" class="garage-viewport-offscreen" aria-hidden="true"></div>
     </section>
 
     <!-- ===================== MULTIPLAYER LOBBY ===================== -->

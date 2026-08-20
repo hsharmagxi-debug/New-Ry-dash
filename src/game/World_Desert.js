@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { makeNeonEnvTexture } from './EnvMap.js';
 
 /* =========================================================================
    RYDASH — "Neon Desert" world: Vegas x Dubai x Cyberpunk. A vast desert
@@ -221,6 +222,7 @@ export function buildTrack() {
 }
 
 export function buildWorld(scene) {
+  scene.environment = makeNeonEnvTexture(['#ff7a3d', '#ff2e88', '#00e5ff', '#ffd166', '#ffb347']);
   scene.add(buildSky());
   scene.add(buildGlowSkyline());
   scene.add(buildGround());

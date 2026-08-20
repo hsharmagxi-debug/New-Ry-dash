@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { makeNeonEnvTexture } from './EnvMap.js';
 
 /* =========================================================================
    RYDASH — "Vertical City" world: a narrow racing canyon between massive
@@ -226,6 +227,7 @@ function buildGround() {
 }
 
 export function buildWorld(scene) {
+  scene.environment = makeNeonEnvTexture(['#00e5ff', '#ff2e88', '#ffb347', '#9b30ff']);
   scene.add(buildSky());
   scene.add(buildGround());
   const billboardList = [];

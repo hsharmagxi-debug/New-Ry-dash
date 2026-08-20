@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { makeNeonEnvTexture } from './EnvMap.js';
 
 /* =========================================================================
    RYDASH — "Storm City" world: a violent electric storm over a dark city.
@@ -207,6 +208,7 @@ function buildFogVolumes() {
 }
 
 export function buildWorld(scene) {
+  scene.environment = makeNeonEnvTexture(['#8b30ff', '#6a1eb0', '#3a5cff', '#c0a0ff', '#e8e0ff']);
   scene.add(buildSky());
   scene.add(buildCitySkyline());
   scene.add(buildGround());

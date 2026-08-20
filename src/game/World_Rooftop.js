@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { makeNeonEnvTexture } from './EnvMap.js';
 
 /* =========================================================================
    RYDASH — "Skyline" world: rooftop racing across a dense futuristic city.
@@ -288,6 +289,7 @@ export function buildTrack() {
 }
 
 export function buildWorld(scene) {
+  scene.environment = makeNeonEnvTexture(['#00e5ff', '#ff2e88', '#9b30ff', '#ffb347']);
   scene.add(buildSky());
   scene.add(buildTowers());
   scene.add(buildHelipadMarkers());

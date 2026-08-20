@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { makeNeonEnvTexture } from './EnvMap.js';
 
 /* =========================================================================
    RYDASH — "Sunset Highway" world: a bright, premium mountain-pass circuit
@@ -273,6 +274,7 @@ function buildGround() {
 }
 
 export function buildWorld(scene) {
+  scene.environment = makeNeonEnvTexture(['#ffb347', '#ff7a1a', '#7c4dff', '#ffe08a', '#ff2e88']);
   scene.add(buildSky());
   const sun = buildSun();
   scene.add(sun);

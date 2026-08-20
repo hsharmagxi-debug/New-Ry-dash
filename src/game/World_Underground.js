@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { makeNeonEnvTexture } from './EnvMap.js';
 
 /* =========================================================================
    RYDASH — "Deep Run" world: abandoned metro tunnels / underground highway.
@@ -139,6 +140,7 @@ export function buildTrack() {
 }
 
 export function buildWorld(scene) {
+  scene.environment = makeNeonEnvTexture(['#00e5ff', '#ff2e88', '#fff4c9', '#39ff9d']);
   scene.background = new THREE.Color(0x030304);
   scene.add(buildGround());
   scene.add(buildCeiling());

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { makeNeonEnvTexture } from './EnvMap.js';
 
 /* =========================================================================
    RYDASH — "Coastal Highway" world: a moonlit night drive along the coast.
@@ -227,6 +228,7 @@ function buildFloatingParticles(count = 400) {
 }
 
 export function buildWorld(scene) {
+  scene.environment = makeNeonEnvTexture(['#cfe0ff', '#39ff9d', '#0e3a56', '#8fa8ff', '#ffd9a0']);
   scene.add(buildSky());
   scene.add(buildMoon());
   scene.add(buildMountainSilhouette());

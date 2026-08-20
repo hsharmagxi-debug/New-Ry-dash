@@ -1,6 +1,43 @@
 import * as THREE from 'three';
 import { buildCar, CAR_MODELS, CAR_LIVERIES } from './CarFactory.js';
 
+// The car paint is a PBR MeshPhysicalMaterial (metalness + clearcoat) — without an environment
+// map, PBR metals/clearcoats render dark and flat no matter how many direct lights are added,
+// because most of their apparent brightness comes from reflected environment light, not direct
+// diffuse lighting. This builds a small neon-studio env texture so the paint actually looks
+// glossy/lit, matching the reflections the race-world scenes already get from their own env maps.
+function makeStudioEnvTexture() {
+  const w = 512, h = 256;
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  const grd = ctx.createLinearGradient(0, 0, 0, h);
+  grd.addColorStop(0, '#1a2035');
+  grd.addColorStop(0.5, '#0a0e1a');
+  grd.addColorStop(1, '#141018');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, w, h);
+  // Bright soft "studio window" highlights — these are what give clear-coat paint its glossy
+  // streak reflections and metal its sense of shape.
+  const highlights = [
+    { x: w * 0.28, y: h * 0.32, r: 90, color: 'rgba(235,245,255,0.95)' },
+    { x: w * 0.7, y: h * 0.42, r: 70, color: 'rgba(0,229,255,0.85)' },
+    { x: w * 0.5, y: h * 0.68, r: 60, color: 'rgba(255,23,111,0.6)' },
+    { x: w * 0.85, y: h * 0.25, r: 50, color: 'rgba(124,77,255,0.55)' },
+  ];
+  highlights.forEach((hl) => {
+    const g = ctx.createRadialGradient(hl.x, hl.y, 0, hl.x, hl.y, hl.r);
+    g.addColorStop(0, hl.color);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(hl.x, hl.y, hl.r, 0, Math.PI * 2); ctx.fill();
+  });
+  const tex = new THREE.CanvasTexture(c);
+  tex.mapping = THREE.EquirectangularReflectionMapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
 /*
  * RYDASH PreviewStage
  *
@@ -26,6 +63,7 @@ export class PreviewStage {
     this.interactive = interactive;
 
     this.scene = new THREE.Scene();
+    this.scene.environment = makeStudioEnvTexture();
 
     /*
      * Camera

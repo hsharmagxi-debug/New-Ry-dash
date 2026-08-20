@@ -205,6 +205,36 @@ input,select{font-family:var(--font-body)}
 .howto-icon{font-size:1.5rem;line-height:1}
 .howto-start-btn{position:relative;z-index:1;margin-top:28px}
 
+/* ---------- World Select / RYDASH Map ---------- */
+.worldmap-screen{position:relative;align-items:center;justify-content:flex-start;padding:70px 20px 20px;overflow-y:auto}
+.worldmap-screen .panel-title{position:relative;z-index:1}
+.worldmap-sub{position:relative;z-index:1;text-align:center;margin-bottom:10px}
+.world-map{position:relative;z-index:1;width:100%;max-width:640px;aspect-ratio:600/460;margin:10px auto 0}
+.world-map-lines{position:absolute;inset:0;width:100%;height:100%}
+.world-map-lines line{stroke:rgba(0,229,255,.35);stroke-width:1.5;stroke-dasharray:4 4}
+.world-hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-family:var(--font-display);font-weight:900;font-size:1.1rem;letter-spacing:.06em;
+  background:radial-gradient(circle,rgba(0,229,255,.18),transparent 70%);
+  padding:14px 20px;border:1px solid var(--neon-cyan);border-radius:12px;color:var(--neon-cyan);
+  text-shadow:0 0 14px rgba(0,229,255,.7);white-space:nowrap}
+.world-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;
+  align-items:center;gap:2px;background:var(--panel);border:1px solid var(--panel-border);
+  border-radius:10px;padding:10px 14px;cursor:pointer;transition:transform .15s ease,border-color .15s ease;
+  min-width:130px;color:var(--text)}
+.world-node:hover{transform:translate(-50%,-50%) scale(1.06);border-color:var(--neon-cyan)}
+.world-node.selected{border-color:var(--neon-pink);box-shadow:0 0 18px rgba(255,46,136,.35)}
+.world-node-num{font-family:var(--font-display);font-size:.65rem;color:var(--text-dim)}
+.world-node-name{font-family:var(--font-display);font-weight:700;font-size:.82rem;letter-spacing:.03em}
+.world-node-desc{font-size:.7rem;color:var(--text-dim)}
+.world-node-stars{font-size:.65rem;color:var(--neon-orange);letter-spacing:1px}
+.worldmap-selected{position:relative;z-index:1;text-align:center;margin-top:14px;color:var(--neon-cyan);
+  font-family:var(--font-display);font-size:.85rem;min-height:1.4em}
+@media (max-width:560px){
+  .world-node{min-width:100px;padding:7px 9px}
+  .world-node-name{font-size:.68rem}
+  .world-hub{font-size:.85rem;padding:10px 14px}
+}
+
 /* misc */
 .fps-counter{position:absolute;top:18px;left:18px;background:rgba(0,0,0,.5);color:var(--neon-green);padding:4px 10px;border-radius:6px;font-family:monospace;font-size:.8rem;z-index:20}
 .toast{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--panel-border);padding:12px 22px;border-radius:10px;font-size:.85rem;z-index:30;transition:opacity .3s,transform .3s}

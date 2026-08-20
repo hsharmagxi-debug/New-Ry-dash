@@ -842,7 +842,20 @@ $('settingSound').checked = state.soundOn;
 $('settingFps').checked = state.showFps;
 $('settingQuality').addEventListener('change', (e) => { state.quality = e.target.value; localStorage.setItem('vx_quality', state.quality); });
 $('settingCamera').addEventListener('change', (e) => { state.cameraMode = e.target.value; localStorage.setItem('vx_camera', state.cameraMode); });
-$('settingWorld').addEventListener('change', (e) => { state.worldId = e.target.value; localStorage.setItem('vx_world', state.worldId); });
+function setWorld(id) {
+  state.worldId = id;
+  localStorage.setItem('vx_world', id);
+  $('settingWorld').value = id;
+  document.querySelectorAll('.world-node').forEach((n) => n.classList.toggle('selected', n.dataset.world === id));
+  const label = (WORLDS[id] || WORLDS.neon).label;
+  const sel = $('worldMapSelected');
+  if (sel) sel.textContent = `Selected: ${label}`;
+}
+$('settingWorld').addEventListener('change', (e) => setWorld(e.target.value));
+$('openWorldMapBtn').addEventListener('click', () => { showScreen('screen-worldmap'); setWorld(state.worldId); });
+document.querySelectorAll('.world-node').forEach((node) => {
+  node.addEventListener('click', () => setWorld(node.dataset.world));
+});
 $('settingSound').addEventListener('change', (e) => { state.soundOn = e.target.checked; localStorage.setItem('vx_sound', state.soundOn); });
 $('settingFps').addEventListener('change', (e) => { state.showFps = e.target.checked; localStorage.setItem('vx_fps', state.showFps); $('fpsCounter').classList.toggle('hidden', !state.showFps); });
 

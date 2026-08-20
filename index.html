@@ -256,6 +256,7 @@
         <div class="setting-row"><label>World</label>
           <select id="settingWorld"><option value="neon">Neon District (rain, night city)</option><option value="sunset">Sunline Highway (mountains, golden hour)</option><option value="desert">Neon Desert (Vegas-style skyline, drones)</option><option value="underground">Deep Run (underground tunnels, passing train)</option><option value="rooftop">Skyline (rooftop racing, towers)</option></select>
         </div>
+        <button id="openWorldMapBtn" class="btn btn-secondary" style="margin-top:10px;width:100%">🌍 Open World Map</button>
         <div class="setting-row"><label>Sound Effects</label>
           <input id="settingSound" type="checkbox" checked />
         </div>
@@ -263,6 +264,44 @@
           <input id="settingFps" type="checkbox" />
         </div>
       </div>
+    </section>
+
+    <!-- ===================== WORLD SELECT ===================== -->
+    <section id="screen-worldmap" class="screen worldmap-screen">
+      <div class="ambient-bg"></div>
+      <button class="btn-back" data-back="screen-settings">← Back</button>
+      <h2 class="panel-title center">RACE THE CITY. <span class="accent">OWN THE NIGHT.</span></h2>
+      <p class="muted center worldmap-sub">Choose a world and conquer the streets.</p>
+
+      <div class="world-map">
+        <svg class="world-map-lines" viewBox="0 0 600 460" preserveAspectRatio="xMidYMid meet">
+          <line x1="300" y1="230" x2="300" y2="90" /><line x1="300" y1="230" x2="470" y2="150" />
+          <line x1="300" y1="230" x2="130" y2="150" /><line x1="300" y1="230" x2="470" y2="330" />
+          <line x1="300" y1="230" x2="130" y2="330" />
+        </svg>
+        <div class="world-hub">RYDASH</div>
+        <button class="world-node" data-world="neon" style="left:50%;top:19%">
+          <span class="world-node-num">01</span><span class="world-node-name">NEON DISTRICT</span>
+          <span class="world-node-desc">🌧️ Rain City</span><span class="world-node-stars">★★★★☆</span>
+        </button>
+        <button class="world-node" data-world="sunset" style="left:78%;top:33%">
+          <span class="world-node-num">02</span><span class="world-node-name">SUNLINE</span>
+          <span class="world-node-desc">🌅 Sunset Highway</span><span class="world-node-stars">★★★★☆</span>
+        </button>
+        <button class="world-node" data-world="desert" style="left:78%;top:72%">
+          <span class="world-node-num">03</span><span class="world-node-name">BLACK DESERT</span>
+          <span class="world-node-desc">🏜️ Neon Desert</span><span class="world-node-stars">★★★★★</span>
+        </button>
+        <button class="world-node" data-world="underground" style="left:22%;top:72%">
+          <span class="world-node-num">04</span><span class="world-node-name">DEEP RUN</span>
+          <span class="world-node-desc">🚇 Underground</span><span class="world-node-stars">★★★★★</span>
+        </button>
+        <button class="world-node" data-world="rooftop" style="left:22%;top:33%">
+          <span class="world-node-num">05</span><span class="world-node-name">SKYLINE</span>
+          <span class="world-node-desc">🌃 Rooftop City</span><span class="world-node-stars">★★★★☆</span>
+        </button>
+      </div>
+      <p id="worldMapSelected" class="worldmap-selected"></p>
     </section>
 
     <!-- ===================== HOW TO PLAY ===================== -->

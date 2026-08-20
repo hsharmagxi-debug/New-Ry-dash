@@ -1,10 +1,10 @@
--- VelocityX — Supabase schema. Run this in your project's SQL Editor.
+-- RYDASH — Supabase schema. Run this in your project's SQL Editor.
 
 create table if not exists public.scores (
   id uuid primary key default gen_random_uuid(),
   driver_name text not null check (char_length(driver_name) between 1 and 20),
   time_ms integer not null check (time_ms > 0),
-  car text not null default 'apex',
+  car text not null default 'apex-r9',
   livery text not null default 'plasma',
   created_at timestamptz not null default now()
 );
@@ -21,11 +21,11 @@ create policy "Public read access" on public.scores
 create policy "Public insert access" on public.scores
   for insert with check (true);
 
--- Optional: profile table if you want to store car/name per signed-in user.
+-- Optional: profile table to store driver preferences per signed-in user.
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   display_name text,
-  favorite_car text default 'apex',
+  favorite_car text default 'apex-r9',
   favorite_livery text default 'plasma',
   updated_at timestamptz default now()
 );

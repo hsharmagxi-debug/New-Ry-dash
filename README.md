@@ -4,12 +4,12 @@ Created by **Urvashi Chandan**.
 
 A free, browser-based **3D multiplayer street racing game** — built from scratch with Three.js
 (WebGL), real-time multiplayer over Supabase Realtime, a Supabase Auth + Postgres leaderboard,
-and five fully animated worlds, each with its own weather, lighting, and hazards.
+and eight fully animated worlds, each with its own weather, lighting, and hazards.
 
 > **Honest scope note:** true GTA/NFS-level visuals come from licensed car models, motion capture,
 > and photogrammetry built by hundreds of artists over years — not reachable from scratch for
 > free. What this build has instead: 10 original stylized cars with glossy clear-coat paint,
-> flared wide-body arches, quad LED lighting and chrome wheels; five procedurally built circuits;
+> flared wide-body arches, quad LED lighting and chrome wheels; eight procedurally built circuits;
 > bloom post-processing; drift particles; dynamic headlights; camera shake; and real-time
 > multiplayer — a genuine arcade racer, not a tech demo.
 
@@ -54,8 +54,8 @@ and five fully animated worlds, each with its own weather, lighting, and hazards
   - All eight share red/white apex curbing + guardrails, nitro pickups, and the same physics/AI.
 - **10 original car models × 9 liveries** — Shadow GT (Hypercar/Legendary), Inferno X
   (Supercar/Epic), Cyber Veloce (Electric Hypercar/Rare), Nighthawk (Drift Coupe/Epic), Vortex RS
-  (Track/Rare), Phantom R (Highway GT/Legendary), Pulse GT (Sport/Epic), Fury ZX (Street
-  Racer/Epic), Aeron X (Track Coupe/Rare), Titan RS (Muscle/Legendary) — each with clear-coat/
+  (Track/Rare), Apex R9 (Track/Legendary), Titan S (Muscle/Epic), Phantom LX (Highway GT/Legendary),
+  Storm XR (Rally GT/Rare), Raptor ZX (Street Racer/Epic) — each with clear-coat/
   pearlescent paint, flared wide-body arches, chrome forged wheels with visible brake calipers,
   canards, multi-tip exhausts, and a rotating 3D garage preview you can drag to orbit. Garage
   shows rarity badge + Speed/Handling/Drift/Nitro stat bars.
@@ -185,24 +185,30 @@ Vercel/Render both auto-redeploy on every push to `main` — no extra step neede
 ```
 rydash/
 ├── index.html                 All screens/pages markup (SPA, router in main.js)
+├── vite.config.js             Vite build config with vendor chunk splitting
 ├── src/
 │   ├── main.js                 Router, race loop, input, HUD, screen wiring, world selection
 │   ├── styles/main.css          Full neon UI design system
 │   ├── game/
-│   │   ├── CarFactory.js         6 procedural car models × 9 liveries (clear-coat paint, chrome, arches)
-│   │   ├── World.js               "Neon District" world: sky, city, rain, road, curbing, lights
-│   │   ├── World_Sunset.js         "Sunline Highway" world: mountains, skyline, golden-hour sun
-│   │   ├── World_Desert.js         "Neon Desert" world: glowing skyline, cacti, drone lights
-│   │   ├── World_Underground.js     "Deep Run" world: tunnel girders, neon strips, passing train
-│   │   ├── World_Rooftop.js          "Skyline" world: rooftop circuit, dense tower skyline
+│   │   ├── CarFactory.js         10 procedural car models × 9 liveries (clear-coat paint, chrome, arches)
 │   │   ├── CarController.js        Arcade drift physics + AI driver
-│   │   ├── Effects.js               Bloom post-processing + drift smoke particles
+│   │   ├── Audio.js                 Web Audio API procedural sound synthesizer (engine, drift, nitro, crashes)
+│   │   ├── Effects.js               Bloom post-processing + drift smoke & spark particles
+│   │   ├── EnvMap.js                Procedural equirectangular neon reflection map
 │   │   ├── Ghost.js                  Local best-lap ghost recorder/player (localStorage)
-│   │   └── PreviewStage.js          Rotating 3D car preview (home hero + garage)
+│   │   ├── PreviewStage.js          Rotating 3D car preview (garage)
+│   │   ├── World.js                 "Neon District" world: sky, city, rain, road, curbing, lights
+│   │   ├── World_Sunset.js          "Sunline Highway" world: mountains, skyline, golden-hour sun
+│   │   ├── World_Desert.js          "Neon Desert" world: glowing skyline, cacti, drone lights
+│   │   ├── World_Underground.js     "Deep Run" world: tunnel girders, neon strips, passing train
+│   │   ├── World_Rooftop.js         "Skyline" world: rooftop circuit, dense tower skyline, ramps
+│   │   ├── World_Storm.js           "Storm City" world: lightning, storm clouds, heavy rain
+│   │   ├── World_Coastal.js         "Coastal Highway" world: ocean wave vertex shaders, moonlit road
+│   │   └── World_Vertical.js        "Vertical City" world: skyscraper canyons, flying traffic
 │   └── net/
 │       ├── supabaseClient.js        Supabase client init (local-mode fallback if unconfigured)
 │       ├── multiplayer.js            Realtime room: create/join, presence, transform broadcast
-│       └── backend.js                 Auth + leaderboard read/write (Supabase or localStorage)
+│       └── backend.js                 Auth + leaderboard + profile read/write (Supabase or localStorage)
 ├── supabase_schema.sql        SQL to create the `scores` + `profiles` tables
 └── .env.example                Copy to .env to enable Supabase
 ```

@@ -56,6 +56,9 @@ export class GhostPlayer {
         o.material.depthWrite = false;
         o.castShadow = false;
         o.receiveShadow = false;
+      } else if (o.isLight) {
+        o.visible = false;
+        o.intensity = 0;
       }
     });
   }

@@ -6,7 +6,9 @@ const LOCAL_USER_KEY = 'rydash_guest_id';
 export function getGuestId() {
   let id = localStorage.getItem(LOCAL_USER_KEY);
   if (!id) {
-    id = 'guest_' + Math.random().toString(36).slice(2, 10);
+    id = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? 'guest_' + crypto.randomUUID().slice(0, 8)
+      : 'guest_' + Math.random().toString(36).slice(2, 10);
     localStorage.setItem(LOCAL_USER_KEY, id);
   }
   return id;
@@ -79,4 +81,30 @@ export async function fetchLeaderboard(limit = 20) {
   }
   const scores = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
   return scores.slice(0, limit);
+}
+
+export async function fetchProfile(userId) {
+  if (!supabaseReady || !userId) return null;
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('display_name,favorite_car,favorite_livery')
+    .eq('id', userId)
+    .maybeSingle();
+  if (error) {
+    console.warn('Failed to fetch profile:', error.message);
+    return null;
+  }
+  return data;
+}
+
+export async function upsertProfile(userId, profile) {
+  if (!supabaseReady || !userId) return;
+  const { error } = await supabase
+    .from('profiles')
+    .upsert({
+      id: userId,
+      ...profile,
+      updated_at: new Date().toISOString(),
+    });
+  if (error) console.warn('Failed to update profile:', error.message);
 }

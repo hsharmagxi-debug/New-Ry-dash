@@ -91,23 +91,20 @@ export class CarController {
     }
     this.speed = THREE.MathUtils.clamp(this.speed, -this.maxSpeed * 0.4, targetMax);
 
-    // Steering — responsive arcade handling
-const speedFactor = THREE.MathUtils.clamp(
-  Math.abs(this.speed) / this.maxSpeed,
-  0.12,
-  1
-);
+    // Steering — responsive arcade handling (steers only when moving)
+    const speedMagnitude = Math.abs(this.speed);
+    const speedFactor = THREE.MathUtils.clamp(speedMagnitude / (this.maxSpeed * 0.45), 0, 1);
 
-const steerAmount =
-  this.steerInput *
-  this.turnRate *
-  speedFactor *
-  dt *
-  (this.speed < 0 ? -1 : 1);
+    const steerAmount =
+      this.steerInput *
+      this.turnRate *
+      speedFactor *
+      dt *
+      (this.speed < -0.2 ? -1 : 1);
 
-// Normal steering.
-// Handbrake gives only a modest steering boost.
-this.heading += steerAmount * (this.handbrake ? 1.25 : 1);
+    if (speedMagnitude > 0.1) {
+      this.heading += steerAmount * (this.handbrake ? 1.25 : 1);
+    }
 
 // Drift factor — mainly visual, with controlled sideways movement.
 const targetDrift = this.handbrake

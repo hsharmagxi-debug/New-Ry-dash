@@ -96,6 +96,11 @@ $('garageBtn').addEventListener('click', () => { showScreen('screen-garage'); op
 $('leaderboardBtn').addEventListener('click', () => { showScreen('screen-leaderboard'); loadLeaderboard(); });
 $('settingsBtn').addEventListener('click', () => showScreen('screen-settings'));
 $('howtoBtn').addEventListener('click', () => showScreen('screen-howto'));
+$('startTrainingBtn').addEventListener('click', () => {
+  state.isMultiplayerRace = false;
+  showScreen('screen-garage');
+  openGarage(() => startRaceFlow(false));
+});
 $('navAuthBtn').addEventListener('click', () => showScreen('screen-auth'));
 
 /* ============================== AUTH ============================== */
@@ -161,7 +166,7 @@ function renderGarageInfo() {
   $('carRarity').style.borderColor = `#${rarity.color.toString(16).padStart(6, '0')}`;
   $('statSpeed').style.width = `${modelDef.topSpeed * 100}%`;
   $('statHandling').style.width = `${modelDef.handling * 100}%`;
-  $('statDrift').style.width = `${modelDef.drift * 100}%`;
+  $('statAccel').style.width = `${modelDef.accel * 100}%`;
   $('statNitro').style.width = `${modelDef.nitro * 100}%`;
   buildColorSwatches();
 }

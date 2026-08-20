@@ -22,213 +22,58 @@ export const RARITY = {
 };
 
  export const CAR_MODELS = [
+  // Matches the "SELECT YOUR RIDE" reference card layout exactly: name, class subtitle, rarity,
+  // and Speed/Handling/Acceleration/Nitro stats (0-100 in the reference, stored here as 0-1).
+  // `drift` isn't shown on the card but still drives handbrake feel in CarController.
   {
-    id: 'shadow-gt',
-    name: 'SHADOW GT',
-    class: 'Hypercar',
-    rarity: 'legendary',
-    topSpeed: 0.88,
-    accel: 0.86,
-    handling: 0.88,
-    drift: 0.82,
-    nitro: 0.86,
-    scale: 1.0,
-    lowSlung: 1.15,
-    wide: 1.08,
-    wing: true,
-    quadLights: false,
-    hoodScoop: true,
-    arches: true
+    id: 'shadow-gt', name: 'SHADOW GT', class: 'Exotic GT', rarity: 'legendary',
+    topSpeed: 0.92, handling: 0.88, accel: 0.90, nitro: 0.90, drift: 0.8,
+    scale: 1.0, lowSlung: 1.15, wide: 1.08, wing: true, quadLights: false, hoodScoop: true, arches: true
   },
-
   {
-    id: 'inferno-x',
-    name: 'INFERNO X',
-    class: 'Supercar',
-    rarity: 'epic',
-    topSpeed: 0.84,
-    accel: 0.98,
-    handling: 0.72,
-    drift: 0.78,
-    nitro: 0.88,
-    scale: 0.98,
-    lowSlung: 1.18,
-    wide: 1.06,
-    wing: true,
-    quadLights: false,
-    hoodScoop: true,
-    arches: true
+    id: 'inferno-x', name: 'INFERNO X', class: 'Super Coupe', rarity: 'legendary',
+    topSpeed: 0.94, handling: 0.86, accel: 0.91, nitro: 0.93, drift: 0.78,
+    scale: 0.98, lowSlung: 1.18, wide: 1.06, wing: true, quadLights: false, hoodScoop: true, arches: true
   },
-
   {
-    id: 'cyber-veloce',
-    name: 'CYBER VELOCE',
-    class: 'Electric Hypercar',
-    rarity: 'rare',
-    topSpeed: 0.82,
-    accel: 0.84,
-    handling: 0.98,
-    drift: 0.86,
-    nitro: 0.84,
-    scale: 0.99,
-    lowSlung: 1.12,
-    wide: 1.04,
-    wing: true,
-    quadLights: true,
-    hoodScoop: false,
-    arches: true
+    id: 'cyber-veloce', name: 'CYBER VELOCE', class: 'Electric Hypercar', rarity: 'epic',
+    topSpeed: 0.95, handling: 0.91, accel: 0.96, nitro: 0.92, drift: 0.7,
+    scale: 0.99, lowSlung: 1.12, wide: 1.04, wing: true, quadLights: true, hoodScoop: false, arches: true
   },
-
   {
-    id: 'nighthawk',
-    name: 'NIGHTHAWK',
-    class: 'Drift Coupe',
-    rarity: 'epic',
-    topSpeed: 0.8,
-    accel: 0.82,
-    handling: 0.88,
-    drift: 1.0,
-    nitro: 0.82,
-    scale: 1.02,
-    lowSlung: 1.02,
-    wide: 1.02,
-    wing: false,
-    quadLights: true,
-    hoodScoop: false,
-    arches: true
+    id: 'nighthawk', name: 'NIGHTHAWK', class: 'Luxury GT', rarity: 'epic',
+    topSpeed: 0.90, handling: 0.87, accel: 0.88, nitro: 0.84, drift: 0.72,
+    scale: 1.02, lowSlung: 1.02, wide: 1.02, wing: false, quadLights: true, hoodScoop: false, arches: true
   },
-
   {
-    id: 'vortex-rs',
-    name: 'VORTEX RS',
-    class: 'Track',
-    rarity: 'rare',
-    topSpeed: 1.0,
-    accel: 0.82,
-    handling: 0.76,
-    drift: 0.74,
-    nitro: 0.9,
-    scale: 0.97,
-    lowSlung: 1.2,
-    wide: 1.1,
-    wing: true,
-    quadLights: false,
-    hoodScoop: true,
-    arches: true
+    id: 'vortex-rs', name: 'VORTEX RS', class: 'Track Coupe', rarity: 'epic',
+    topSpeed: 0.93, handling: 0.94, accel: 0.95, nitro: 0.90, drift: 0.8,
+    scale: 0.97, lowSlung: 1.2, wide: 1.1, wing: true, quadLights: false, hoodScoop: true, arches: true
   },
-
   {
-    id: 'apex-r9',
-    name: 'APEX R9',
-    class: 'Grand Tourer',
-    rarity: 'epic',
-    topSpeed: 0.9,
-    accel: 0.82,
-    handling: 0.88,
-    drift: 0.68,
-    nitro: 0.84,
-    scale: 1.04,
-    lowSlung: 1.0,
-    wide: 1.04,
-    wing: false,
-    quadLights: true,
-    hoodScoop: false,
-    arches: true
+    id: 'apex-r9', name: 'APEX R9', class: 'Hypercar', rarity: 'legendary',
+    topSpeed: 0.96, handling: 0.92, accel: 0.97, nitro: 0.94, drift: 0.68,
+    scale: 1.04, lowSlung: 1.0, wide: 1.04, wing: false, quadLights: true, hoodScoop: false, arches: true
   },
-
   {
-    id: 'phantom-r',
-    name: 'PHANTOM R',
-    class: 'Highway GT',
-    rarity: 'legendary',
-    topSpeed: 0.98,
-    accel: 0.88,
-    handling: 0.78,
-    drift: 0.76,
-    nitro: 0.94,
-    scale: 1.06,
-    lowSlung: 1.1,
-    wide: 1.04,
-    wing: false,
-    quadLights: false,
-    hoodScoop: true,
-    arches: true
+    id: 'titan-s', name: 'TITAN S', class: 'Performance Sedan', rarity: 'rare',
+    topSpeed: 0.86, handling: 0.82, accel: 0.83, nitro: 0.80, drift: 0.94,
+    scale: 1.1, lowSlung: 0.9, wide: 1.14, wing: false, quadLights: true, hoodScoop: true, arches: true
   },
-
   {
-    id: 'pulse-gt',
-    name: 'PULSE GT',
-    class: 'Sport',
-    rarity: 'epic',
-    topSpeed: 0.86,
-    accel: 0.9,
-    handling: 0.84,
-    drift: 0.8,
-    nitro: 1.0,
-    scale: 0.97,
-    lowSlung: 1.0,
-    wide: 0.98,
-    wing: true,
-    quadLights: true,
-    hoodScoop: false,
-    arches: true
+    id: 'phantom-lx', name: 'PHANTOM LX', class: 'Ultra GT', rarity: 'rare',
+    topSpeed: 0.87, handling: 0.88, accel: 0.85, nitro: 0.78, drift: 0.62,
+    scale: 1.06, lowSlung: 0.94, wide: 1.05, wing: false, quadLights: true, hoodScoop: false, arches: true
   },
-
   {
-    id: 'fury-zx',
-    name: 'FURY ZX',
-    class: 'Street Racer',
-    rarity: 'epic',
-    topSpeed: 0.9,
-    accel: 0.96,
-    handling: 0.78,
-    drift: 0.88,
-    nitro: 0.86,
-    scale: 1.04,
-    lowSlung: 0.9,
-    wide: 1.1,
-    wing: false,
-    quadLights: true,
-    hoodScoop: true,
-    arches: true
+    id: 'storm-xr', name: 'STORM XR', class: 'AWD Performance', rarity: 'rare',
+    topSpeed: 0.84, handling: 0.90, accel: 0.85, nitro: 0.82, drift: 0.9,
+    scale: 1.05, lowSlung: 0.86, wide: 1.08, wing: true, quadLights: true, hoodScoop: true, arches: true
   },
-
   {
-    id: 'aeron-x',
-    name: 'AERON X',
-    class: 'Track Coupe',
-    rarity: 'rare',
-    topSpeed: 0.84,
-    accel: 0.86,
-    handling: 1.0,
-    drift: 0.9,
-    nitro: 0.82,
-    scale: 0.95,
-    lowSlung: 1.15,
-    wide: 0.97,
-    wing: true,
-    quadLights: false,
-    hoodScoop: false,
-    arches: true
-  },
-
-  {
-    id: 'titan-rs',
-    name: 'TITAN RS',
-    class: 'Muscle',
-    rarity: 'legendary',
-    topSpeed: 0.92,
-    accel: 0.88,
-    handling: 0.86,
-    drift: 0.7,
-    nitro: 0.92,
-    scale: 1.12,
-    lowSlung: 0.85,
-    wide: 1.16,
-    wing: false,
-    quadLights: true,
-    hoodScoop: true,
-    arches: true
+    id: 'raptor-zx', name: 'RAPTOR ZX', class: 'Muscle Coupe', rarity: 'rare',
+    topSpeed: 0.88, handling: 0.75, accel: 0.89, nitro: 0.87, drift: 0.86,
+    scale: 1.02, lowSlung: 1.04, wide: 1.07, wing: true, quadLights: true, hoodScoop: true, arches: true
   }
 ];
 function paintMaterial(liveryColor) {

@@ -82,9 +82,9 @@
       </div>
 
       <aside class="live-card">
-        <div class="live-card-top"><span>LIVE RACES</span><span class="live-dot"></span></div>
-        <div class="live-number">1,248</div>
-        <div class="live-label">DRIVERS ONLINE</div>
+        <div class="live-card-top"><span>SEASON 01</span><span class="live-dot"></span></div>
+        <div class="live-number">5</div>
+        <div class="live-label">WORLDS TO RACE</div>
         <div class="track-mini" aria-hidden="true"><span></span><i></i></div>
         <div class="live-meta"><span>NEON DISTRICT</span><span>3 LAPS</span></div>
       </aside>
@@ -135,7 +135,7 @@
         <div class="stat-bars">
           <div class="stat-row"><span>Speed</span><div class="bar"><div id="statSpeed" class="bar-fill"></div></div></div>
           <div class="stat-row"><span>Handling</span><div class="bar"><div id="statHandling" class="bar-fill"></div></div></div>
-          <div class="stat-row"><span>Drift</span><div class="bar"><div id="statDrift" class="bar-fill"></div></div></div>
+          <div class="stat-row"><span>Acceleration</span><div class="bar"><div id="statAccel" class="bar-fill"></div></div></div>
           <div class="stat-row"><span>Nitro</span><div class="bar"><div id="statNitro" class="bar-fill"></div></div></div>
         </div>
         <div class="color-swatches" id="colorSwatches"></div>
@@ -266,29 +266,59 @@
     </section>
 
     <!-- ===================== HOW TO PLAY ===================== -->
-    <section id="screen-howto" class="screen">
+    <section id="screen-howto" class="screen howto-screen">
+      <div class="ambient-bg"></div>
       <button class="btn-back" data-back="screen-home">← Back</button>
-      <div class="panel-center">
-        <h2 class="panel-title">HOW TO <span class="accent">PLAY</span></h2>
-        <ul class="howto-list">
-          <li><b>W / ↑</b> — Accelerate</li>
-          <li><b>S / ↓</b> — Brake / Reverse</li>
-          <li><b>A D / ← →</b> — Steer</li>
-          <li><b>Space</b> — Handbrake (drift)</li>
-          <li><b>Shift</b> — Nitro boost</li>
-          <li><b>C</b> — Change camera</li>
-          <li><b>Esc</b> — Pause</li>
-        </ul>
-        <p class="muted">On mobile, use the on-screen touch controls. A connected gamepad is
-        auto-detected — left stick steers, triggers gas/brake, A/Cross for nitro, B/Circle or
-        bumpers for handbrake.</p>
-        <p class="muted">Cars now bump each other on contact — ram opponents off their line to
-        take the lead.</p>
-        <p class="muted">Your fastest single-player run on each world+car is saved locally as a
-        translucent <b>ghost</b> to race against next time — beat it to save a new best.</p>
-        <p class="muted">The <b>Skyline</b> world has real launch ramps — hit one fast enough and
-        you'll get real air.</p>
+      <h2 class="panel-title center">TRAINING <span class="accent">CIRCUIT</span></h2>
+
+      <div class="howto-layout">
+        <div class="key-grid">
+          <div class="key-row">
+            <span class="key-cap key-blank"></span><span class="key-cap">W<br><small>↑</small></span><span class="key-cap key-blank"></span>
+            <span class="key-label">Accelerate</span>
+          </div>
+          <div class="key-row">
+            <span class="key-cap">A<br><small>←</small></span><span class="key-cap">S<br><small>↓</small></span><span class="key-cap">D<br><small>→</small></span>
+            <span class="key-label">Steer / Brake / Reverse</span>
+          </div>
+          <div class="key-row"><span class="key-cap key-wide">SPACE</span><span class="key-label">Nitro</span></div>
+          <div class="key-row"><span class="key-cap key-wide">SHIFT</span><span class="key-label">Drift (handbrake)</span></div>
+          <div class="key-row"><span class="key-cap">C</span><span class="key-label">Camera Change</span></div>
+          <div class="key-row"><span class="key-cap">ESC</span><span class="key-label">Pause</span></div>
+          <p class="muted howto-note">On mobile, use the on-screen touch controls. A connected
+          gamepad is auto-detected — left stick steers, triggers gas/brake, A/Cross for nitro,
+          B/Circle or bumpers for handbrake.</p>
+        </div>
+
+        <div class="howto-checklist">
+          <div class="howto-card">
+            <span class="howto-icon">🏁</span>
+            <div><b>Complete Laps</b><p>Be the first to finish the required laps — 8 racers, live position tracking.</p></div>
+          </div>
+          <div class="howto-card">
+            <span class="howto-icon">⚡</span>
+            <div><b>Use Nitro</b><p>Fill your nitro and boost for maximum speed — or drive through a glowing pickup ring for an instant refill.</p></div>
+          </div>
+          <div class="howto-card">
+            <span class="howto-icon">🌀</span>
+            <div><b>Drift Corners</b><p>Hold handbrake through sharp turns to take corners faster and build nitro.</p></div>
+          </div>
+          <div class="howto-card">
+            <span class="howto-icon">⚠️</span>
+            <div><b>Avoid Traffic</b><p>Other cars will slow you down on contact — and straying off the road costs you speed too.</p></div>
+          </div>
+          <div class="howto-card">
+            <span class="howto-icon">👻</span>
+            <div><b>Beat Your Ghost</b><p>Your fastest run per world/car replays as a translucent ghost — beat it to save a new best.</p></div>
+          </div>
+          <div class="howto-card">
+            <span class="howto-icon">🛫</span>
+            <div><b>Catch Air</b><p>Skyline has real launch ramps — hit one fast enough and you'll get genuine airtime.</p></div>
+          </div>
+        </div>
       </div>
+
+      <button id="startTrainingBtn" class="btn btn-primary btn-lg howto-start-btn">START TRAINING</button>
     </section>
 
     <div id="fpsCounter" class="fps-counter hidden">0 FPS</div>

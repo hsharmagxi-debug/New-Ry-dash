@@ -173,6 +173,38 @@ input,select{font-family:var(--font-body)}
 .howto-list{list-style:none;display:flex;flex-direction:column;gap:10px;text-align:left;margin:16px 0}
 .howto-list li{padding:10px 14px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.92rem}
 
+/* Reusable dark ambient backdrop for non-home screens — reuses the same neon-city artwork as
+   the home hero (heavily darkened) so every screen feels part of one world, without needing a
+   separate photo per page. */
+.ambient-bg{position:absolute;inset:0;z-index:0;
+  background:#05060a url('/rydash-neon-home.png') center 30% / cover no-repeat;
+  filter:blur(2px) brightness(.28) saturate(.8)}
+.ambient-bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,transparent 0%,#05060a 85%)}
+
+/* ---------- How to Play / Training Circuit ---------- */
+.howto-screen{position:relative;overflow-y:auto;padding:70px 24px 40px;align-items:center}
+.howto-screen .panel-title{position:relative;z-index:1;margin-bottom:28px}
+.howto-layout{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:1000px;width:100%;margin:0 auto}
+@media (max-width:760px){.howto-layout{grid-template-columns:1fr}}
+.key-grid{background:var(--panel);border:1px solid var(--panel-border);border-radius:var(--radius);padding:22px}
+.key-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.key-cap{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:38px;height:38px;padding:0 8px;border-radius:8px;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);font-family:var(--font-display);font-weight:700;font-size:.85rem;
+  box-shadow:0 2px 0 rgba(0,0,0,.3)}
+.key-cap small{font-size:.6rem;color:var(--text-dim);line-height:1}
+.key-cap.key-blank{background:transparent;border-color:transparent;box-shadow:none}
+.key-cap.key-wide{min-width:90px}
+.key-label{color:var(--text-dim);font-size:.85rem;margin-left:6px}
+.howto-note{margin-top:16px;font-size:.78rem}
+.howto-checklist{display:flex;flex-direction:column;gap:12px}
+.howto-card{display:flex;gap:14px;align-items:flex-start;background:var(--panel);border:1px solid var(--panel-border);
+  border-radius:var(--radius);padding:14px 16px}
+.howto-card b{font-family:var(--font-display);font-size:.88rem;letter-spacing:.02em}
+.howto-card p{color:var(--text-dim);font-size:.8rem;margin-top:4px;line-height:1.4}
+.howto-icon{font-size:1.5rem;line-height:1}
+.howto-start-btn{position:relative;z-index:1;margin-top:28px}
+
 /* misc */
 .fps-counter{position:absolute;top:18px;left:18px;background:rgba(0,0,0,.5);color:var(--neon-green);padding:4px 10px;border-radius:6px;font-family:monospace;font-size:.8rem;z-index:20}
 .toast{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--panel-border);padding:12px 22px;border-radius:10px;font-size:.85rem;z-index:30;transition:opacity .3s,transform .3s}

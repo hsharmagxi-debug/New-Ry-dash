@@ -729,19 +729,29 @@ input, select {
 .stat-name { color: var(--text-dim); }
 .stat-bar-track {
   width: 58%;
-  height: 4px;
+  height: 6px;
   background: rgba(255, 255, 255, 0.08);
-  border-radius: 2px;
+  border-radius: 3px;
   overflow: hidden;
 }
-.stat-bar-val {
+.stat-bar-fill, .stat-bar-val {
   height: 100%;
-  border-radius: 2px;
+  border-radius: 3px;
 }
-.stat-speed { background: var(--neon-cyan); }
-.stat-handling { background: var(--neon-pink); }
-.stat-accel { background: var(--neon-purple); }
-.stat-nitro { background: var(--neon-gold); }
+.fill-orange, .stat-speed { background: linear-gradient(90deg, #ff5e00, #ff9900); box-shadow: 0 0 8px rgba(255, 120, 0, 0.6); }
+.fill-cyan, .stat-handling { background: linear-gradient(90deg, #00b4d8, #00f2fe); box-shadow: 0 0 8px rgba(0, 242, 254, 0.6); }
+.fill-purple, .stat-accel { background: linear-gradient(90deg, #b5179e, #7209b7); box-shadow: 0 0 8px rgba(181, 23, 158, 0.6); }
+.fill-green, .stat-nitro { background: linear-gradient(90deg, #06d6a0, #38ef7d); box-shadow: 0 0 8px rgba(56, 239, 125, 0.6); }
+.fill-pink { background: linear-gradient(90deg, #f72585, #ff4d6d); box-shadow: 0 0 8px rgba(247, 37, 133, 0.6); }
+.fill-gold { background: linear-gradient(90deg, #f77f00, #fcbf49); box-shadow: 0 0 8px rgba(252, 191, 73, 0.6); }
+.stat-val {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #fff;
+  min-width: 22px;
+  text-align: right;
+}
 
 .garage-detail-panel {
   display: flex;

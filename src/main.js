@@ -262,16 +262,41 @@ function buildGarageCards() {
   grid.innerHTML = '';
   CAR_MODELS.forEach((m, idx) => {
     const card = document.createElement('div');
-    card.className = 'car-card ' + (m.rarity || 'rare') + (idx === state.carIndex ? ' active' : '');
+    const rarityClass = 'rarity-' + (m.rarity || 'rare');
+    card.className = `car-card ${rarityClass} ${idx === state.carIndex ? 'active selected' : ''}`;
+    const num = String(idx + 1).padStart(2, '0');
+    const spd = Math.round(m.topSpeed * 100);
+    const hnd = Math.round(m.handling * 100);
+    const acc = Math.round(m.accel * 100);
+    const nit = Math.round(m.nitro * 100);
     card.innerHTML = `
-      <div class="car-rarity-badge">${(m.rarity || 'RARE').toUpperCase()}</div>
-      <div class="car-card-name">${m.name}</div>
-      <div class="car-card-class">${m.class || 'Performance'}</div>
-      <div class="car-stats-mini">
-        <div class="stat-mini-row"><span>SPD</span><div class="bar-bg"><div class="bar-fill" style="width:${m.topSpeed * 100}%"></div></div></div>
-        <div class="stat-mini-row"><span>ACC</span><div class="bar-bg"><div class="bar-fill" style="width:${m.accel * 100}%"></div></div></div>
-        <div class="stat-mini-row"><span>HND</span><div class="bar-bg"><div class="bar-fill" style="width:${m.handling * 100}%"></div></div></div>
-        <div class="stat-mini-row"><span>NIT</span><div class="bar-bg"><div class="bar-fill" style="width:${m.nitro * 100}%"></div></div></div>
+      <div class="car-card-header">
+        <span class="car-num">${num}</span>
+        <span class="car-title">${m.name}</span>
+        <span class="rarity-tag ${rarityClass}">${(m.rarity || 'RARE').toUpperCase()}</span>
+      </div>
+      <div class="car-class">${(m.class || 'EXOTIC GT').toUpperCase()}</div>
+      <div class="car-stats">
+        <div class="stat-row">
+          <span class="stat-name">SPEED</span>
+          <div class="stat-bar-track"><div class="stat-bar-fill fill-orange" style="width:${spd}%"></div></div>
+          <span class="stat-val">${spd}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-name">HANDLING</span>
+          <div class="stat-bar-track"><div class="stat-bar-fill fill-cyan" style="width:${hnd}%"></div></div>
+          <span class="stat-val">${hnd}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-name">ACCELERATION</span>
+          <div class="stat-bar-track"><div class="stat-bar-fill fill-purple" style="width:${acc}%"></div></div>
+          <span class="stat-val">${acc}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-name">NITRO</span>
+          <div class="stat-bar-track"><div class="stat-bar-fill fill-green" style="width:${nit}%"></div></div>
+          <span class="stat-val">${nit}</span>
+        </div>
       </div>
     `;
     card.onclick = () => {
@@ -279,6 +304,7 @@ function buildGarageCards() {
       localStorage.setItem('rydash_car', idx);
       updatePreviewStages();
       buildGarageCards();
+      toast(`Selected: ${m.name}`);
     };
     grid.appendChild(card);
   });

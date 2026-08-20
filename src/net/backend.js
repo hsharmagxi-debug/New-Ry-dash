@@ -37,6 +37,21 @@ export async function signOut() {
   await supabase.auth.signOut();
 }
 
+// OAuth sign-in — 'google' covers Gmail, 'azure' covers Microsoft/Outlook/Hotmail accounts.
+// Both need to be enabled with real client credentials in the Supabase dashboard first (see
+// README's "Enable Google / Microsoft sign-in" section) — until then this throws a clear error
+// instead of silently failing. There is no Yahoo provider in Supabase Auth.
+export async function signInWithOAuth(provider) {
+  if (!supabaseReady) throw new Error('Supabase not configured.');
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: window.location.origin },
+  });
+  if (error) throw error;
+  // On success the browser navigates away to the provider's consent screen and back —
+  // there's no further local state to update here.
+}
+
 export async function submitScore({ name, timeMs, car, livery }) {
   if (supabaseReady) {
     const { error } = await supabase.from('scores').insert({

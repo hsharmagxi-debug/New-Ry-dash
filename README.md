@@ -118,8 +118,37 @@ First push will ask you to sign in (browser popup, or a
    VITE_SUPABASE_URL=https://your-project.supabase.co
    VITE_SUPABASE_ANON_KEY=your-anon-key
    ```
+   **Important:** `VITE_SUPABASE_URL` must be the *plain* project URL only — no `/rest/v1/` or
+   any other path on the end. If you copy it from a REST API code example on the dashboard
+   instead of the plain "Project URL" field, it'll have `/rest/v1/` appended, which silently
+   breaks OAuth sign-in (auth calls end up at the wrong path) even though email/password
+   sign-in still happens to work. Double-check it ends in exactly `.supabase.co` with nothing after.
 5. Restart `npm run dev` — the Multiplayer Lobby, global leaderboard, and email sign-in/sign-up
    now work. No code changes needed; the app auto-detects the env vars.
+
+### 2b. Enable Google / Microsoft sign-in (optional)
+
+The Driver Login screen has "Continue with Google" and "Continue with Microsoft" buttons
+already wired up — Microsoft's login also covers Outlook/Hotmail accounts under one button.
+**Yahoo isn't supported** — Supabase Auth doesn't offer a Yahoo provider, so Yahoo users sign in
+with email/password instead (their Yahoo address works fine as the email). To activate the two
+that are supported:
+
+**Google:**
+1. [Google Cloud Console](https://console.cloud.google.com) → create a project (or use one) →
+   **APIs & Services → Credentials** → **Create Credentials → OAuth client ID** → Web application.
+2. Authorized redirect URI: `https://YOUR-PROJECT-REF.supabase.co/auth/v1/callback`.
+3. Copy the generated **Client ID** and **Client Secret**.
+4. In Supabase: **Authentication → Providers → Google** → paste both → **Save**.
+
+**Microsoft:**
+1. [Azure Portal](https://portal.azure.com) → **App registrations → New registration**.
+2. Redirect URI (Web): `https://YOUR-PROJECT-REF.supabase.co/auth/v1/callback`.
+3. Under **Certificates & secrets**, create a new client secret and copy it, plus the
+   **Application (client) ID** from the Overview page.
+4. In Supabase: **Authentication → Providers → Azure** → paste the client ID/secret → **Save**.
+
+No code changes needed for either — the buttons already call the right provider once enabled.
 
 ### 3. Deploy — Vercel (recommended, free)
 

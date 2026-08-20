@@ -138,6 +138,14 @@ async function handleAuth(mode) {
     $('authMsg').textContent = err.message || 'Something went wrong.';
   }
 }
+$('authGoogleBtn').addEventListener('click', async () => {
+  $('authMsg').textContent = 'Redirecting to Google…';
+  try { await backend.signInWithOAuth('google'); } catch (err) { $('authMsg').textContent = err.message || 'Google sign-in isn’t enabled yet — see README.'; }
+});
+$('authMicrosoftBtn').addEventListener('click', async () => {
+  $('authMsg').textContent = 'Redirecting to Microsoft…';
+  try { await backend.signInWithOAuth('azure'); } catch (err) { $('authMsg').textContent = err.message || 'Microsoft sign-in isn’t enabled yet — see README.'; }
+});
 $('authGuestBtn').addEventListener('click', () => showScreen('screen-home'));
 $('authSignOutBtn').addEventListener('click', async () => { await backend.signOut(); await refreshAuthUI(); });
 

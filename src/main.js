@@ -5,6 +5,9 @@ import { buildWorld as buildSunsetWorld } from './game/World_Sunset.js';
 import { buildWorld as buildDesertWorld } from './game/World_Desert.js';
 import { buildWorld as buildUndergroundWorld } from './game/World_Underground.js';
 import { buildWorld as buildRooftopWorld } from './game/World_Rooftop.js';
+import { buildWorld as buildStormWorld } from './game/World_Storm.js';
+import { buildWorld as buildCoastalWorld } from './game/World_Coastal.js';
+import { buildWorld as buildVerticalWorld } from './game/World_Vertical.js';
 import { loadGhost, saveGhostIfBest, GhostRecorder, GhostPlayer } from './game/Ghost.js';
 
 const WORLDS = {
@@ -13,6 +16,9 @@ const WORLDS = {
   desert: { label: 'Neon Desert', build: buildDesertWorld },
   underground: { label: 'Deep Run', build: buildUndergroundWorld },
   rooftop: { label: 'Skyline', build: buildRooftopWorld },
+  storm: { label: 'Storm City', build: buildStormWorld },
+  coastal: { label: 'Coastal Highway', build: buildCoastalWorld },
+  vertical: { label: 'Vertical City', build: buildVerticalWorld },
 };
 import { CarController, AIDriver } from './game/CarController.js';
 import { buildComposer, SmokeSystem, SparkSystem } from './game/Effects.js';

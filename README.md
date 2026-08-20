@@ -29,7 +29,7 @@ and five fully animated worlds, each with its own weather, lighting, and hazards
   intensity during nitro, for a burst-of-speed feel.
 - **Ghost replay** — your fastest single-player run per world+car is saved locally and replays as
   a translucent ghost car next time, so you're always racing your own best. No backend needed.
-- **Five worlds** (pick in Settings):
+- **Eight worlds** (pick in Settings or the World Map screen):
   - **Neon District** — rain, flickering neon billboards, glossy reflective wet asphalt (env-mapped),
     passing background traffic light-streaks, occasional lightning, bloom-lit signs/headlights.
   - **Sunline Highway** — golden-hour mountain pass, snow-capped peaks, distant city skyline, palm
@@ -42,7 +42,16 @@ and five fully animated worlds, each with its own weather, lighting, and hazards
     holographic billboards glow, distant helipad rings glimmer below, and two physical **launch
     ramps** send any car crossing them above ~14 units/s airborne (real gravity/airborne physics,
     not a scripted hop — AI opponents use them too).
-  - All five share red/white apex curbing + guardrails, nitro pickups, and the same physics/AI.
+  - **Storm City** — a violent electric storm: purple storm clouds, frequent lightning (every
+    2-4s) synchronized with a headlight-sweep effect, rain that breathes in intensity waves, and
+    drifting ground fog.
+  - **Coastal Highway** — moonlit night drive along the coast: a real animated ocean (vertex-shader
+    wave displacement, not a scrolling texture) on one side, distant mountains/city on the other,
+    slow-drifting floating particles.
+  - **Vertical City** — a narrow racing canyon between towering skyscrapers: flying vehicles loop
+    overhead, an elevated train sweeps past on its own track, giant digital billboards flicker,
+    pedestrian silhouettes line the sidewalks.
+  - All eight share red/white apex curbing + guardrails, nitro pickups, and the same physics/AI.
 - **10 original car models × 9 liveries** — Shadow GT (Hypercar/Legendary), Inferno X
   (Supercar/Epic), Cyber Veloce (Electric Hypercar/Rare), Nighthawk (Drift Coupe/Epic), Vortex RS
   (Track/Rare), Phantom R (Highway GT/Legendary), Pulse GT (Sport/Epic), Fury ZX (Street

@@ -227,6 +227,7 @@ input,select{font-family:var(--font-body)}
 .worldmap-screen .panel-title{position:relative;z-index:1}
 .worldmap-sub{position:relative;z-index:1;text-align:center;margin-bottom:10px}
 .world-map{position:relative;z-index:1;width:100%;max-width:640px;aspect-ratio:600/460;margin:10px auto 0}
+.world-map-8{aspect-ratio:1/1;max-width:560px}
 .world-map-lines{position:absolute;inset:0;width:100%;height:100%}
 .world-map-lines line{stroke:rgba(0,229,255,.35);stroke-width:1.5;stroke-dasharray:4 4}
 .world-hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);

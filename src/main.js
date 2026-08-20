@@ -53,8 +53,10 @@ const qs = (sel) => document.querySelector(sel);
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach((el) => el.classList.remove('active'));
   const target = $(id);
-  if (target) target.classList.add('active');
-  state.screen = id;
+  if (target) {
+    target.classList.add('active');
+    state.screen = id;
+  }
   document.querySelectorAll('[data-back]').forEach((btn) => {
     btn.onclick = () => showScreen(btn.dataset.back);
   });
@@ -71,7 +73,7 @@ function toast(msg, ms = 2400) {
 
 /* ============================== SOUND TOGGLE ============================== */
 function updateSoundUI() {
-  const icon = $('navSoundIcon');
+  const icon = $('soundIcon') || $('navSoundIcon');
   if (icon) icon.textContent = state.soundOn ? '🔊' : '🔇';
   const settingCheckbox = $('settingSound');
   if (settingCheckbox) settingCheckbox.checked = state.soundOn;
@@ -91,25 +93,26 @@ if (navSoundToggle) {
 
 /* ============================== BOOT / INIT ============================== */
 async function boot() {
-  $('navPlayerName').textContent = state.playerName;
+  const authStatus = $('authStatus') || $('navPlayerName');
+  if (authStatus) authStatus.textContent = state.playerName;
   updateSoundUI();
 
   // Wire Topbar / Auth Buttons
-  const navLoginBtn = $('navLoginBtn');
-  if (navLoginBtn) navLoginBtn.onclick = () => showScreen('screen-auth');
+  const navAuthBtn = $('navAuthBtn') || $('navLoginBtn');
+  if (navAuthBtn) navAuthBtn.onclick = () => showScreen('screen-auth');
 
   // Quick Race & Multiplayer
-  const heroRaceBtn = $('heroRaceBtn');
-  if (heroRaceBtn) {
-    heroRaceBtn.onclick = () => {
+  const playBtn = $('playBtn') || $('heroRaceBtn');
+  if (playBtn) {
+    playBtn.onclick = () => {
       sound.init();
       showScreen('screen-garage');
       openGarage(() => startRaceFlow(false));
     };
   }
-  const heroMultiBtn = $('heroMultiBtn');
-  if (heroMultiBtn) {
-    heroMultiBtn.onclick = () => {
+  const multiplayerBtn = $('multiplayerBtn') || $('heroMultiBtn');
+  if (multiplayerBtn) {
+    multiplayerBtn.onclick = () => {
       sound.init();
       showScreen('screen-garage');
       openGarage(() => showScreen('screen-lobby'));
@@ -117,20 +120,20 @@ async function boot() {
   }
 
   // 5-Button Dock
-  const dockGarageBtn = $('dockGarageBtn');
-  if (dockGarageBtn) dockGarageBtn.onclick = () => { showScreen('screen-garage'); openGarage(() => showScreen('screen-home')); };
+  const garageBtn = $('garageBtn') || $('dockGarageBtn');
+  if (garageBtn) garageBtn.onclick = () => { showScreen('screen-garage'); openGarage(() => showScreen('screen-home')); };
 
-  const dockLeaderboardBtn = $('dockLeaderboardBtn');
-  if (dockLeaderboardBtn) dockLeaderboardBtn.onclick = () => { showScreen('screen-leaderboard'); loadLeaderboard(); };
+  const leaderboardBtn = $('leaderboardBtn') || $('dockLeaderboardBtn');
+  if (leaderboardBtn) leaderboardBtn.onclick = () => { showScreen('screen-leaderboard'); loadLeaderboard(); };
 
-  const dockWorldBtn = $('dockWorldBtn');
-  if (dockWorldBtn) dockWorldBtn.onclick = () => { showScreen('screen-worldmap'); setWorld(state.worldId); updateLapPillsUI(); };
+  const worldmapBtn = $('worldmapBtn') || $('dockWorldBtn');
+  if (worldmapBtn) worldmapBtn.onclick = () => { showScreen('screen-worldmap'); setWorld(state.worldId); updateLapPillsUI(); };
 
-  const dockSettingsBtn = $('dockSettingsBtn');
-  if (dockSettingsBtn) dockSettingsBtn.onclick = () => showScreen('screen-settings');
+  const settingsBtn = $('settingsBtn') || $('dockSettingsBtn');
+  if (settingsBtn) settingsBtn.onclick = () => showScreen('screen-settings');
 
-  const dockHowToBtn = $('dockHowToBtn');
-  if (dockHowToBtn) dockHowToBtn.onclick = () => showScreen('screen-howto');
+  const howtoBtn = $('howtoBtn') || $('dockHowToBtn');
+  if (howtoBtn) howtoBtn.onclick = () => showScreen('screen-howto');
 
   // Supabase Auth
   try {
@@ -138,12 +141,13 @@ async function boot() {
     if (user) {
       state.session = user;
       state.playerName = user.user_metadata?.driver_name || user.email?.split('@')[0] || state.playerName;
-      $('navPlayerName').textContent = state.playerName;
-      if (navLoginBtn) navLoginBtn.textContent = '👤 ' + state.playerName;
+      if (authStatus) authStatus.textContent = state.playerName;
+      if (navAuthBtn) navAuthBtn.textContent = '👤 ' + state.playerName;
     }
   } catch (_) {}
 
-  setTimeout(() => showScreen('screen-home'), 400);
+  // Immediately display the home screen
+  showScreen('screen-home');
 }
 
 /* ============================== AUTH HANDLERS ============================== */
@@ -151,19 +155,21 @@ const authForm = $('authForm');
 if (authForm) {
   authForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = $('authEmail').value.trim();
-    const password = $('authPassword').value;
+    const email = $('authEmail')?.value.trim();
+    const password = $('authPassword')?.value;
     const msg = $('authMsg');
-    msg.textContent = 'Signing in…';
+    if (msg) msg.textContent = 'Signing in…';
     const res = await backend.signIn(email, password);
     if (res.error) {
-      msg.textContent = res.error.message || 'Failed to sign in';
+      if (msg) msg.textContent = res.error.message || 'Failed to sign in';
     } else {
-      msg.textContent = 'Welcome back!';
+      if (msg) msg.textContent = 'Welcome back!';
       state.session = res.user;
       state.playerName = res.user.user_metadata?.driver_name || email.split('@')[0];
-      $('navPlayerName').textContent = state.playerName;
-      $('navLoginBtn').textContent = '👤 ' + state.playerName;
+      const authStatus = $('authStatus') || $('navPlayerName');
+      if (authStatus) authStatus.textContent = state.playerName;
+      const navAuthBtn = $('navAuthBtn') || $('navLoginBtn');
+      if (navAuthBtn) navAuthBtn.textContent = '👤 ' + state.playerName;
       setTimeout(() => showScreen('screen-home'), 600);
     }
   });
@@ -172,19 +178,19 @@ if (authForm) {
 const authSignUpBtn = $('authSignUpBtn');
 if (authSignUpBtn) {
   authSignUpBtn.addEventListener('click', async () => {
-    const email = $('authEmail').value.trim();
-    const password = $('authPassword').value;
+    const email = $('authEmail')?.value.trim();
+    const password = $('authPassword')?.value;
     const msg = $('authMsg');
     if (!email || password.length < 6) {
-      msg.textContent = 'Enter email & 6+ char password';
+      if (msg) msg.textContent = 'Enter email & 6+ char password';
       return;
     }
-    msg.textContent = 'Creating account…';
+    if (msg) msg.textContent = 'Creating account…';
     const res = await backend.signUp(email, password, { driver_name: email.split('@')[0] });
     if (res.error) {
-      msg.textContent = res.error.message || 'Sign up failed';
+      if (msg) msg.textContent = res.error.message || 'Sign up failed';
     } else {
-      msg.textContent = 'Account created! Check email or sign in.';
+      if (msg) msg.textContent = 'Account created! Check email or sign in.';
     }
   });
 }
@@ -274,14 +280,19 @@ if (createRoomBtn) {
 const joinRoomBtn = $('joinRoomBtn');
 if (joinRoomBtn) {
   joinRoomBtn.addEventListener('click', async () => {
-    const code = $('joinCodeInput').value.trim().toUpperCase();
-    if (code.length !== 5) { $('lobbyMsg').textContent = 'Enter a valid 5-letter code.'; return; }
+    const code = $('joinCodeInput')?.value.trim().toUpperCase();
+    if (!code || code.length !== 5) {
+      const msg = $('lobbyMsg');
+      if (msg) msg.textContent = 'Enter a valid 5-letter code.';
+      return;
+    }
     await joinRoom(code, false);
   });
 }
 
 async function joinRoom(code, isHost) {
-  $('lobbyMsg').textContent = 'Connecting to room…';
+  const msg = $('lobbyMsg');
+  if (msg) msg.textContent = 'Connecting to room…';
   try {
     const local = { id: backend.getGuestId(), name: state.playerName, carModel: CAR_MODELS[state.carIndex].id, livery: CAR_LIVERIES[state.liveryIndex].id };
     const room = new MultiplayerRoom(code, local);
@@ -290,25 +301,31 @@ async function joinRoom(code, isHost) {
     room.onRaceStart = () => { state.isMultiplayerRace = true; beginRace(); };
     await room.connect();
     state.multiplayer = room;
-    $('roomCodeDisplay').textContent = code;
-    $('roomInfo').classList.remove('hidden');
-    $('startRaceBtn').classList.toggle('hidden', !isHost);
-    $('lobbyMsg').textContent = isHost ? 'Room created — share this code!' : 'Joined room!';
+    const roomCodeDisplay = $('roomCodeDisplay');
+    if (roomCodeDisplay) roomCodeDisplay.textContent = code;
+    const roomInfo = $('roomInfo');
+    if (roomInfo) roomInfo.classList.remove('hidden');
+    const startRaceBtn = $('startRaceBtn');
+    if (startRaceBtn) startRaceBtn.classList.toggle('hidden', !isHost);
+    if (msg) msg.textContent = isHost ? 'Room created — share this code!' : 'Joined room!';
     updateLobbyUI(room);
   } catch (err) {
-    $('lobbyMsg').textContent = err.message || 'Connection failed';
+    if (msg) msg.textContent = err.message || 'Connection failed';
   }
 }
 
 function updateLobbyUI(room) {
-  $('playerCount').textContent = `${room.playerCount} / 8 Racers`;
+  const playerCount = $('playerCount');
+  if (playerCount) playerCount.textContent = `${room.playerCount} / 8 Racers`;
   const list = $('lobbyPlayerList');
-  list.innerHTML = `<li>🏁 ${state.playerName} (you)</li>`;
-  room.remotePlayers.forEach((p) => {
-    const li = document.createElement('li');
-    li.textContent = `🚗 ${p.name || 'Racer'}`;
-    list.appendChild(li);
-  });
+  if (list) {
+    list.innerHTML = `<li>🏁 ${state.playerName} (you)</li>`;
+    room.remotePlayers.forEach((p) => {
+      const li = document.createElement('li');
+      li.textContent = `🚗 ${p.name || 'Racer'}`;
+      list.appendChild(li);
+    });
+  }
 }
 
 const startRaceBtn = $('startRaceBtn');
@@ -325,7 +342,7 @@ if (leaveRoomBtn) {
   leaveRoomBtn.addEventListener('click', () => {
     state.multiplayer?.leave?.();
     state.multiplayer = null;
-    $('roomInfo').classList.add('hidden');
+    $('roomInfo')?.classList.add('hidden');
     showScreen('screen-home');
   });
 }
@@ -545,7 +562,8 @@ function beginRace() {
   window.addEventListener('keyup', onKeyUp);
 
   const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  $('touchControls').classList.toggle('hidden', !isTouch);
+  const touchControls = $('touchControls');
+  if (touchControls) touchControls.classList.toggle('hidden', !isTouch);
   const touchState = { gas: false, brake: false, left: false, right: false, nitro: false, horn: false };
   function bindTouch(id, key) {
     const el = $(id);
@@ -682,16 +700,23 @@ function beginRace() {
     sound.startEngine();
   });
 
-  $('hudTotalLaps').textContent = state.totalLaps;
-  $('resumeBtn').onclick = togglePause;
-  $('restartBtn').onclick = () => { teardownRace(); beginRace(); };
-  $('quitBtn').onclick = () => { teardownRace(); showScreen('screen-home'); };
-  $('pauseBtn').onclick = togglePause;
+  const hudTotalLaps = $('hudTotalLaps');
+  if (hudTotalLaps) hudTotalLaps.textContent = state.totalLaps;
+  
+  const resumeBtn = $('resumeBtn');
+  if (resumeBtn) resumeBtn.onclick = togglePause;
+  const restartBtn = $('restartBtn');
+  if (restartBtn) restartBtn.onclick = () => { teardownRace(); beginRace(); };
+  const quitBtn = $('quitBtn');
+  if (quitBtn) quitBtn.onclick = () => { teardownRace(); showScreen('screen-home'); };
+  const pauseBtn = $('pauseBtn');
+  if (pauseBtn) pauseBtn.onclick = togglePause;
+
   let paused = false;
   function togglePause() {
     if (!raceStarted || raceFinished) return;
     paused = !paused;
-    $('pauseOverlay').classList.toggle('hidden', !paused);
+    $('pauseOverlay')?.classList.toggle('hidden', !paused);
     if (!paused) lastFrame = performance.now();
   }
 
@@ -827,12 +852,14 @@ function beginRace() {
       sound.updateNitro(player.nitroActive);
 
       if (checkpointAdvance(player, player.rig.group.position)) {
-        $('hudLap').textContent = Math.min(player.lap, state.totalLaps);
+        const hudLap = $('hudLap');
+        if (hudLap) hudLap.textContent = Math.min(player.lap, state.totalLaps);
         const lapTime = elapsedMs - lastLapStartMs;
         lastLapStartMs = elapsedMs;
         if (bestLapMs === null || lapTime < bestLapMs) {
           bestLapMs = lapTime;
-          $('hudBest').textContent = formatRaceTime(bestLapMs);
+          const hudBest = $('hudBest');
+          if (hudBest) hudBest.textContent = formatRaceTime(bestLapMs);
         }
         if (player.lap > state.totalLaps) finishRace();
       }
@@ -901,7 +928,8 @@ function beginRace() {
     if (state.showFps) {
       fpsAcc += dt; fpsFrames++;
       if (now - fpsLast > 500) {
-        $('fpsCounter').textContent = `${Math.round(fpsFrames / fpsAcc)} FPS`;
+        const fpsCounter = $('fpsCounter');
+        if (fpsCounter) fpsCounter.textContent = `${Math.round(fpsFrames / fpsAcc)} FPS`;
         fpsAcc = 0; fpsFrames = 0; fpsLast = now;
       }
     }
@@ -931,7 +959,8 @@ function beginRace() {
       renderer.dispose();
     },
   };
-  $('fpsCounter').classList.toggle('hidden', !state.showFps);
+  const fpsCounter = $('fpsCounter');
+  if (fpsCounter) fpsCounter.classList.toggle('hidden', !state.showFps);
   raceCtx.rafId = requestAnimationFrame(frame);
 }
 
@@ -940,27 +969,27 @@ function teardownRace() {
   sound.stopEngine();
   sound.updateDrift(0);
   sound.updateNitro(false);
-  $('pauseOverlay').classList.add('hidden');
+  $('pauseOverlay')?.classList.add('hidden');
 }
 
 function runCountdown(onGo) {
   const overlay = $('countdownOverlay');
   const num = $('countdownNum');
-  overlay.classList.remove('hidden');
+  if (overlay) overlay.classList.remove('hidden');
   let n = 3;
-  num.textContent = n;
+  if (num) num.textContent = n;
   sound.playCountdown(false);
   const iv = setInterval(() => {
     n -= 1;
     if (n > 0) {
-      num.textContent = n;
+      if (num) num.textContent = n;
       sound.playCountdown(false);
     } else if (n === 0) {
-      num.textContent = 'GO!';
+      if (num) num.textContent = 'GO!';
       sound.playCountdown(true);
     } else {
       clearInterval(iv);
-      overlay.classList.add('hidden');
+      if (overlay) overlay.classList.add('hidden');
       onGo();
     }
   }, 800);
@@ -976,17 +1005,23 @@ const SPEEDO_MAX_KMH = 320;
 const SPEEDO_CIRCUMFERENCE = 2 * Math.PI * 70;
 
 function updateHud(player, opponents, elapsedMs) {
-  $('hudSpeed').textContent = Math.round(player.speedKmh);
+  const hudSpeed = $('hudSpeed');
+  if (hudSpeed) hudSpeed.textContent = Math.round(player.speedKmh);
+  
   const gearVal = player.gear || (player.speed < -0.2 ? 'R' : (Math.min(6, Math.floor(player.speedKmh / 45) + 1)));
-  $('hudGear').textContent = gearVal;
+  const hudGear = $('hudGear');
+  if (hudGear) hudGear.textContent = gearVal;
   
   const rpmEl = $('hudRpm');
   if (rpmEl) {
     rpmEl.textContent = `${Math.round(player.rpm || 3000).toLocaleString()} RPM`;
   }
 
-  $('nitroFill').style.width = `${player.nitro * 100}%`;
-  $('hudTimer').textContent = formatRaceTime(elapsedMs);
+  const nitroFill = $('nitroFill');
+  if (nitroFill) nitroFill.style.width = `${player.nitro * 100}%`;
+  
+  const hudTimer = $('hudTimer');
+  if (hudTimer) hudTimer.textContent = formatRaceTime(elapsedMs);
 
   const speedoFrac = THREE.MathUtils.clamp(player.speedKmh / SPEEDO_MAX_KMH, 0, 1);
   const ring = $('speedoFillRing');
@@ -997,15 +1032,18 @@ function updateHud(player, opponents, elapsedMs) {
 
   const speedFrac = THREE.MathUtils.clamp((player.speedKmh - 110) / 100, 0, 1);
   const linesOpacity = player.nitroActive ? 0.85 : speedFrac * 0.5;
-  $('speedLines').style.opacity = linesOpacity;
+  const speedLines = $('speedLines');
+  if (speedLines) speedLines.style.opacity = linesOpacity;
 
   const standings = [{ name: state.playerName + ' (you)', lap: player.lap || 1, cp: player.nextCP || 0, me: true }]
     .concat(opponents.map((o) => ({ name: o.name, lap: o.ctrl?.lap || 1, cp: o.ctrl?.nextCP || 0, me: false })));
   standings.sort((a, b) => (b.lap - a.lap) || (b.cp - a.cp));
   
   const myRank = standings.findIndex((s) => s.me) + 1;
-  $('hudPos').textContent = String(myRank).padStart(2, '0');
-  $('hudPosTotal').textContent = String(standings.length).padStart(2, '0');
+  const hudPos = $('hudPos');
+  if (hudPos) hudPos.textContent = String(myRank).padStart(2, '0');
+  const hudPosTotal = $('hudPosTotal');
+  if (hudPosTotal) hudPosTotal.textContent = String(standings.length).padStart(2, '0');
 }
 
 function showResults(timeMs, opponents) {
@@ -1021,22 +1059,29 @@ function showResults(timeMs, opponents) {
   });
 
   list.sort((a, b) => a.time - b.time);
-  $('resultsList').innerHTML = list.map((r, i) => {
-    const m = Math.floor(r.time / 60000);
-    const s = ((r.time % 60000) / 1000).toFixed(3);
-    return `<div class="res-row ${r.me ? 'me' : ''}"><span>${i + 1}. ${escapeHtml(r.name)}</span><span>${m}:${s.padStart(6, '0')}</span></div>`;
-  }).join('');
+  const resultsList = $('resultsList');
+  if (resultsList) {
+    resultsList.innerHTML = list.map((r, i) => {
+      const m = Math.floor(r.time / 60000);
+      const s = ((r.time % 60000) / 1000).toFixed(3);
+      return `<div class="res-row ${r.me ? 'me' : ''}"><span>${i + 1}. ${escapeHtml(r.name)}</span><span>${m}:${s.padStart(6, '0')}</span></div>`;
+    }).join('');
+  }
 
   const myRank = list.findIndex((r) => r.me) + 1;
-  $('resultsBest').textContent = `Rank: ${myRank}/${list.length} • Your time: ${mins}:${secs.padStart(6, '0')}`;
+  const resultsBest = $('resultsBest');
+  if (resultsBest) {
+    resultsBest.textContent = `Rank: ${myRank}/${list.length} • Your time: ${mins}:${secs.padStart(6, '0')}`;
+  }
 }
 
-$('raceAgainBtn').addEventListener('click', () => beginRace());
-$('resultsMenuBtn').addEventListener('click', () => showScreen('screen-home'));
+$('raceAgainBtn')?.addEventListener('click', () => beginRace());
+$('resultsMenuBtn')?.addEventListener('click', () => showScreen('screen-home'));
 
 /* ============================== LEADERBOARD ============================== */
 async function loadLeaderboard() {
   const body = $('leaderboardBody');
+  if (!body) return;
   body.innerHTML = '<tr><td colspan="6" class="muted center">Loading records…</td></tr>';
   const rows = await backend.fetchLeaderboard(25);
   
@@ -1085,17 +1130,20 @@ document.querySelectorAll('.set-tab-btn').forEach((btn) => {
   });
 });
 
-$('settingQuality').value = state.quality;
-$('settingSound').checked = state.soundOn;
-$('settingFps').checked = state.showFps;
+const settingQuality = $('settingQuality');
+if (settingQuality) settingQuality.value = state.quality;
+const settingSound = $('settingSound');
+if (settingSound) settingSound.checked = state.soundOn;
+const settingFps = $('settingFps');
+if (settingFps) settingFps.checked = state.showFps;
 sound.setEnabled(state.soundOn);
 
 const resetSettingsBtn = $('resetSettingsBtn');
 if (resetSettingsBtn) {
   resetSettingsBtn.addEventListener('click', () => {
-    $('settingQuality').value = 'high';
-    $('settingSound').checked = true;
-    $('settingFps').checked = false;
+    if (settingQuality) settingQuality.value = 'high';
+    if (settingSound) settingSound.checked = true;
+    if (settingFps) settingFps.checked = false;
     toast('Settings reset to defaults');
   });
 }
@@ -1103,9 +1151,9 @@ if (resetSettingsBtn) {
 const applySettingsBtn = $('applySettingsBtn');
 if (applySettingsBtn) {
   applySettingsBtn.addEventListener('click', () => {
-    state.quality = $('settingQuality').value;
-    state.soundOn = $('settingSound').checked;
-    state.showFps = $('settingFps').checked;
+    if (settingQuality) state.quality = settingQuality.value;
+    if (settingSound) state.soundOn = settingSound.checked;
+    if (settingFps) state.showFps = settingFps.checked;
     localStorage.setItem('rydash_quality', state.quality);
     localStorage.setItem('rydash_sound', state.soundOn);
     localStorage.setItem('rydash_fps', state.showFps);
@@ -1152,11 +1200,11 @@ if (worldSelectConfirmBtn) {
   });
 }
 
-$('settingQuality').addEventListener('change', (e) => {
+$('settingQuality')?.addEventListener('change', (e) => {
   state.quality = e.target.value;
   localStorage.setItem('rydash_quality', state.quality);
 });
-$('settingSound').addEventListener('change', (e) => {
+$('settingSound')?.addEventListener('change', (e) => {
   state.soundOn = e.target.checked;
   localStorage.setItem('rydash_sound', state.soundOn);
   sound.setEnabled(state.soundOn);
@@ -1167,4 +1215,9 @@ const savedLivery = localStorage.getItem('rydash_livery') ?? localStorage.getIte
 if (savedCar !== null) state.carIndex = Number(savedCar);
 if (savedLivery !== null) state.liveryIndex = Number(savedLivery);
 
-boot();
+// Ensure boot is executed when DOM is loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}

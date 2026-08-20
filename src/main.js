@@ -151,16 +151,14 @@ async function boot() {
   if (playBtn) {
     playBtn.onclick = () => {
       sound.init();
-      showScreen('screen-garage');
-      openGarage(() => startRaceFlow(false));
+      startRaceFlow(false);
     };
   }
   const multiplayerBtn = $('multiplayerBtn') || $('heroMultiBtn');
   if (multiplayerBtn) {
     multiplayerBtn.onclick = () => {
       sound.init();
-      showScreen('screen-garage');
-      openGarage(() => showScreen('screen-lobby'));
+      showScreen('screen-lobby');
     };
   }
 
@@ -1241,9 +1239,8 @@ document.querySelectorAll('.world-node').forEach((node) => {
 const worldSelectConfirmBtn = $('worldSelectConfirmBtn');
 if (worldSelectConfirmBtn) {
   worldSelectConfirmBtn.addEventListener('click', () => {
-    toast(`Selected world: ${(WORLDS[state.worldId] || WORLDS.neon).label}`);
-    showScreen('screen-garage');
-    openGarage(() => startRaceFlow(false));
+    toast(`Launching ${(WORLDS[state.worldId] || WORLDS.neon).label}…`);
+    startRaceFlow(false);
   });
 }
 

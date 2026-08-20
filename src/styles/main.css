@@ -177,7 +177,7 @@ input, select {
    01 HOME SCREEN & DOCK
    ========================================================================= */
 #screen-home {
-  background: #02040a;
+  background: radial-gradient(circle at 50% 30%, #0d1733 0%, #030713 75%);
 }
 
 .home-world {
@@ -186,19 +186,11 @@ input, select {
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
-  background-image: linear-gradient(180deg, rgba(2, 4, 12, 0.45) 0%, rgba(2, 4, 12, 0.82) 100%),
-                    url('/rydash-cinematic-home.jpg'),
-                    url('./rydash-cinematic-home.jpg'),
-                    url('/rydash-neon-home.png'),
-                    url('./rydash-neon-home.png');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
 }
 .world-sky {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(2,3,8,0.2) 0%, rgba(7,13,34,0.4) 60%, rgba(21,9,42,0.6) 100%);
+  background: linear-gradient(180deg, #020308 0%, #070d22 60%, #15092a 100%);
 }
 .world-buildings {
   position: absolute;
@@ -206,9 +198,9 @@ input, select {
   left: 0;
   right: 0;
   height: 60%;
-  background-image: repeating-linear-gradient(90deg, rgba(9,14,28,0.4) 0px, rgba(9,14,28,0.4) 30px, rgba(4,6,12,0.4) 30px, rgba(4,6,12,0.4) 60px);
+  background-image: repeating-linear-gradient(90deg, #090e1c 0px, #090e1c 30px, #04060c 30px, #04060c 60px);
   mask-image: linear-gradient(180deg, transparent 0%, black 40%);
-  opacity: 0.4;
+  opacity: 0.6;
 }
 .world-road {
   position: absolute;
@@ -216,7 +208,7 @@ input, select {
   left: 0;
   right: 0;
   height: 28%;
-  background: linear-gradient(180deg, rgba(8,13,30,0.6) 0%, rgba(2,3,7,0.9) 100%);
+  background: linear-gradient(180deg, #080d1e 0%, #020307 100%);
   border-top: 1px solid rgba(0, 229, 255, 0.3);
 }
 

@@ -260,6 +260,7 @@
             <div class="speedo-center">
               <span id="hudSpeed" class="speedo-value">187</span>
               <span class="speedo-unit">KM/H</span>
+              <span id="hudRpm" class="speedo-rpm">4,200 RPM</span>
             </div>
           </div>
           <div class="gear-nitro">
@@ -278,6 +279,7 @@
           <button id="touchRight" class="touch-btn">▶</button>
         </div>
         <div class="touch-pedals">
+          <button id="touchHorn" class="touch-btn horn-btn" title="Sports Car Horn">📢</button>
           <button id="touchNitro" class="touch-btn nitro-btn">🔥</button>
           <button id="touchBrake" class="touch-btn">▼</button>
           <button id="touchGas" class="touch-btn">▲</button>
@@ -485,6 +487,18 @@
         </button>
       </div>
       <div id="worldMapSelected" class="worldmap-selected">Selected: NEON DISTRICT (Rain City)</div>
+      
+      <!-- Lap Configuration Selector -->
+      <div class="lap-selector-wrap">
+        <span class="lap-selector-label">RACE LENGTH:</span>
+        <div class="lap-pills">
+          <button class="lap-pill" data-laps="1">1 LAP (SPRINT)</button>
+          <button class="lap-pill" data-laps="2">2 LAPS (QUICK)</button>
+          <button class="lap-pill active" data-laps="3">3 LAPS (STANDARD)</button>
+          <button class="lap-pill" data-laps="5">5 LAPS (ENDURANCE)</button>
+        </div>
+      </div>
+
       <button id="worldSelectConfirmBtn" class="btn btn-primary btn-lg" style="margin-top:16px;">CONFIRM WORLD &amp; RACE</button>
     </section>
 
@@ -521,6 +535,10 @@
           <div class="key-row">
             <span class="key-cap key-wide">SHIFT</span>
             <span class="key-label">Nitro Boost</span>
+          </div>
+          <div class="key-row">
+            <span class="key-cap">H</span>
+            <span class="key-label">Sports Car Horn</span>
           </div>
           <div class="key-row">
             <span class="key-cap">C</span>

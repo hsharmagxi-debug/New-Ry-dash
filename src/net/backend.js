@@ -20,6 +20,11 @@ export async function getSession() {
   return data.session;
 }
 
+export async function getCurrentUser() {
+  const session = await getSession();
+  return session?.user || null;
+}
+
 export async function signUp(email, password) {
   if (!supabaseReady) throw new Error('Supabase not configured.');
   const { data, error } = await supabase.auth.signUp({ email, password });

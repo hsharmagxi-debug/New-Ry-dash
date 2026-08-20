@@ -20,8 +20,9 @@ const WORLDS = {
   coastal: { label: 'Night Coastal Highway', build: buildCoastalWorld },
   vertical: { label: 'Vertical Mega-City', build: buildVerticalWorld },
 };
+
 import { CarController, AIDriver } from './game/CarController.js';
-import { buildComposer, SmokeSystem, SparkSystem } from './game/Effects.js';
+import { buildComposer, SmokeSystem, SparkSystem, WaterSpraySystem, NitroJetSystem } from './game/Effects.js';
 import { PreviewStage } from './game/PreviewStage.js';
 import { sound } from './game/Audio.js';
 import { MultiplayerRoom } from './net/multiplayer.js';
@@ -39,10 +40,10 @@ const state = {
   worldId: localStorage.getItem('rydash_world') || localStorage.getItem('vx_world') || 'neon',
   soundOn: (localStorage.getItem('rydash_sound') ?? localStorage.getItem('vx_sound')) !== 'false',
   showFps: (localStorage.getItem('rydash_fps') ?? localStorage.getItem('vx_fps')) === 'true',
+  totalLaps: Number(localStorage.getItem('rydash_laps')) || 3,
   session: null,
-  multiplayer: null, // MultiplayerRoom instance when in a room
+  multiplayer: null,
   isMultiplayerRace: false,
-  totalLaps: 3,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -51,214 +52,236 @@ const qs = (sel) => document.querySelector(sel);
 /* ============================== SCREEN ROUTER ============================== */
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach((el) => el.classList.remove('active'));
-  $(id).classList.add('active');
+  const target = $(id);
+  if (target) target.classList.add('active');
   state.screen = id;
   document.querySelectorAll('[data-back]').forEach((btn) => {
     btn.onclick = () => showScreen(btn.dataset.back);
   });
 }
 
-function toast(msg, ms = 2600) {
-  const el = $('toast');
-  el.textContent = msg;
-  el.classList.remove('hidden');
-  clearTimeout(toast._t);
-  toast._t = setTimeout(() => el.classList.add('hidden'), ms);
+function toast(msg, ms = 2400) {
+  const t = $('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.remove('hidden');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.add('hidden'), ms);
 }
 
-/* ============================== LOADING ============================== */
-async function boot() {
-  const steps = ['Initializing street network…', 'Loading garage…', 'Connecting racers…', 'Warming up engine…', 'Ready.'];
-  for (let i = 0; i < steps.length; i++) {
-    $('loaderLabel').textContent = steps[i];
-    $('loaderFill').style.width = `${((i + 1) / steps.length) * 100}%`;
-    await new Promise((r) => setTimeout(r, 220));
-  }
-  showScreen('screen-home');
-  refreshAuthUI();
+/* ============================== SOUND TOGGLE ============================== */
+function updateSoundUI() {
+  const icon = $('navSoundIcon');
+  if (icon) icon.textContent = state.soundOn ? '🔊' : '🔇';
+  const settingCheckbox = $('settingSound');
+  if (settingCheckbox) settingCheckbox.checked = state.soundOn;
+  sound.setEnabled(state.soundOn);
 }
 
-/* ============================== HOME ============================== */
-$('playBtn').addEventListener('click', () => {
-  state.isMultiplayerRace = false;
-  showScreen('screen-garage');
-  openGarage(() => startRaceFlow(false));
-});
-$('multiplayerBtn').addEventListener('click', () => {
-  if (!supabaseReady) {
-    toast('Multiplayer connected — ready for race lobbies.');
-  }
-  showScreen('screen-lobby');
-});
-$('garageBtn').addEventListener('click', () => { showScreen('screen-garage'); openGarage(null); });
-$('leaderboardBtn').addEventListener('click', () => { showScreen('screen-leaderboard'); loadLeaderboard(); });
-const worldmapBtn = $('worldmapBtn');
-if (worldmapBtn) worldmapBtn.addEventListener('click', () => { showScreen('screen-worldmap'); setWorld(state.worldId); });
-$('settingsBtn').addEventListener('click', () => showScreen('screen-settings'));
-$('howtoBtn').addEventListener('click', () => showScreen('screen-howto'));
-$('startTrainingBtn').addEventListener('click', () => {
-  state.isMultiplayerRace = false;
-  showScreen('screen-garage');
-  openGarage(() => startRaceFlow(false));
-});
-$('navAuthBtn').addEventListener('click', () => showScreen('screen-auth'));
-
-const navSound = $('navSoundToggle');
-if (navSound) {
-  navSound.addEventListener('click', () => {
+const navSoundToggle = $('navSoundToggle');
+if (navSoundToggle) {
+  navSoundToggle.addEventListener('click', () => {
+    sound.init();
     state.soundOn = !state.soundOn;
-    sound.setEnabled(state.soundOn);
-    $('soundIcon').textContent = state.soundOn ? '🔊' : '🔇';
-    if ($('settingSound')) $('settingSound').checked = state.soundOn;
     localStorage.setItem('rydash_sound', state.soundOn);
-    toast(state.soundOn ? 'Audio Enabled' : 'Audio Muted');
+    updateSoundUI();
+    toast(state.soundOn ? 'Sound: Enabled' : 'Sound: Muted');
   });
 }
 
-// Garage tab navigation
-document.querySelectorAll('.garage-tab-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.garage-tab-btn').forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
-  });
-});
+/* ============================== BOOT / INIT ============================== */
+async function boot() {
+  $('navPlayerName').textContent = state.playerName;
+  updateSoundUI();
 
-/* ============================== AUTH ============================== */
-async function refreshAuthUI() {
-  state.session = await backend.getSession();
-  const signedIn = Boolean(state.session);
-  $('authStatus').textContent = signedIn ? (state.session.user?.email || 'Driver') : 'Guest';
-  $('navAuthBtn').textContent = signedIn ? 'Account' : 'Login';
-  $('authSignOutBtn').classList.toggle('hidden', !signedIn);
-  if (!supabaseReady) $('authMsg').textContent = 'Driver profile active (local storage sync).';
-}
+  // Wire Topbar / Auth Buttons
+  const navLoginBtn = $('navLoginBtn');
+  if (navLoginBtn) navLoginBtn.onclick = () => showScreen('screen-auth');
 
-$('authForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  await handleAuth('signin');
-});
-$('authSignUpBtn').addEventListener('click', () => handleAuth('signup'));
-async function handleAuth(mode) {
-  const email = $('authEmail').value.trim();
-  const password = $('authPassword').value;
-  $('authMsg').textContent = 'Connecting to Driver Lounge…';
-  try {
-    if (mode === 'signup') await backend.signUp(email, password);
-    else await backend.signIn(email, password);
-    await refreshAuthUI();
-    $('authMsg').textContent = mode === 'signup' ? 'Account created successfully!' : 'Welcome back, Driver!';
-    toast(mode === 'signup' ? 'Account created!' : 'Signed in as ' + email);
-    setTimeout(() => showScreen('screen-home'), 700);
-  } catch (err) {
-    $('authMsg').textContent = err.message || 'Authentication error.';
+  // Quick Race & Multiplayer
+  const heroRaceBtn = $('heroRaceBtn');
+  if (heroRaceBtn) {
+    heroRaceBtn.onclick = () => {
+      sound.init();
+      showScreen('screen-garage');
+      openGarage(() => startRaceFlow(false));
+    };
   }
+  const heroMultiBtn = $('heroMultiBtn');
+  if (heroMultiBtn) {
+    heroMultiBtn.onclick = () => {
+      sound.init();
+      showScreen('screen-garage');
+      openGarage(() => showScreen('screen-lobby'));
+    };
+  }
+
+  // 5-Button Dock
+  const dockGarageBtn = $('dockGarageBtn');
+  if (dockGarageBtn) dockGarageBtn.onclick = () => { showScreen('screen-garage'); openGarage(() => showScreen('screen-home')); };
+
+  const dockLeaderboardBtn = $('dockLeaderboardBtn');
+  if (dockLeaderboardBtn) dockLeaderboardBtn.onclick = () => { showScreen('screen-leaderboard'); loadLeaderboard(); };
+
+  const dockWorldBtn = $('dockWorldBtn');
+  if (dockWorldBtn) dockWorldBtn.onclick = () => { showScreen('screen-worldmap'); setWorld(state.worldId); updateLapPillsUI(); };
+
+  const dockSettingsBtn = $('dockSettingsBtn');
+  if (dockSettingsBtn) dockSettingsBtn.onclick = () => showScreen('screen-settings');
+
+  const dockHowToBtn = $('dockHowToBtn');
+  if (dockHowToBtn) dockHowToBtn.onclick = () => showScreen('screen-howto');
+
+  // Supabase Auth
+  try {
+    const user = await backend.getCurrentUser();
+    if (user) {
+      state.session = user;
+      state.playerName = user.user_metadata?.driver_name || user.email?.split('@')[0] || state.playerName;
+      $('navPlayerName').textContent = state.playerName;
+      if (navLoginBtn) navLoginBtn.textContent = '👤 ' + state.playerName;
+    }
+  } catch (_) {}
+
+  setTimeout(() => showScreen('screen-home'), 400);
 }
-$('authGuestBtn').addEventListener('click', () => {
-  toast('Signed in as Guest Driver');
-  showScreen('screen-home');
-});
-$('authSignOutBtn').addEventListener('click', async () => {
-  await backend.signOut();
-  await refreshAuthUI();
-  toast('Signed out');
-});
+
+/* ============================== AUTH HANDLERS ============================== */
+const authForm = $('authForm');
+if (authForm) {
+  authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = $('authEmail').value.trim();
+    const password = $('authPassword').value;
+    const msg = $('authMsg');
+    msg.textContent = 'Signing in…';
+    const res = await backend.signIn(email, password);
+    if (res.error) {
+      msg.textContent = res.error.message || 'Failed to sign in';
+    } else {
+      msg.textContent = 'Welcome back!';
+      state.session = res.user;
+      state.playerName = res.user.user_metadata?.driver_name || email.split('@')[0];
+      $('navPlayerName').textContent = state.playerName;
+      $('navLoginBtn').textContent = '👤 ' + state.playerName;
+      setTimeout(() => showScreen('screen-home'), 600);
+    }
+  });
+}
+
+const authSignUpBtn = $('authSignUpBtn');
+if (authSignUpBtn) {
+  authSignUpBtn.addEventListener('click', async () => {
+    const email = $('authEmail').value.trim();
+    const password = $('authPassword').value;
+    const msg = $('authMsg');
+    if (!email || password.length < 6) {
+      msg.textContent = 'Enter email & 6+ char password';
+      return;
+    }
+    msg.textContent = 'Creating account…';
+    const res = await backend.signUp(email, password, { driver_name: email.split('@')[0] });
+    if (res.error) {
+      msg.textContent = res.error.message || 'Sign up failed';
+    } else {
+      msg.textContent = 'Account created! Check email or sign in.';
+    }
+  });
+}
+
+const authGuestBtn = $('authGuestBtn');
+if (authGuestBtn) {
+  authGuestBtn.addEventListener('click', () => {
+    toast('Continuing in Guest Mode');
+    showScreen('screen-home');
+  });
+}
 
 /* ============================== GARAGE ============================== */
 let garageStage = null;
-let garageThumbnails = null; // cached data-URLs, one per CAR_MODELS index — generated once
-// A representative "signature" livery per car for its grid thumbnail (color variety, matches
-// the reference card layout's visual mix). Selecting a different color swatch still only
-// affects the actual race car, not the thumbnail — regenerating 10 renders per swatch click
-// wasn't worth the complexity for a grid that's mainly about picking the *car*, not the paint.
-const GARAGE_THUMB_LIVERY = [4, 1, 0, 5, 3, 0, 8, 5, 0, 4];
+let garageOnConfirm = null;
 
-function hex(n) { return `#${n.toString(16).padStart(6, '0')}`; }
-
-async function generateGarageThumbnails() {
-  if (garageThumbnails) return garageThumbnails;
-  const stage = new PreviewStage($('garageViewport'), { interactive: false });
-  $('garageViewport').style.width = '400px';
-  $('garageViewport').style.height = '300px';
-  stage._resize();
-  garageThumbnails = CAR_MODELS.map((modelDef, i) => {
-    const livery = CAR_LIVERIES[GARAGE_THUMB_LIVERY[i] % CAR_LIVERIES.length];
-    stage.setCarByIndex(i, GARAGE_THUMB_LIVERY[i] % CAR_LIVERIES.length);
-    stage.carRig.group.rotation.y = 0.55; // a flattering 3/4 angle, not straight-on
-    stage.renderOnce();
-    return stage.renderer.domElement.toDataURL('image/png');
-  });
-  stage.dispose();
-  return garageThumbnails;
+function openGarage(onConfirm) {
+  garageOnConfirm = onConfirm;
+  buildGarageCards();
+  buildColorSwatches();
 }
 
-async function openGarage(onContinue) {
-  const thumbs = await generateGarageThumbnails();
+function buildGarageCards() {
   const grid = $('garageGrid');
-  grid.innerHTML = CAR_MODELS.map((modelDef, i) => {
-    const rarity = RARITY[modelDef.rarity] || RARITY.common;
-    return `
-      <button class="garage-card ${i === state.carIndex ? 'selected' : ''}" data-index="${i}" style="--rarity-color:${hex(rarity.color)}">
-        <div class="garage-card-top">
-          <span class="garage-card-num">${String(i + 1).padStart(2, '0')}</span>
-          <span class="garage-card-rarity">${rarity.label}</span>
-        </div>
-        <img class="garage-card-img" src="${thumbs[i]}" alt="${modelDef.name}" />
-        <h3 class="garage-card-name">${modelDef.name}</h3>
-        <p class="garage-card-class">${modelDef.class}</p>
-        <div class="garage-card-stats">
-          <div class="mini-stat-row"><span>SPEED</span><div class="mini-bar"><div style="width:${modelDef.topSpeed * 100}%"></div></div><b>${Math.round(modelDef.topSpeed * 100)}</b></div>
-          <div class="mini-stat-row"><span>HANDLING</span><div class="mini-bar mini-bar-cyan"><div style="width:${modelDef.handling * 100}%"></div></div><b>${Math.round(modelDef.handling * 100)}</b></div>
-          <div class="mini-stat-row"><span>ACCEL</span><div class="mini-bar mini-bar-purple"><div style="width:${modelDef.accel * 100}%"></div></div><b>${Math.round(modelDef.accel * 100)}</b></div>
-          <div class="mini-stat-row"><span>NITRO</span><div class="mini-bar mini-bar-green"><div style="width:${modelDef.nitro * 100}%"></div></div><b>${Math.round(modelDef.nitro * 100)}</b></div>
-        </div>
-      </button>`;
-  }).join('');
-
-  grid.querySelectorAll('.garage-card').forEach((card) => {
-    card.addEventListener('click', () => {
-      state.carIndex = Number(card.dataset.index);
-      grid.querySelectorAll('.garage-card').forEach((c) => c.classList.toggle('selected', c === card));
-      buildColorSwatches();
-    });
+  if (!grid) return;
+  grid.innerHTML = '';
+  CAR_MODELS.forEach((m, idx) => {
+    const card = document.createElement('div');
+    card.className = 'car-card ' + (m.rarity || 'rare') + (idx === state.carIndex ? ' active' : '');
+    card.innerHTML = `
+      <div class="car-rarity-badge">${(m.rarity || 'RARE').toUpperCase()}</div>
+      <div class="car-card-name">${m.name}</div>
+      <div class="car-card-class">${m.class || 'Performance'}</div>
+      <div class="car-stats-mini">
+        <div class="stat-mini-row"><span>SPD</span><div class="bar-bg"><div class="bar-fill" style="width:${m.topSpeed * 100}%"></div></div></div>
+        <div class="stat-mini-row"><span>ACC</span><div class="bar-bg"><div class="bar-fill" style="width:${m.accel * 100}%"></div></div></div>
+        <div class="stat-mini-row"><span>HND</span><div class="bar-bg"><div class="bar-fill" style="width:${m.handling * 100}%"></div></div></div>
+        <div class="stat-mini-row"><span>NIT</span><div class="bar-bg"><div class="bar-fill" style="width:${m.nitro * 100}%"></div></div></div>
+      </div>
+    `;
+    card.onclick = () => {
+      state.carIndex = idx;
+      localStorage.setItem('rydash_car', idx);
+      buildGarageCards();
+    };
+    grid.appendChild(card);
   });
-
-  buildColorSwatches();
-
-  $('selectCarBtn').onclick = () => {
-    localStorage.setItem('rydash_car', state.carIndex);
-    localStorage.setItem('rydash_livery', state.liveryIndex);
-    if (onContinue) onContinue();
-    else showScreen('screen-home');
-  };
 }
 
 function buildColorSwatches() {
   const wrap = $('colorSwatches');
+  if (!wrap) return;
   wrap.innerHTML = '';
   CAR_LIVERIES.forEach((l, i) => {
+    const hex = '#' + l.color.toString(16).padStart(6, '0');
     const b = document.createElement('button');
     b.className = 'swatch' + (i === state.liveryIndex ? ' active' : '');
-    b.style.background = hex(l.color);
-    b.style.color = b.style.background;
+    b.style.background = hex;
+    b.style.color = hex;
     b.title = l.name;
-    b.onclick = () => { state.liveryIndex = i; buildColorSwatches(); };
+    b.onclick = () => {
+      state.liveryIndex = i;
+      localStorage.setItem('rydash_livery', i);
+      buildColorSwatches();
+    };
     wrap.appendChild(b);
   });
 }
 
+const selectCarBtn = $('selectCarBtn');
+if (selectCarBtn) {
+  selectCarBtn.addEventListener('click', () => {
+    if (garageOnConfirm) garageOnConfirm();
+    else showScreen('screen-worldmap');
+  });
+}
+
 /* ============================== LOBBY (MULTIPLAYER) ============================== */
-$('createRoomBtn').addEventListener('click', async () => {
-  const code = MultiplayerRoom.generateCode();
-  await joinRoom(code, true);
-});
-$('joinRoomBtn').addEventListener('click', async () => {
-  const code = $('joinCodeInput').value.trim().toUpperCase();
-  if (code.length !== 5) { $('lobbyMsg').textContent = 'Enter a valid 5-letter room code.'; return; }
-  await joinRoom(code, false);
-});
+const createRoomBtn = $('createRoomBtn');
+if (createRoomBtn) {
+  createRoomBtn.addEventListener('click', async () => {
+    const code = MultiplayerRoom.generateCode();
+    await joinRoom(code, true);
+  });
+}
+
+const joinRoomBtn = $('joinRoomBtn');
+if (joinRoomBtn) {
+  joinRoomBtn.addEventListener('click', async () => {
+    const code = $('joinCodeInput').value.trim().toUpperCase();
+    if (code.length !== 5) { $('lobbyMsg').textContent = 'Enter a valid 5-letter code.'; return; }
+    await joinRoom(code, false);
+  });
+}
 
 async function joinRoom(code, isHost) {
-  $('lobbyMsg').textContent = 'Connecting…';
+  $('lobbyMsg').textContent = 'Connecting to room…';
   try {
     const local = { id: backend.getGuestId(), name: state.playerName, carModel: CAR_MODELS[state.carIndex].id, livery: CAR_LIVERIES[state.liveryIndex].id };
     const room = new MultiplayerRoom(code, local);
@@ -273,12 +296,12 @@ async function joinRoom(code, isHost) {
     $('lobbyMsg').textContent = isHost ? 'Room created — share this code!' : 'Joined room!';
     updateLobbyUI(room);
   } catch (err) {
-    $('lobbyMsg').textContent = err.message;
+    $('lobbyMsg').textContent = err.message || 'Connection failed';
   }
 }
 
 function updateLobbyUI(room) {
-  $('playerCount').textContent = `${room.playerCount} racer${room.playerCount > 1 ? 's' : ''} connected`;
+  $('playerCount').textContent = `${room.playerCount} / 8 Racers`;
   const list = $('lobbyPlayerList');
   list.innerHTML = `<li>🏁 ${state.playerName} (you)</li>`;
   room.remotePlayers.forEach((p) => {
@@ -288,14 +311,27 @@ function updateLobbyUI(room) {
   });
 }
 
-$('startRaceBtn').addEventListener('click', () => {
-  state.multiplayer?.sendRaceStart({ startedAt: Date.now() });
-  state.isMultiplayerRace = true;
-  beginRace();
-});
+const startRaceBtn = $('startRaceBtn');
+if (startRaceBtn) {
+  startRaceBtn.addEventListener('click', () => {
+    state.multiplayer?.sendRaceStart({ startedAt: Date.now() });
+    state.isMultiplayerRace = true;
+    beginRace();
+  });
+}
+
+const leaveRoomBtn = $('leaveRoomBtn');
+if (leaveRoomBtn) {
+  leaveRoomBtn.addEventListener('click', () => {
+    state.multiplayer?.leave?.();
+    state.multiplayer = null;
+    $('roomInfo').classList.add('hidden');
+    showScreen('screen-home');
+  });
+}
 
 /* ============================== RACE ENGINE ============================== */
-let raceCtx = null; // holds everything for the active race, torn down on exit
+let raceCtx = null;
 
 function startRaceFlow(multiplayer) {
   state.isMultiplayerRace = multiplayer;
@@ -307,8 +343,15 @@ function beginRace() {
   const canvas = $('gameCanvas');
   const width = window.innerWidth, height = window.innerHeight;
 
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: state.quality !== 'low', powerPreference: 'high-performance', preserveDrawingBuffer: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, state.quality === 'high' ? 2 : 1.3));
+  // Ultra-crisp rendering: anti-aliasing & HiDPI retina pixel ratio
+  const pixelRatio = Math.min(window.devicePixelRatio, state.quality === 'high' ? 2.0 : 1.5);
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: true,
+    powerPreference: 'high-performance',
+    preserveDrawingBuffer: true,
+  });
+  renderer.setPixelRatio(pixelRatio);
   renderer.setSize(width, height);
   renderer.shadowMap.enabled = state.quality !== 'low';
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -322,13 +365,10 @@ function beginRace() {
   const activeWorld = WORLDS[state.worldId] || WORLDS.neon;
   const { curve, trackWidth, update: updateWorld, ramps = [] } = activeWorld.build(scene);
 
-  // Checkpoints for lap tracking (robust regardless of racing line)
   const CP_COUNT = 10;
   const checkpoints = curve.getSpacedPoints(CP_COUNT).slice(0, CP_COUNT);
 
-  // Minimap — a live top-down radar. Track outline + the world->map transform are computed once
-  // (the curve never changes mid-race); car dots are re-projected with that same transform and
-  // redrawn every frame.
+  // Minimap
   const minimapCanvas = $('minimapCanvas');
   const minimapCtx = minimapCanvas ? minimapCanvas.getContext('2d') : null;
   let minimapPoints = null;
@@ -351,7 +391,7 @@ function beginRace() {
     minimapCtx.save();
     minimapCtx.beginPath();
     minimapCtx.arc(size / 2, size / 2, size / 2 - 1, 0, Math.PI * 2);
-    minimapCtx.clip(); // circular clip so the track/dots never poke past the round canvas edge
+    minimapCtx.clip();
 
     minimapCtx.beginPath();
     minimapPoints.forEach((p, i) => (i === 0 ? minimapCtx.moveTo(p.x, p.y) : minimapCtx.lineTo(p.x, p.y)));
@@ -376,12 +416,10 @@ function beginRace() {
     minimapCtx.arc(pp.x, pp.y, 4, 0, Math.PI * 2);
     minimapCtx.fill();
     minimapCtx.shadowBlur = 0;
-
     minimapCtx.restore();
   }
 
-  // Nitro pickups — glowing rings placed around every circuit (world-agnostic, unlike ramps).
-  // Driving through one instantly refills nitro; it goes on cooldown and reappears after a bit.
+  // Nitro pickups
   const NITRO_PICKUP_TS = [0.12, 0.32, 0.5, 0.68, 0.85];
   const nitroPickups = NITRO_PICKUP_TS.map((t) => {
     const p = curve.getPointAt(t);
@@ -399,6 +437,7 @@ function beginRace() {
     scene.add(group);
     return { position: new THREE.Vector3(p.x, 0, p.z), group, ring, radius: 2.4, cooldown: 0 };
   });
+
   function updateNitroPickups(dt) {
     nitroPickups.forEach((pk) => {
       if (pk.cooldown > 0) {
@@ -409,8 +448,9 @@ function beginRace() {
       pk.ring.position.y = 1.0 + Math.sin(performance.now() * 0.003 + pk.position.x) * 0.15;
     });
   }
+
   function checkNitroPickup(ctrl) {
-    if (ctrl.nitro >= 0.98) return; // already full, nothing to collect
+    if (ctrl.nitro >= 0.98) return;
     for (const pk of nitroPickups) {
       if (pk.cooldown > 0) continue;
       const dx = ctrl.position.x - pk.position.x;
@@ -429,27 +469,12 @@ function beginRace() {
     }
   }
 
-  // Nitro exhaust flames — small bright bursts from each exhaust tip while nitro is active.
-  // Reuses the same SparkSystem as collision sparks (bright/additive/short-lived reads as a
-  // flame here too) rather than a whole separate particle class.
-  function emitNitroFlame(ctrl) {
-    if (!ctrl.nitroActive || !ctrl.rig.exhaustPositions) return;
-    ctrl.rig.exhaustPositions.forEach((localPos) => {
-      const worldPos = ctrl.rig.group.localToWorld(localPos.clone());
-      sparks.emit(worldPos, 2);
-    });
-  }
-  function emitAllNitroFlames() {
-    emitNitroFlame(player);
-    opponents.forEach((o) => emitNitroFlame(o.ctrl));
-  }
-
   // Player car
   const modelDef = CAR_MODELS[state.carIndex];
   const livery = CAR_LIVERIES[state.liveryIndex];
   const playerRig = buildCar(modelDef, livery.color);
   scene.add(playerRig.group);
-  // Real dynamic headlights only for the player's car (perf-bounded — see CarFactory.js note).
+
   if (state.quality !== 'low') {
     playerRig.headlightSpots.forEach((spot) => {
       spot.intensity = 3.2;
@@ -457,223 +482,186 @@ function beginRace() {
       if (spot.castShadow) { spot.shadow.mapSize.set(512, 512); spot.shadow.bias = -0.003; }
     });
   }
-  const player = new CarController({ carRig: playerRig, statDef: modelDef });
+
+  const player = new CarController(playerRig, modelDef, { isPlayer: true, trackCurve: curve, trackWidth });
   const startPoint = checkpoints[0];
   const startTangent = curve.getTangentAt(0);
   const startHeading = Math.atan2(startTangent.x, startTangent.z);
   player.setStartTransform(new THREE.Vector3(startPoint.x - 2, 0, startPoint.z), startHeading);
   player.nextCP = 1;
 
-  // Opponents: AI (single-player) OR remote players (multiplayer)
+  // Opponents: 7 AI racers
   const opponents = [];
-  const remoteRigs = new Map();
+  const opponentDefs = [
+    { name: 'NitroKing', modelIdx: 0, liveryIdx: 1 },
+    { name: 'SpeedDemon', modelIdx: 1, liveryIdx: 2 },
+    { name: 'DriftGhost', modelIdx: 2, liveryIdx: 0 },
+    { name: 'PhantomX', modelIdx: 3, liveryIdx: 4 },
+    { name: 'StreetLegend', modelIdx: 4, liveryIdx: 5 },
+    { name: 'NightRider', modelIdx: 5, liveryIdx: 6 },
+    { name: 'Redline', modelIdx: 6, liveryIdx: 7 },
+  ];
 
-  if (state.isMultiplayerRace && state.multiplayer) {
-    state.multiplayer.remotePlayers.forEach((p, id) => {
-      const mDef = CAR_MODELS.find((m) => m.id === p.carModel) || CAR_MODELS[0];
-      const lv = CAR_LIVERIES.find((l) => l.id === p.livery) || CAR_LIVERIES[1];
-      const rig = buildCar(mDef, lv.color);
-      rig.group.position.set(startPoint.x + 2, 0, startPoint.z);
-      scene.add(rig.group);
-      const ctrl = {
-        position: new THREE.Vector3(startPoint.x + 2, 0, startPoint.z),
-        heading: startHeading,
-        speed: 0,
-        lap: 1,
-        nextCP: 1,
-        rig,
-      };
-      remoteRigs.set(id, {
-        rig,
-        ctrl,
-        name: p.name || 'Racer',
-        targetX: startPoint.x + 2,
-        targetZ: startPoint.z,
-        targetRy: startHeading,
-        speed: 0,
-        lap: 1,
-        nextCP: 1,
-        finishTimeMs: null,
-      });
-    });
+  opponentDefs.forEach((def, i) => {
+    const oppModel = CAR_MODELS[def.modelIdx % CAR_MODELS.length];
+    const oppLivery = CAR_LIVERIES[def.liveryIdx % CAR_LIVERIES.length];
+    const oppRig = buildCar(oppModel, oppLivery.color);
+    scene.add(oppRig.group);
+    const oppCtrl = new CarController(oppRig, oppModel, { isPlayer: false, trackCurve: curve, trackWidth });
+    const row = Math.floor(i / 2);
+    const col = i % 2;
+    const t0 = -(row + 1) * 0.012;
+    const p0 = curve.getPointAt(((t0 % 1) + 1) % 1);
+    const lateral = (col === 0 ? -1 : 1) * 3;
+    oppCtrl.setStartTransform(new THREE.Vector3(p0.x + lateral, 0, p0.z), startHeading);
+    const ai = new AIDriver(oppCtrl, curve, { tOffset: ((t0 % 1) + 1) % 1, targetSpeedKmh: oppModel.topSpeed * 290, aggro: 0.82 + i * 0.03 });
+    opponents.push({ ctrl: oppCtrl, ai, name: def.name, nextCP: 1, lap: 1, finishTimeMs: null });
+  });
 
-    state.multiplayer.onTransform = (payload) => {
-      const entry = remoteRigs.get(payload.id);
-      if (entry) {
-        entry.targetX = payload.x;
-        entry.targetZ = payload.z;
-        entry.targetRy = payload.ry;
-        entry.speed = payload.speed || 0;
-        if (payload.lap) entry.lap = payload.lap;
-        if (payload.cp !== undefined) entry.nextCP = payload.cp;
-      }
-    };
+  // Effects
+  const smoke = new SmokeSystem(scene, 140);
+  const sparks = new SparkSystem(scene, 240);
+  const waterSpray = new WaterSpraySystem(scene, 180);
+  const nitroJets = new NitroJetSystem(scene);
 
-    state.multiplayer.onFinish = (payload) => {
-      const entry = remoteRigs.get(payload.id);
-      if (entry) {
-        entry.finishTimeMs = payload.timeMs;
-        toast(`🏁 ${entry.name} finished in ${formatRaceTime(payload.timeMs)}!`);
-      }
-    };
-
-    state.multiplayer.onPlayerLeave = (id) => {
-      const entry = remoteRigs.get(id);
-      if (entry) {
-        scene.remove(entry.rig.group);
-        remoteRigs.delete(id);
-        toast(`${entry.name} left the race`);
-      }
-    };
-  } else {
-    // 7 AI opponents + the player = an 8-car grid (matches the "POS 03/08" HUD format).
-    const aiCount = 7;
-    const gridCols = 2;
-    for (let i = 0; i < aiCount; i++) {
-      const mDef = CAR_MODELS[(state.carIndex + i + 1) % CAR_MODELS.length];
-      const lv = CAR_LIVERIES[(state.liveryIndex + i * 2 + 1) % CAR_LIVERIES.length];
-      const rig = buildCar(mDef, lv.color);
-      scene.add(rig.group);
-      const ctrl = new CarController({ carRig: rig, statDef: mDef, isAI: true });
-      // Stagger the grid back in rows of 2 so 8 cars don't spawn stacked on top of each other.
-      const row = Math.floor(i / gridCols);
-      const col = i % gridCols;
-      const t0 = -(row + 1) * 0.012;
-      const p0 = curve.getPointAt(((t0 % 1) + 1) % 1);
-      const lateral = (col === 0 ? -1 : 1) * 3;
-      ctrl.setStartTransform(new THREE.Vector3(p0.x + lateral, 0, p0.z), startHeading);
-      const ai = new AIDriver(ctrl, curve, ((t0 % 1) + 1) % 1, 0.74 + Math.random() * 0.22);
-      opponents.push({ ctrl, ai, name: `CPU ${i + 1}`, nextCP: 1, lap: 1, finishTimeMs: null });
-    }
-  }
-
-  // Ghost replay — your fastest recorded run on this world+car, shown as a translucent car
-  // to race against. Local-only (localStorage), single-player races only.
-  const ghostRecorder = new GhostRecorder();
-  let ghostPlayer = null;
-  if (!state.isMultiplayerRace) {
-    const savedGhost = loadGhost(state.worldId, modelDef.id);
-    if (savedGhost) {
-      const ghostRig = buildCar(modelDef, livery.color);
-      scene.add(ghostRig.group);
-      ghostPlayer = new GhostPlayer(ghostRig, savedGhost);
-      toast(`Racing your ghost — beat ${formatRaceTime(savedGhost.timeMs)}`);
-    }
-  }
-
-  const smoke = new SmokeSystem(scene, 100);
-  const sparks = new SparkSystem(scene, 220);
   const { composer, bloom, motionBlur } = buildComposer(renderer, scene, camera, width, height);
   bloom.enabled = state.quality !== 'low';
   motionBlur.enabled = state.quality !== 'low';
 
   // Input
-  const input = { throttle: 0, steer: 0, handbrake: false, nitro: false };
+  const input = { gas: 0, brake: 0, steer: 0, handbrake: 0, nitro: false, horn: false };
   const keys = new Set();
   function onKeyDown(e) {
     keys.add(e.code);
     if (e.code === 'Escape') togglePause();
     if (e.code === 'KeyC') cycleCamera();
+    if (e.code === 'KeyH') sound.startHorn();
   }
-  function onKeyUp(e) { keys.delete(e.code); }
+  function onKeyUp(e) {
+    keys.delete(e.code);
+    if (e.code === 'KeyH') sound.stopHorn();
+  }
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', onKeyUp);
 
   const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   $('touchControls').classList.toggle('hidden', !isTouch);
-  const touchState = { gas: false, brake: false, left: false, right: false, nitro: false };
+  const touchState = { gas: false, brake: false, left: false, right: false, nitro: false, horn: false };
   function bindTouch(id, key) {
     const el = $(id);
-    const set = (v) => (touchState[key] = v);
+    if (!el) return;
+    const set = (v) => {
+      touchState[key] = v;
+      if (key === 'horn') {
+        if (v) sound.startHorn();
+        else sound.stopHorn();
+      }
+    };
     el.addEventListener('touchstart', (e) => { e.preventDefault(); set(true); }, { passive: false });
     el.addEventListener('touchend', (e) => { e.preventDefault(); set(false); }, { passive: false });
     el.addEventListener('mousedown', () => set(true));
     el.addEventListener('mouseup', () => set(false));
   }
-  bindTouch('touchGas', 'gas'); bindTouch('touchBrake', 'brake'); bindTouch('touchLeft', 'left'); bindTouch('touchRight', 'right'); bindTouch('touchNitro', 'nitro');
-
-  // Gamepad support — standard mapping: left stick X steers, RT/R2 (button 7) throttle,
-  // LT/L2 (button 6) brake, A/Cross (button 0) nitro, B/Circle or bumpers handbrake.
-  function readGamepad() {
-    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
-    for (const pad of pads) {
-      if (!pad || !pad.connected) continue;
-      const deadzone = 0.15;
-      const stickX = pad.axes[0] || 0;
-      const steer = Math.abs(stickX) > deadzone ? stickX : 0;
-      const rt = pad.buttons[7] ? pad.buttons[7].value : 0;
-      const lt = pad.buttons[6] ? pad.buttons[6].value : 0;
-      const nitroBtn = pad.buttons[0] && pad.buttons[0].pressed;
-      const handbrakeBtn = (pad.buttons[1] && pad.buttons[1].pressed) || (pad.buttons[4] && pad.buttons[4].pressed) || (pad.buttons[5] && pad.buttons[5].pressed);
-      if (Math.abs(stickX) > deadzone || rt > 0.05 || lt > 0.05 || nitroBtn || handbrakeBtn) {
-        return { steer, throttle: rt > 0.05 ? rt : lt > 0.05 ? -lt : 0, handbrake: handbrakeBtn, nitro: nitroBtn };
-      }
-    }
-    return null;
-  }
+  bindTouch('touchGas', 'gas');
+  bindTouch('touchBrake', 'brake');
+  bindTouch('touchLeft', 'left');
+  bindTouch('touchRight', 'right');
+  bindTouch('touchNitro', 'nitro');
+  bindTouch('touchHorn', 'horn');
 
   function readInput() {
     sound.init();
-    const gp = readGamepad();
-    if (gp) {
-      input.throttle = gp.throttle;
-      input.steer = gp.steer;
-      input.handbrake = gp.handbrake;
-      input.nitro = gp.nitro;
-      return;
-    }
     const gas = keys.has('KeyW') || keys.has('ArrowUp') || touchState.gas;
     const brake = keys.has('KeyS') || keys.has('ArrowDown') || touchState.brake;
     const left = keys.has('KeyA') || keys.has('ArrowLeft') || touchState.left;
     const right = keys.has('KeyD') || keys.has('ArrowRight') || touchState.right;
-    input.throttle = gas ? 1 : brake ? -1 : 0;
+    const hornKey = keys.has('KeyH') || touchState.horn;
+
+    input.gas = gas ? 1 : 0;
+    input.brake = brake ? 1 : 0;
     input.steer = (left ? -1 : 0) + (right ? 1 : 0);
-    input.handbrake = keys.has('Space') || touchState.brake && gas;
+    input.handbrake = keys.has('Space') || (touchState.brake && gas);
     input.nitro = keys.has('ShiftLeft') || keys.has('ShiftRight') || touchState.nitro;
+    input.horn = hornKey;
   }
 
-  // Camera modes
+  // Camera modes & Tight Chase Camera
   let camMode = state.cameraMode;
   function cycleCamera() {
     camMode = camMode === 'chase' ? 'hood' : camMode === 'hood' ? 'orbit' : 'chase';
     toast(`Camera: ${camMode}`);
   }
   const camOffset = new THREE.Vector3();
-  // Camera shake — an impulse-decay system. bumpShake() is called on collisions/landings;
-  // the offset decays back to zero each frame so it reads as a jolt, not constant jitter.
   let shakeIntensity = 0;
   function bumpShake(amount) {
-    shakeIntensity = Math.min(1.5, shakeIntensity + amount);
+    shakeIntensity = Math.min(1.6, shakeIntensity + amount);
     sound.playImpact(amount);
   }
+
+  let countdownT = 0;
+  let isCountingDown = true;
+
   function updateCamera(dt) {
     const carPos = player.rig.group.position;
     const heading = player.heading;
     const dir = new THREE.Vector3(Math.sin(heading), 0, Math.cos(heading));
+    
     let shakeX = 0, shakeY = 0;
     if (shakeIntensity > 0.001) {
-      shakeX = (Math.random() - 0.5) * shakeIntensity * 0.6;
-      shakeY = (Math.random() - 0.5) * shakeIntensity * 0.4;
-      shakeIntensity *= Math.max(0, 1 - dt * 6);
+      shakeX = (Math.random() - 0.5) * shakeIntensity * 0.55;
+      shakeY = (Math.random() - 0.5) * shakeIntensity * 0.35;
+      shakeIntensity *= Math.max(0, 1 - dt * 7);
     } else {
       shakeIntensity = 0;
     }
+
+    if (isCountingDown) {
+      // 3D Cinematic opening crane shot sweeping from front-quarter beauty angle to rear chase position
+      const orbitAngle = heading + Math.PI * 0.8 * (1 - countdownT);
+      const orbitDist = 5.6 - countdownT * 0.6;
+      const orbitHeight = 1.6 + (1 - countdownT) * 1.2;
+      camera.position.set(
+        carPos.x - Math.sin(orbitAngle) * orbitDist + shakeX,
+        carPos.y + orbitHeight + shakeY,
+        carPos.z - Math.cos(orbitAngle) * orbitDist
+      );
+      camera.lookAt(carPos.x, carPos.y + 0.9, carPos.z);
+      camera.fov = 62;
+      camera.updateProjectionMatrix();
+      return;
+    }
+
     if (camMode === 'chase') {
-      camOffset.set(-dir.x * 8.5, 3.4, -dir.z * 8.5);
+      // Tighter dynamic chase camera
+      const speedRatio = THREE.MathUtils.clamp(player.speedKmh / 300, 0, 1);
+      const targetDist = player.nitroActive ? 5.8 : (4.9 + speedRatio * 0.8);
+      const targetHeight = 1.82 + speedRatio * 0.32;
+      
+      camOffset.set(-dir.x * targetDist, targetHeight, -dir.z * targetDist);
       const target = carPos.clone().add(camOffset);
-      camera.position.lerp(target, Math.min(1, dt * 4));
-      camera.position.x += shakeX; camera.position.y += shakeY;
-      camera.lookAt(carPos.x, carPos.y + 1.1, carPos.z);
-      camera.fov = THREE.MathUtils.lerp(camera.fov, 62 + Math.min(20, player.speedKmh / 12), 0.05);
+      camera.position.lerp(target, Math.min(1, dt * 8.5));
+      camera.position.x += shakeX;
+      camera.position.y += shakeY;
+
+      const lookTarget = carPos.clone().add(new THREE.Vector3(dir.x * 2.2, 0.95, dir.z * 2.2));
+      camera.lookAt(lookTarget);
+
+      const targetRoll = -player.steerInput * 0.045 * THREE.MathUtils.clamp(player.speedKmh / 60, 0, 1);
+      camera.rotation.z = THREE.MathUtils.lerp(camera.rotation.z, targetRoll, Math.min(1, dt * 6));
+
+      const baseFov = 62;
+      const speedFov = (player.speedKmh / 320) * 13;
+      const nitroFov = player.nitroActive ? 6.5 : 0;
+      camera.fov = THREE.MathUtils.lerp(camera.fov, baseFov + speedFov + nitroFov, Math.min(1, dt * 6));
       camera.updateProjectionMatrix();
     } else if (camMode === 'hood') {
-      const hoodPos = carPos.clone().add(new THREE.Vector3(dir.x * 1.4, 1.15, dir.z * 1.4));
-      camera.position.lerp(hoodPos, Math.min(1, dt * 10));
+      const hoodPos = carPos.clone().add(new THREE.Vector3(dir.x * 1.35, 1.12, dir.z * 1.35));
+      camera.position.lerp(hoodPos, Math.min(1, dt * 12));
       camera.position.x += shakeX; camera.position.y += shakeY;
-      camera.lookAt(carPos.x + dir.x * 10, carPos.y + 1, carPos.z + dir.z * 10);
+      camera.lookAt(carPos.x + dir.x * 12, carPos.y + 0.95, carPos.z + dir.z * 12);
     } else {
       const t = performance.now() * 0.0003;
-      camera.position.set(carPos.x + Math.sin(t) * 12 + shakeX, 5 + shakeY, carPos.z + Math.cos(t) * 12);
+      camera.position.set(carPos.x + Math.sin(t) * 11 + shakeX, 4.5 + shakeY, carPos.z + Math.cos(t) * 11);
       camera.lookAt(carPos);
     }
   }
@@ -685,7 +673,14 @@ function beginRace() {
   let lastFrame = performance.now();
   let lastLapStartMs = 0;
   let bestLapMs = null;
-  runCountdown(() => { raceStarted = true; lastFrame = performance.now(); });
+  let lastGear = 1;
+
+  runCountdown(() => {
+    raceStarted = true;
+    isCountingDown = false;
+    lastFrame = performance.now();
+    sound.startEngine();
+  });
 
   $('hudTotalLaps').textContent = state.totalLaps;
   $('resumeBtn').onclick = togglePause;
@@ -707,16 +702,14 @@ function beginRace() {
       if (ctrl.nextCP >= CP_COUNT) {
         ctrl.nextCP = 0;
         ctrl.lap = (ctrl.lap || 1) + 1;
-        return true; // crossed start/finish
+        return true;
       }
     }
     return false;
   }
-  player.lap = 1;
 
-  // Simple arcade car-vs-car collision: circle-overlap push-apart + speed dampening.
-  // Not a physics sim — just enough to make cars feel solid and bump each other on contact.
-  const CAR_RADIUS = 2.1;
+  // Elastic vehicle-to-vehicle collision detection & impulse physics
+  const CAR_RADIUS = 2.15;
   function resolveCarCollisions(playerCtrl, aiList) {
     const all = [playerCtrl, ...aiList.map((o) => o.ctrl)];
     for (let i = 0; i < all.length; i++) {
@@ -729,25 +722,31 @@ function beginRace() {
         if (dist > 0.0001 && dist < minDist) {
           const overlap = (minDist - dist) / 2;
           const nx = dx / dist, nz = dz / dist;
+          const normal = new THREE.Vector3(nx, 0, nz);
+          
           a.position.x += nx * overlap; a.position.z += nz * overlap;
           b.position.x -= nx * overlap; b.position.z -= nz * overlap;
           a.rig.group.position.copy(a.position);
           b.rig.group.position.copy(b.position);
-          const impactSpeed = Math.abs(a.speed) + Math.abs(b.speed);
-          a.speed *= 0.82; b.speed *= 0.82;
-          if (impactSpeed > 8) {
-            const contactPoint = a.rig.group.position.clone().lerp(b.rig.group.position, 0.5);
-            contactPoint.y += 0.4;
-            sparks.emit(contactPoint, Math.min(16, Math.round(impactSpeed)));
+
+          const relativeSpeed = Math.abs(a.speed - b.speed) + 4;
+          const impulseMagnitude = Math.min(22, relativeSpeed * 1.2);
+          
+          if (a.applyCollisionImpulse) a.applyCollisionImpulse(normal.clone().multiplyScalar(impulseMagnitude), 0.88);
+          if (b.applyCollisionImpulse) b.applyCollisionImpulse(normal.clone().multiplyScalar(-impulseMagnitude), 0.88);
+
+          const contactPoint = a.rig.group.position.clone().lerp(b.rig.group.position, 0.5);
+          contactPoint.y += 0.45;
+          sparks.emit(contactPoint, Math.min(20, Math.round(relativeSpeed * 1.5)));
+
+          if (a === playerCtrl || b === playerCtrl) {
+            bumpShake(Math.min(1.2, relativeSpeed / 45));
           }
-          if (a === playerCtrl || b === playerCtrl) bumpShake(Math.min(1, impactSpeed / 60));
         }
       }
     }
   }
 
-  // Off-road penalty: cars straying outside the road surface get a speed drag, using the
-  // nearest checkpoint segment as a cheap approximation of distance-from-centerline.
   function segmentDistance(px, pz, ax, az, bx, bz) {
     const abx = bx - ax, abz = bz - az;
     const apx = px - ax, apz = pz - az;
@@ -756,21 +755,20 @@ function beginRace() {
     const cx = ax + abx * t, cz = az + abz * t;
     return Math.hypot(px - cx, pz - cz);
   }
+
   function applyOffRoadDrag(ctrl, dt) {
     const prevCP = checkpoints[(ctrl.nextCP - 1 + CP_COUNT) % CP_COUNT];
     const nextCP = checkpoints[ctrl.nextCP];
     const dist = segmentDistance(ctrl.position.x, ctrl.position.z, prevCP.x, prevCP.z, nextCP.x, nextCP.z);
-    const offRoad = dist > trackWidth / 2 + 1.5; // small buffer past the curb before it bites
+    const offRoad = dist > trackWidth / 2 + 1.6;
     if (offRoad && !ctrl.airborne) {
-      ctrl.speed *= Math.max(0.9, 1 - dt * 1.4); // sand/grass drag
+      ctrl.speed *= Math.max(0.88, 1 - dt * 1.6);
       ctrl.offRoad = true;
     } else {
       ctrl.offRoad = false;
     }
   }
 
-  // Ramp jumps (currently only Skyline defines ramps — harmless no-op elsewhere since
-  // `ramps` defaults to []) + a small dust puff on landing for any airborne car.
   function checkRamps(ctrl) {
     if (!ctrl.airborne) {
       for (const ramp of ramps) {
@@ -783,8 +781,8 @@ function beginRace() {
       }
     }
     if (ctrl.justLanded) {
-      smoke.emit(ctrl.rig.group.position, 1.4);
-      if (ctrl === player) bumpShake(0.7);
+      smoke.emit(ctrl.rig.group.position, 1.6);
+      if (ctrl === player) bumpShake(0.8);
     }
   }
 
@@ -795,13 +793,7 @@ function beginRace() {
     sound.updateNitro(false);
     const timeMs = Math.round(elapsedMs);
     backend.submitScore({ name: state.playerName, timeMs, car: modelDef.id, livery: livery.id });
-    if (state.isMultiplayerRace) state.multiplayer?.sendFinish({ timeMs });
-    if (!state.isMultiplayerRace) {
-      const isNewBest = saveGhostIfBest(state.worldId, modelDef.id, timeMs, ghostRecorder.samples);
-      if (isNewBest) toast('New ghost best lap saved!');
-    }
-    const resultOpponents = state.isMultiplayerRace ? Array.from(remoteRigs.values()) : opponents;
-    showResults(timeMs, resultOpponents);
+    showResults(timeMs, opponents);
   }
 
   let fpsAcc = 0, fpsFrames = 0, fpsLast = performance.now();
@@ -811,13 +803,26 @@ function beginRace() {
     const dt = Math.min(0.05, (now - lastFrame) / 1000);
     lastFrame = now;
 
+    if (isCountingDown) {
+      countdownT = Math.min(1, countdownT + dt * 0.35);
+      updateCamera(dt);
+      composer.render();
+      return;
+    }
+
     if (raceStarted && !paused && !raceFinished) {
       elapsedMs += dt * 1000;
       readInput();
       player.applyPlayerInput(input, dt);
       player.step(dt);
 
-      sound.updateEngine(player.speedKmh, input.throttle, player.nitroActive);
+      // Check gear shift pop
+      if (player.gear !== lastGear && player.gear !== 'R') {
+        sound.playGearShift();
+        lastGear = player.gear;
+      }
+
+      sound.updateEngine(player.speedKmh, player.rpm || 3000, input.gas, player.nitroActive);
       sound.updateDrift(player.driftFactor);
       sound.updateNitro(player.nitroActive);
 
@@ -831,77 +836,65 @@ function beginRace() {
         }
         if (player.lap > state.totalLaps) finishRace();
       }
-      if (player.driftFactor > 0.15 && Math.abs(player.speed) > 4) {
+
+      // Tire smoke on drift / hard acceleration
+      if (player.driftFactor > 0.12 && Math.abs(player.speed) > 5) {
         const rl = player.rig.wheels.rl.getWorldPosition(new THREE.Vector3());
         const rr = player.rig.wheels.rr.getWorldPosition(new THREE.Vector3());
-        smoke.emit(rl, player.driftFactor); smoke.emit(rr, player.driftFactor);
+        smoke.emit(rl, player.driftFactor * 1.5);
+        smoke.emit(rr, player.driftFactor * 1.5);
       }
 
-      if (state.isMultiplayerRace && state.multiplayer) {
-        remoteRigs.forEach((entry) => {
-          entry.rig.group.position.x = THREE.MathUtils.lerp(entry.rig.group.position.x, entry.targetX, Math.min(1, dt * 15));
-          entry.rig.group.position.z = THREE.MathUtils.lerp(entry.rig.group.position.z, entry.targetZ, Math.min(1, dt * 15));
-          let dh = entry.targetRy - entry.rig.group.rotation.y;
-          dh = Math.atan2(Math.sin(dh), Math.cos(dh));
-          entry.rig.group.rotation.y += dh * Math.min(1, dt * 15);
-          entry.ctrl.position.copy(entry.rig.group.position);
-          entry.ctrl.heading = entry.rig.group.rotation.y;
-          entry.ctrl.speed = entry.speed;
-          entry.ctrl.lap = entry.lap;
-          entry.ctrl.nextCP = entry.nextCP;
-        });
-      } else {
-        opponents.forEach((o) => {
-          o.ai.step(dt);
-          o.ctrl.step(dt);
-          if (checkpointAdvance(o.ctrl, o.ctrl.rig.group.position)) {
-            if (o.ctrl.lap > state.totalLaps && !o.finishTimeMs) {
-              o.finishTimeMs = Math.round(elapsedMs);
-            }
+      // Water spray on wet tracks (Neon Rain, Storm City, Coastal)
+      const isWetTrack = state.worldId === 'neon' || state.worldId === 'storm' || state.worldId === 'coastal';
+      if (isWetTrack && player.speedKmh > 35) {
+        const dir = new THREE.Vector3(Math.sin(player.heading), 0, Math.cos(player.heading));
+        const rl = player.rig.wheels.rl.getWorldPosition(new THREE.Vector3());
+        const rr = player.rig.wheels.rr.getWorldPosition(new THREE.Vector3());
+        waterSpray.emit(rl, dir, player.speedKmh);
+        waterSpray.emit(rr, dir, player.speedKmh);
+      }
+
+      // Nitro jet flames
+      nitroJets.update(player.position, player.heading, player.nitroActive, dt);
+
+      opponents.forEach((o) => {
+        o.ai.step(dt);
+        o.ctrl.step(dt);
+        if (checkpointAdvance(o.ctrl, o.ctrl.rig.group.position)) {
+          if (o.ctrl.lap > state.totalLaps && !o.finishTimeMs) {
+            o.finishTimeMs = Math.round(elapsedMs);
           }
-        });
-      }
+        }
+      });
 
-      const activeOpponents = state.isMultiplayerRace
-        ? Array.from(remoteRigs.values()).map((r) => ({ ctrl: r.ctrl, name: r.name }))
-        : opponents;
-
-      resolveCarCollisions(player, activeOpponents);
+      resolveCarCollisions(player, opponents);
       checkRamps(player);
-      activeOpponents.forEach((o) => checkRamps(o.ctrl));
+      opponents.forEach((o) => checkRamps(o.ctrl));
       applyOffRoadDrag(player, dt);
-      activeOpponents.forEach((o) => applyOffRoadDrag(o.ctrl, dt));
+      opponents.forEach((o) => applyOffRoadDrag(o.ctrl, dt));
       updateNitroPickups(dt);
       checkNitroPickup(player);
-      activeOpponents.forEach((o) => checkNitroPickup(o.ctrl));
-      emitAllNitroFlames();
-
-      ghostRecorder.record(elapsedMs, player.position.x, player.position.z, player.heading);
-      if (ghostPlayer && !ghostPlayer.finished) ghostPlayer.update(elapsedMs);
-
-      if (state.isMultiplayerRace && state.multiplayer) {
-        state.multiplayer.sendTransform({
-          x: player.position.x,
-          z: player.position.z,
-          ry: player.heading,
-          speed: player.speedKmh,
-          lap: player.lap,
-          cp: player.nextCP,
-        });
-      }
+      opponents.forEach((o) => checkNitroPickup(o.ctrl));
 
       updateCamera(dt);
-      updateHud(player, activeOpponents, elapsedMs);
+      updateHud(player, opponents, elapsedMs);
       updateMinimap();
+
       if (motionBlur.enabled) {
-        const speedFrac = THREE.MathUtils.clamp((player.speedKmh - 130) / 120, 0, 1);
-        const targetBlur = player.nitroActive ? 1 : speedFrac;
-        motionBlur.uniforms.uIntensity.value = THREE.MathUtils.lerp(motionBlur.uniforms.uIntensity.value, targetBlur, Math.min(1, dt * 6));
+        const speedFrac = THREE.MathUtils.clamp((player.speedKmh - 120) / 140, 0, 1);
+        const targetBlur = player.nitroActive ? 1.0 : speedFrac * 0.7;
+        const targetAberration = player.nitroActive ? 1.0 : (player.speedKmh > 240 ? 0.4 : 0);
+        motionBlur.uniforms.uIntensity.value = THREE.MathUtils.lerp(motionBlur.uniforms.uIntensity.value, targetBlur, Math.min(1, dt * 7));
+        if (motionBlur.uniforms.uAberration) {
+          motionBlur.uniforms.uAberration.value = THREE.MathUtils.lerp(motionBlur.uniforms.uAberration.value, targetAberration, Math.min(1, dt * 7));
+        }
       }
     }
 
     smoke.update(dt);
     sparks.update(dt);
+    waterSpray.update(dt);
     updateWorld(dt);
     composer.render();
 
@@ -918,62 +911,13 @@ function beginRace() {
     const w = window.innerWidth, h = window.innerHeight;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    const pr = Math.min(window.devicePixelRatio, state.quality === 'high' ? 2.0 : 1.5);
+    renderer.setPixelRatio(pr);
     renderer.setSize(w, h);
     composer.setSize(w, h);
   }
   window.addEventListener('resize', onResize);
 
-  // Debug hook so we can force-render frames even if the tab is backgrounded/throttled.
-  window.__vxDebug = {
-    forceFrame(dt = 0.05) {
-      if (!raceStarted) { raceStarted = true; lastFrame = performance.now(); }
-      elapsedMs += dt * 1000;
-      readInput();
-      player.applyPlayerInput(input, dt);
-      player.step(dt);
-      if (checkpointAdvance(player, player.rig.group.position)) {
-        $('hudLap').textContent = Math.min(player.lap, state.totalLaps);
-        const lapTime = elapsedMs - lastLapStartMs;
-        lastLapStartMs = elapsedMs;
-        if (bestLapMs === null || lapTime < bestLapMs) {
-          bestLapMs = lapTime;
-          $('hudBest').textContent = formatRaceTime(bestLapMs);
-        }
-      }
-      const activeOpponents = state.isMultiplayerRace
-        ? Array.from(remoteRigs.values()).map((r) => ({ ctrl: r.ctrl, name: r.name }))
-        : opponents;
-      activeOpponents.forEach((o) => { if (o.ai) { o.ai.step(dt); o.ctrl.step(dt); } checkpointAdvance(o.ctrl, o.ctrl.rig.group.position); });
-      resolveCarCollisions(player, activeOpponents);
-      checkRamps(player);
-      activeOpponents.forEach((o) => checkRamps(o.ctrl));
-      applyOffRoadDrag(player, dt);
-      activeOpponents.forEach((o) => applyOffRoadDrag(o.ctrl, dt));
-      updateNitroPickups(dt);
-      checkNitroPickup(player);
-      activeOpponents.forEach((o) => checkNitroPickup(o.ctrl));
-      emitAllNitroFlames();
-      updateCamera(dt);
-      updateHud(player, activeOpponents, elapsedMs);
-      updateMinimap();
-      if (motionBlur.enabled) {
-        const speedFrac = THREE.MathUtils.clamp((player.speedKmh - 130) / 120, 0, 1);
-        const targetBlur = player.nitroActive ? 1 : speedFrac;
-        motionBlur.uniforms.uIntensity.value = THREE.MathUtils.lerp(motionBlur.uniforms.uIntensity.value, targetBlur, Math.min(1, dt * 6));
-      }
-      smoke.update(dt);
-      sparks.update(dt);
-      updateWorld(dt);
-composer.render();
-    },
-    setInput(i) { Object.assign(touchState, i); },
-    player,
-    ramps,
-    nitroPickups,
-    curve,
-    motionBlur,
-    sparks,
-  };
   raceCtx = {
     rafId: null,
     teardown() {
@@ -990,214 +934,237 @@ composer.render();
   $('fpsCounter').classList.toggle('hidden', !state.showFps);
   raceCtx.rafId = requestAnimationFrame(frame);
 }
-  function teardownRace() {
-    if (raceCtx) { raceCtx.teardown(); raceCtx = null; }
-    sound.stopEngine();
-    sound.updateDrift(0);
-    sound.updateNitro(false);
-    $('pauseOverlay').classList.add('hidden');
-  }
 
-  function runCountdown(onGo) {
-    const overlay = $('countdownOverlay');
-    const num = $('countdownNum');
-    overlay.classList.remove('hidden');
-    let n = 3;
-    num.textContent = n;
-    sound.playCountdown(false);
-    const iv = setInterval(() => {
-      n -= 1;
-      if (n > 0) {
-        num.textContent = n;
-        sound.playCountdown(false);
-      } else if (n === 0) {
-        num.textContent = 'GO!';
-        sound.playCountdown(true);
-      } else {
-        clearInterval(iv);
-        overlay.classList.add('hidden');
-        onGo();
-      }
-    }, 800);
-  }
+function teardownRace() {
+  if (raceCtx) { raceCtx.teardown(); raceCtx = null; }
+  sound.stopEngine();
+  sound.updateDrift(0);
+  sound.updateNitro(false);
+  $('pauseOverlay').classList.add('hidden');
+}
 
-  function formatRaceTime(ms) {
-    const m = Math.floor(ms / 60000);
-    const s = ((ms % 60000) / 1000).toFixed(3);
-    return `${m}:${s.padStart(6, '0')}`;
-  }
-
-  const SPEEDO_MAX_KMH = 320;
-  const SPEEDO_CIRCUMFERENCE = 2 * Math.PI * 70;
-
-  function updateHud(player, opponents, elapsedMs) {
-    $('hudSpeed').textContent = Math.round(player.speedKmh);
-    $('hudGear').textContent = player.speed < -0.2 ? 'R' : (Math.min(6, Math.floor(player.speedKmh / 45) + 1));
-    $('nitroFill').style.width = `${player.nitro * 100}%`;
-    $('hudTimer').textContent = formatRaceTime(elapsedMs);
-
-    const speedoFrac = THREE.MathUtils.clamp(player.speedKmh / SPEEDO_MAX_KMH, 0, 1);
-    const ring = $('speedoFillRing');
-    if (ring) {
-      ring.style.strokeDashoffset = SPEEDO_CIRCUMFERENCE * (1 - speedoFrac);
-      ring.style.stroke = speedoFrac > 0.85 ? '#ff2e2e' : speedoFrac > 0.6 ? '#ff7a1a' : '#00e5ff';
+function runCountdown(onGo) {
+  const overlay = $('countdownOverlay');
+  const num = $('countdownNum');
+  overlay.classList.remove('hidden');
+  let n = 3;
+  num.textContent = n;
+  sound.playCountdown(false);
+  const iv = setInterval(() => {
+    n -= 1;
+    if (n > 0) {
+      num.textContent = n;
+      sound.playCountdown(false);
+    } else if (n === 0) {
+      num.textContent = 'GO!';
+      sound.playCountdown(true);
+    } else {
+      clearInterval(iv);
+      overlay.classList.add('hidden');
+      onGo();
     }
+  }, 800);
+}
 
-    const speedFrac = THREE.MathUtils.clamp((player.speedKmh - 110) / 100, 0, 1);
-    const linesOpacity = player.nitroActive ? 0.85 : speedFrac * 0.5;
-    $('speedLines').style.opacity = linesOpacity;
+function formatRaceTime(ms) {
+  const m = Math.floor(ms / 60000);
+  const s = ((ms % 60000) / 1000).toFixed(3);
+  return `${m}:${s.padStart(6, '0')}`;
+}
 
-    const standings = [{ name: state.playerName + ' (you)', lap: player.lap || 1, cp: player.nextCP || 0, me: true }]
-      .concat(opponents.map((o) => ({ name: o.name, lap: o.ctrl?.lap || 1, cp: o.ctrl?.nextCP || 0, me: false })));
-    standings.sort((a, b) => (b.lap - a.lap) || (b.cp - a.cp));
-    
-    const myRank = standings.findIndex((s) => s.me) + 1;
-    $('hudPos').textContent = String(myRank).padStart(2, '0');
-    $('hudPosTotal').textContent = String(standings.length).padStart(2, '0');
+const SPEEDO_MAX_KMH = 320;
+const SPEEDO_CIRCUMFERENCE = 2 * Math.PI * 70;
+
+function updateHud(player, opponents, elapsedMs) {
+  $('hudSpeed').textContent = Math.round(player.speedKmh);
+  const gearVal = player.gear || (player.speed < -0.2 ? 'R' : (Math.min(6, Math.floor(player.speedKmh / 45) + 1)));
+  $('hudGear').textContent = gearVal;
+  
+  const rpmEl = $('hudRpm');
+  if (rpmEl) {
+    rpmEl.textContent = `${Math.round(player.rpm || 3000).toLocaleString()} RPM`;
   }
 
-  function showResults(timeMs, opponents) {
-    teardownRace();
-    showScreen('screen-results');
-    const mins = Math.floor(timeMs / 60000);
-    const secs = ((timeMs % 60000) / 1000).toFixed(3);
-    const list = [{ name: state.playerName + ' (you)', time: timeMs, me: true }];
+  $('nitroFill').style.width = `${player.nitro * 100}%`;
+  $('hudTimer').textContent = formatRaceTime(elapsedMs);
 
-    (opponents || []).forEach((o, i) => {
-      const oppTime = timeMs + (i + 1) * 1400 + Math.round(Math.random() * 800);
-      list.push({ name: o.name, time: oppTime, me: false });
-    });
-
-    list.sort((a, b) => a.time - b.time);
-    $('resultsList').innerHTML = list.map((r, i) => {
-      const m = Math.floor(r.time / 60000);
-      const s = ((r.time % 60000) / 1000).toFixed(3);
-      return `<div class="res-row ${r.me ? 'me' : ''}"><span>${i + 1}. ${escapeHtml(r.name)}</span><span>${m}:${s.padStart(6, '0')}</span></div>`;
-    }).join('');
-
-    const myRank = list.findIndex((r) => r.me) + 1;
-    $('resultsBest').textContent = `Rank: ${myRank}/${list.length} • Your time: ${mins}:${secs.padStart(6, '0')}`;
+  const speedoFrac = THREE.MathUtils.clamp(player.speedKmh / SPEEDO_MAX_KMH, 0, 1);
+  const ring = $('speedoFillRing');
+  if (ring) {
+    ring.style.strokeDashoffset = SPEEDO_CIRCUMFERENCE * (1 - speedoFrac);
+    ring.style.stroke = speedoFrac > 0.85 ? '#ff2e2e' : speedoFrac > 0.6 ? '#ff7a1a' : '#00e5ff';
   }
 
-  $('raceAgainBtn').addEventListener('click', () => beginRace());
-  $('resultsMenuBtn').addEventListener('click', () => showScreen('screen-home'));
+  const speedFrac = THREE.MathUtils.clamp((player.speedKmh - 110) / 100, 0, 1);
+  const linesOpacity = player.nitroActive ? 0.85 : speedFrac * 0.5;
+  $('speedLines').style.opacity = linesOpacity;
 
-  /* ============================== LEADERBOARD ============================== */
-  async function loadLeaderboard() {
-    const body = $('leaderboardBody');
-    body.innerHTML = '<tr><td colspan="6" class="muted center">Loading records…</td></tr>';
-    const rows = await backend.fetchLeaderboard(25);
-    
-    const defaultEntries = [
-      { rank: 1, driver_name: 'NitroKing', car: 'SHADOW GT', time_ms: 108753, races: 168, wins: 94 },
-      { rank: 2, driver_name: 'SpeedDemon', car: 'APEX R9', time_ms: 112664, races: 152, wins: 48 },
-      { rank: 3, driver_name: 'DriftGhost', car: 'INFERNO X', time_ms: 113921, races: 140, wins: 35 },
-      { rank: 4, driver_name: 'PhantomX', car: 'CYBER VELOCE', time_ms: 114102, races: 128, wins: 33 },
-      { rank: 5, driver_name: 'StreetLegend', car: 'NIGHTHAWK', time_ms: 114853, races: 101, wins: 21 },
-      { rank: 6, driver_name: 'NightRider', car: 'VORTEX RS', time_ms: 115231, races: 96, wins: 18 },
-    ];
+  const standings = [{ name: state.playerName + ' (you)', lap: player.lap || 1, cp: player.nextCP || 0, me: true }]
+    .concat(opponents.map((o) => ({ name: o.name, lap: o.ctrl?.lap || 1, cp: o.ctrl?.nextCP || 0, me: false })));
+  standings.sort((a, b) => (b.lap - a.lap) || (b.cp - a.cp));
+  
+  const myRank = standings.findIndex((s) => s.me) + 1;
+  $('hudPos').textContent = String(myRank).padStart(2, '0');
+  $('hudPosTotal').textContent = String(standings.length).padStart(2, '0');
+}
 
-    const data = (rows && rows.length) ? rows : defaultEntries;
+function showResults(timeMs, opponents) {
+  teardownRace();
+  showScreen('screen-results');
+  const mins = Math.floor(timeMs / 60000);
+  const secs = ((timeMs % 60000) / 1000).toFixed(3);
+  const list = [{ name: state.playerName + ' (you)', time: timeMs, me: true }];
 
-    body.innerHTML = data.map((r, i) => {
-      const rank = r.rank || (i + 1);
-      const m = Math.floor(r.time_ms / 60000);
-      const s = ((r.time_ms % 60000) / 1000).toFixed(3);
-      const races = r.races || (120 - i * 8);
-      const wins = r.wins || (45 - i * 5);
-      return `<tr>
-        <td><b>#${rank}</b></td>
-        <td>${escapeHtml(r.driver_name)}</td>
-        <td><span class="accent">${escapeHtml(r.car)}</span></td>
-        <td><b>${m}:${s.padStart(6, '0')}</b></td>
-        <td>${races}</td>
-        <td>${wins}</td>
-      </tr>`;
-    }).join('');
-  }
-  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
-
-  document.querySelectorAll('.lead-tab-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.lead-tab-btn').forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      loadLeaderboard();
-    });
+  (opponents || []).forEach((o, i) => {
+    const oppTime = timeMs + (i + 1) * 1400 + Math.round(Math.random() * 800);
+    list.push({ name: o.name, time: oppTime, me: false });
   });
 
-  /* ============================== SETTINGS ============================== */
-  document.querySelectorAll('.set-tab-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.set-tab-btn').forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-    });
+  list.sort((a, b) => a.time - b.time);
+  $('resultsList').innerHTML = list.map((r, i) => {
+    const m = Math.floor(r.time / 60000);
+    const s = ((r.time % 60000) / 1000).toFixed(3);
+    return `<div class="res-row ${r.me ? 'me' : ''}"><span>${i + 1}. ${escapeHtml(r.name)}</span><span>${m}:${s.padStart(6, '0')}</span></div>`;
+  }).join('');
+
+  const myRank = list.findIndex((r) => r.me) + 1;
+  $('resultsBest').textContent = `Rank: ${myRank}/${list.length} • Your time: ${mins}:${secs.padStart(6, '0')}`;
+}
+
+$('raceAgainBtn').addEventListener('click', () => beginRace());
+$('resultsMenuBtn').addEventListener('click', () => showScreen('screen-home'));
+
+/* ============================== LEADERBOARD ============================== */
+async function loadLeaderboard() {
+  const body = $('leaderboardBody');
+  body.innerHTML = '<tr><td colspan="6" class="muted center">Loading records…</td></tr>';
+  const rows = await backend.fetchLeaderboard(25);
+  
+  const defaultEntries = [
+    { rank: 1, driver_name: 'NitroKing', car: 'SHADOW GT', time_ms: 108753, races: 168, wins: 94 },
+    { rank: 2, driver_name: 'SpeedDemon', car: 'APEX R9', time_ms: 112664, races: 152, wins: 48 },
+    { rank: 3, driver_name: 'DriftGhost', car: 'INFERNO X', time_ms: 113921, races: 140, wins: 35 },
+    { rank: 4, driver_name: 'PhantomX', car: 'CYBER VELOCE', time_ms: 114102, races: 128, wins: 33 },
+    { rank: 5, driver_name: 'StreetLegend', car: 'NIGHTHAWK', time_ms: 114853, races: 101, wins: 21 },
+    { rank: 6, driver_name: 'NightRider', car: 'VORTEX RS', time_ms: 115231, races: 96, wins: 18 },
+  ];
+
+  const data = (rows && rows.length) ? rows : defaultEntries;
+
+  body.innerHTML = data.map((r, i) => {
+    const rank = r.rank || (i + 1);
+    const m = Math.floor(r.time_ms / 60000);
+    const s = ((r.time_ms % 60000) / 1000).toFixed(3);
+    const races = r.races || (120 - i * 8);
+    const wins = r.wins || (45 - i * 5);
+    return `<tr>
+      <td><b>#${rank}</b></td>
+      <td>${escapeHtml(r.driver_name)}</td>
+      <td><span class="accent">${escapeHtml(r.car)}</span></td>
+      <td><b>${m}:${s.padStart(6, '0')}</b></td>
+      <td>${races}</td>
+      <td>${wins}</td>
+    </tr>`;
+  }).join('');
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+document.querySelectorAll('.lead-tab-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.lead-tab-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadLeaderboard();
   });
+});
 
-  $('settingQuality').value = state.quality;
-  $('settingSound').checked = state.soundOn;
-  $('settingFps').checked = state.showFps;
-  sound.setEnabled(state.soundOn);
-
-  const resetSettingsBtn = $('resetSettingsBtn');
-  if (resetSettingsBtn) {
-    resetSettingsBtn.addEventListener('click', () => {
-      $('settingQuality').value = 'high';
-      $('settingSound').checked = true;
-      $('settingFps').checked = false;
-      toast('Settings reset to defaults');
-    });
-  }
-
-  const applySettingsBtn = $('applySettingsBtn');
-  if (applySettingsBtn) {
-    applySettingsBtn.addEventListener('click', () => {
-      state.quality = $('settingQuality').value;
-      state.soundOn = $('settingSound').checked;
-      state.showFps = $('settingFps').checked;
-      localStorage.setItem('rydash_quality', state.quality);
-      localStorage.setItem('rydash_sound', state.soundOn);
-      localStorage.setItem('rydash_fps', state.showFps);
-      sound.setEnabled(state.soundOn);
-      toast('Settings applied successfully!');
-      showScreen('screen-home');
-    });
-  }
-
-  function setWorld(id) {
-    state.worldId = id;
-    localStorage.setItem('rydash_world', id);
-    document.querySelectorAll('.world-node').forEach((n) => n.classList.toggle('active', n.dataset.world === id));
-    const label = (WORLDS[id] || WORLDS.neon).label;
-    const sel = $('worldMapSelected');
-    if (sel) sel.textContent = `Selected: ${label}`;
-  }
-
-  document.querySelectorAll('.world-node').forEach((node) => {
-    node.addEventListener('click', () => setWorld(node.dataset.world));
+/* ============================== SETTINGS ============================== */
+document.querySelectorAll('.set-tab-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.set-tab-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
   });
+});
 
-  const worldSelectConfirmBtn = $('worldSelectConfirmBtn');
-  if (worldSelectConfirmBtn) {
-    worldSelectConfirmBtn.addEventListener('click', () => {
-      toast(`Selected world: ${(WORLDS[state.worldId] || WORLDS.neon).label}`);
-      showScreen('screen-garage');
-      openGarage(() => startRaceFlow(false));
-    });
-  }
+$('settingQuality').value = state.quality;
+$('settingSound').checked = state.soundOn;
+$('settingFps').checked = state.showFps;
+sound.setEnabled(state.soundOn);
 
-  $('settingQuality').addEventListener('change', (e) => {
-    state.quality = e.target.value;
+const resetSettingsBtn = $('resetSettingsBtn');
+if (resetSettingsBtn) {
+  resetSettingsBtn.addEventListener('click', () => {
+    $('settingQuality').value = 'high';
+    $('settingSound').checked = true;
+    $('settingFps').checked = false;
+    toast('Settings reset to defaults');
+  });
+}
+
+const applySettingsBtn = $('applySettingsBtn');
+if (applySettingsBtn) {
+  applySettingsBtn.addEventListener('click', () => {
+    state.quality = $('settingQuality').value;
+    state.soundOn = $('settingSound').checked;
+    state.showFps = $('settingFps').checked;
     localStorage.setItem('rydash_quality', state.quality);
-  });
-  $('settingSound').addEventListener('change', (e) => {
-    state.soundOn = e.target.checked;
     localStorage.setItem('rydash_sound', state.soundOn);
+    localStorage.setItem('rydash_fps', state.showFps);
     sound.setEnabled(state.soundOn);
+    toast('Settings applied successfully!');
+    showScreen('screen-home');
   });
+}
 
-  const savedCar = localStorage.getItem('rydash_car') ?? localStorage.getItem('vx_car');
-  const savedLivery = localStorage.getItem('rydash_livery') ?? localStorage.getItem('vx_livery');
-  if (savedCar !== null) state.carIndex = Number(savedCar);
-  if (savedLivery !== null) state.liveryIndex = Number(savedLivery);
+function setWorld(id) {
+  state.worldId = id;
+  localStorage.setItem('rydash_world', id);
+  document.querySelectorAll('.world-node').forEach((n) => n.classList.toggle('active', n.dataset.world === id));
+  const label = (WORLDS[id] || WORLDS.neon).label;
+  const sel = $('worldMapSelected');
+  if (sel) sel.textContent = `Selected: ${label}`;
+}
 
-  boot();
+function updateLapPillsUI() {
+  document.querySelectorAll('.lap-pill').forEach((pill) => {
+    pill.classList.toggle('active', Number(pill.dataset.laps) === state.totalLaps);
+  });
+}
+
+document.querySelectorAll('.lap-pill').forEach((pill) => {
+  pill.addEventListener('click', () => {
+    state.totalLaps = Number(pill.dataset.laps) || 3;
+    localStorage.setItem('rydash_laps', state.totalLaps);
+    updateLapPillsUI();
+    toast(`Race Length: ${state.totalLaps} ${state.totalLaps === 1 ? 'Lap' : 'Laps'}`);
+  });
+});
+
+document.querySelectorAll('.world-node').forEach((node) => {
+  node.addEventListener('click', () => setWorld(node.dataset.world));
+});
+
+const worldSelectConfirmBtn = $('worldSelectConfirmBtn');
+if (worldSelectConfirmBtn) {
+  worldSelectConfirmBtn.addEventListener('click', () => {
+    toast(`Selected world: ${(WORLDS[state.worldId] || WORLDS.neon).label}`);
+    showScreen('screen-garage');
+    openGarage(() => startRaceFlow(false));
+  });
+}
+
+$('settingQuality').addEventListener('change', (e) => {
+  state.quality = e.target.value;
+  localStorage.setItem('rydash_quality', state.quality);
+});
+$('settingSound').addEventListener('change', (e) => {
+  state.soundOn = e.target.checked;
+  localStorage.setItem('rydash_sound', state.soundOn);
+  sound.setEnabled(state.soundOn);
+});
+
+const savedCar = localStorage.getItem('rydash_car') ?? localStorage.getItem('vx_car');
+const savedLivery = localStorage.getItem('rydash_livery') ?? localStorage.getItem('vx_livery');
+if (savedCar !== null) state.carIndex = Number(savedCar);
+if (savedLivery !== null) state.liveryIndex = Number(savedLivery);
+
+boot();

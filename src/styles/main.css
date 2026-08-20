@@ -1297,6 +1297,80 @@ input, select {
 }
 
 /* =========================================================================
+   LAP SELECTOR & EXTRA HUD STYLES
+   ========================================================================= */
+.lap-selector-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0;
+  z-index: 10;
+}
+.lap-selector-label {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+}
+.lap-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.lap-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-dim);
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lap-pill:hover {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: var(--neon-cyan);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.lap-pill.active {
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.3), rgba(0, 119, 255, 0.4));
+  border-color: var(--neon-cyan);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.45);
+}
+
+.speedo-rpm {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: var(--neon-gold);
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.touch-btn.horn-btn {
+  background: rgba(255, 179, 0, 0.18);
+  border-color: rgba(255, 179, 0, 0.6);
+  color: var(--neon-gold);
+}
+.touch-btn.horn-btn:active {
+  background: rgba(255, 179, 0, 0.45);
+  box-shadow: 0 0 16px rgba(255, 179, 0, 0.7);
+}
+
+/* Crisp rendering without pixel distortion */
+#gameCanvas {
+  image-rendering: auto;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* =========================================================================
    RESPONSIVE QUERIES (MOBILE / TABLET / LAPTOP)
    ========================================================================= */
 @media (max-width: 1024px) {
@@ -1319,3 +1393,4 @@ input, select {
   .podium-rank-1 { transform: none; order: -1; }
   .live-card { display: none; }
 }
+

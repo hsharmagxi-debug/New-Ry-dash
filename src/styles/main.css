@@ -1714,26 +1714,68 @@ input, select {
 }
 
 /* =========================================================================
-   RESPONSIVE QUERIES (MOBILE / TABLET / LAPTOP)
+   RESPONSIVE QUERIES (MOBILE / TABLET / LAPTOP - APPLE LEVEL DESIGN)
    ========================================================================= */
-@media (max-width: 1024px) {
+@media (max-width: 1080px) {
+  .home-master-container {
+    flex-direction: column;
+    padding: 10px 20px 20px;
+    gap: 20px;
+  }
+  .home-left-col {
+    max-width: 100%;
+    text-align: center;
+    align-items: center;
+  }
+  .hero-massive-title {
+    font-size: clamp(2.2rem, 6vw, 3.4rem);
+  }
+  .hero-cta-row {
+    justify-content: center;
+  }
+  .hero-dock-row {
+    justify-content: center;
+  }
+  .hero-status-chips {
+    justify-content: center;
+  }
   .garage-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-  .howto-layout {
-    grid-template-columns: 1fr;
+  .garage-topbar-master {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  .garage-bottom-dock {
+    flex-direction: column;
+    gap: 14px;
+  }
+  .dock-left-items {
+    justify-content: center;
   }
 }
 
 @media (max-width: 680px) {
-  .topnav { padding: 16px 20px; }
+  .topnav { padding: 12px 16px; }
   .brand { font-size: 1.1rem; }
   .nav-socials { display: none; }
-  .hero-nav-dock { gap: 8px; }
-  .dock-btn { padding: 9px 12px; font-size: 0.68rem; }
-  .garage-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-tag-badge { font-size: 0.65rem; padding: 4px 10px; }
+  .hero-massive-title { font-size: 2.2rem; }
+  .hero-desc { font-size: 0.88rem; }
+  .btn-cyan-glow, .btn-purple-outline { padding: 12px 20px; font-size: 0.78rem; }
+  .dock-btn-compact { padding: 8px 12px; font-size: 0.65rem; }
+  .quick-car-strip { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .quick-car-btn { padding: 6px 2px; font-size: 0.58rem; }
+  .home-bottom-widgets { grid-template-columns: 1fr; }
+  .garage-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .car-card { padding: 8px; }
+  .car-card-img { height: 75px; }
+  .stat-row { font-size: 0.65rem; }
+  .g-dock-btn { padding: 7px 10px; font-size: 0.65rem; }
+  .garage-quick-race-btn { width: 100%; }
   .podium-row { flex-direction: column; align-items: stretch; }
   .podium-rank-1 { transform: none; order: -1; }
-  .live-card { display: none; }
+  .howto-layout { grid-template-columns: 1fr; }
 }
 

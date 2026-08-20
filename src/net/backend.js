@@ -88,6 +88,22 @@ export async function fetchLeaderboard(limit = 20) {
   return scores.slice(0, limit);
 }
 
+// Real recent race submissions (not fabricated activity) — most recent first. Used by the
+// Home screen's activity feed. Returns [] on an empty/unconfigured backend rather than
+// inventing placeholder players.
+export async function fetchRecentActivity(limit = 5) {
+  if (supabaseReady) {
+    const { data, error } = await supabase
+      .from('scores')
+      .select('driver_name,time_ms,car,created_at')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (!error && data) return data;
+  }
+  const scores = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+  return [...scores].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, limit);
+}
+
 export async function fetchProfile(userId) {
   if (!supabaseReady || !userId) return null;
   const { data, error } = await supabase

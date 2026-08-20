@@ -75,15 +75,17 @@ export class HomeAtmosphere {
       });
     }
 
-    // Traffic cars
+    // Traffic cars — three loose lanes so the streaks read as real passing traffic,
+    // not scattered dots (inspired by the earlier home-world CSS lanes).
     this.trafficCars = [];
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 14; i++) {
+      const lane = i % 3;
       this.trafficCars.push({
         x: Math.random() * w,
-        y: h * 0.72 + (Math.random() * 60 - 30),
-        speed: (Math.random() > 0.5 ? 1 : -1) * (1.5 + Math.random() * 3.5),
+        y: h * (0.66 + lane * 0.07) + (Math.random() * 14 - 7),
+        speed: (lane % 2 === 0 ? 1 : -1) * (2 + Math.random() * 4),
         color: Math.random() > 0.4 ? '#ff2a6d' : '#00e5ff',
-        len: 20 + Math.random() * 25
+        len: 24 + Math.random() * 30
       });
     }
 
@@ -311,7 +313,7 @@ export class HomeAtmosphere {
     this._drawTraffic(ctx, w, h);
 
     // Subtle rain, kept light so it reads as atmosphere, not a downpour
-    this._drawRain(ctx, w, h, 'rgba(140, 210, 255, 0.18)');
+    this._drawRain(ctx, w, h, 'rgba(140, 210, 255, 0.26)');
   }
 
   /* ------------------- 02 SUNSET HIGHWAY (VELORA) ------------------- */

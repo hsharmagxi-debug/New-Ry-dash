@@ -42,6 +42,9 @@ const state = {
   soundOn: (localStorage.getItem('rydash_sound') ?? localStorage.getItem('vx_sound')) !== 'false',
   showFps: (localStorage.getItem('rydash_fps') ?? localStorage.getItem('vx_fps')) === 'true',
   totalLaps: Number(localStorage.getItem('rydash_laps')) || 3,
+  credits: Number(localStorage.getItem('rydash_credits')) || 0,
+  gems: Number(localStorage.getItem('rydash_gems')) || 0,
+  xp: Number(localStorage.getItem('rydash_xp')) || 0,
   session: null,
   multiplayer: null,
   isMultiplayerRace: false,
@@ -62,7 +65,43 @@ function initHomeAtmosphere() {
   }
 }
 
+// Simple, honest progression: every 1,000 XP is a level. Rewards below are earned from actual
+// race results (finishing position), not fabricated — nothing here is decorative-only.
+const XP_PER_LEVEL = 1000;
+function levelFromXp(xp) {
+  return Math.floor(xp / XP_PER_LEVEL) + 1;
+}
+function awardRaceRewards(position, totalRacers) {
+  const placementBonus = Math.max(0, totalRacers - position) * 60;
+  const creditsEarned = 200 + placementBonus;
+  const gemsEarned = position === 1 ? 5 : position <= 3 ? 2 : 0;
+  const xpEarned = 150 + placementBonus;
+  state.credits += creditsEarned;
+  state.gems += gemsEarned;
+  state.xp += xpEarned;
+  localStorage.setItem('rydash_credits', state.credits);
+  localStorage.setItem('rydash_gems', state.gems);
+  localStorage.setItem('rydash_xp', state.xp);
+  updateProfileHudUI();
+  return { creditsEarned, gemsEarned, xpEarned };
+}
+function updateProfileHudUI() {
+  const level = levelFromXp(state.xp);
+  const xpIntoLevel = state.xp % XP_PER_LEVEL;
+  const creditsEl = $('hudCredits');
+  if (creditsEl) creditsEl.textContent = state.credits.toLocaleString();
+  const gemsEl = $('hudGems');
+  if (gemsEl) gemsEl.textContent = state.gems.toLocaleString();
+  const levelEl = $('hudLevel');
+  if (levelEl) levelEl.textContent = level;
+  const nameEl = $('hudProfileName');
+  if (nameEl) nameEl.textContent = state.playerName;
+  const xpFill = $('hudXpFill');
+  if (xpFill) xpFill.style.width = `${(xpIntoLevel / XP_PER_LEVEL) * 100}%`;
+}
+
 function updateHomeHeroCardUI() {
+  updateProfileHudUI();
   const m = CAR_MODELS[state.carIndex] || CAR_MODELS[0];
   const photoEl = $('heroCarPhoto');
   if (photoEl) {
@@ -149,6 +188,7 @@ function showScreen(id) {
 
   if (id === 'screen-home') {
     updateHomeHeroCardUI();
+    loadHomeActivityFeed();
     garageStage?.stop();
   } else if (id === 'screen-garage') {
     initGarageStage();
@@ -978,6 +1018,8 @@ function beginRace() {
     sound.updateNitro(false);
     const timeMs = Math.round(elapsedMs);
     backend.submitScore({ name: state.playerName, timeMs, car: modelDef.id, livery: livery.id });
+    const finishedAhead = opponents.filter((o) => (o.finishTimeMs ?? Infinity) < timeMs).length;
+    awardRaceRewards(finishedAhead + 1, opponents.length + 1);
     showResults(timeMs, opponents);
   }
 
@@ -1213,8 +1255,13 @@ function showResults(timeMs, opponents) {
   const secs = ((timeMs % 60000) / 1000).toFixed(3);
   const list = [{ name: state.playerName + ' (you)', time: timeMs, me: true }];
 
-  (opponents || []).forEach((o, i) => {
-    const oppTime = timeMs + (i + 1) * 1400 + Math.round(Math.random() * 800);
+  // Real result per opponent when they actually crossed the line during the race
+  // (o.finishTimeMs, set live in the race loop); for anyone still on track when the
+  // player finished, project their time from their own simulated lap progress instead
+  // of inventing a random number.
+  (opponents || []).forEach((o) => {
+    const lapsDone = Math.max(o.ctrl?.lap || 1, 1);
+    const oppTime = o.finishTimeMs ?? Math.round(timeMs * (state.totalLaps / lapsDone));
     list.push({ name: o.name, time: oppTime, me: false });
   });
 
@@ -1237,6 +1284,33 @@ function showResults(timeMs, opponents) {
 
 $('raceAgainBtn')?.addEventListener('click', () => beginRace());
 $('resultsMenuBtn')?.addEventListener('click', () => showScreen('screen-home'));
+
+/* ============================== HOME ACTIVITY FEED ============================== */
+// Shows real recent race submissions from the scores table (or local fallback) — never
+// invented player names. An empty backend shows an honest "be the first" state instead.
+function timeAgoLabel(iso) {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+async function loadHomeActivityFeed() {
+  const feed = $('homeActivityFeed');
+  if (!feed) return;
+  const rows = await backend.fetchRecentActivity(5);
+  if (!rows.length) {
+    feed.innerHTML = '<p class="activity-empty muted">No races submitted yet — be the first on the board.</p>';
+    return;
+  }
+  feed.innerHTML = rows.map((r) => {
+    const m = Math.floor(r.time_ms / 60000);
+    const s = ((r.time_ms % 60000) / 1000).toFixed(3);
+    return `<p class="activity-row">💬 <b>${escapeHtml(r.driver_name)}</b> set ${m}:${s.padStart(6, '0')} in <span class="accent">${escapeHtml(r.car)}</span> <span class="activity-time">${timeAgoLabel(r.created_at)}</span></p>`;
+  }).join('');
+}
 
 /* ============================== LEADERBOARD ============================== */
 async function loadLeaderboard() {

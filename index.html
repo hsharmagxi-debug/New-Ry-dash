@@ -62,6 +62,17 @@
           </button>
         </div>
         <div class="nav-actions">
+          <div class="profile-hud">
+            <div class="profile-hud-id">
+              <span id="hudProfileName" class="profile-hud-name">RACER</span>
+              <div class="profile-hud-level-row">
+                <span class="profile-hud-level">LV <span id="hudLevel">1</span></span>
+                <div class="profile-hud-xp-track"><div id="hudXpFill" class="profile-hud-xp-fill" style="width:0%"></div></div>
+              </div>
+            </div>
+            <span class="profile-hud-currency"><span class="currency-icon">🪙</span><span id="hudCredits">0</span></span>
+            <span class="profile-hud-currency"><span class="currency-icon">💎</span><span id="hudGems">0</span></span>
+          </div>
           <span id="authStatus" class="auth-status">Guest</span>
           <button id="navAuthBtn" class="btn btn-ghost btn-sm">Login</button>
         </div>
@@ -221,6 +232,13 @@
                   <div class="challenge-row-top"><span>Use Nitro 10 Times</span><span class="challenge-progress-num">0 / 10</span></div>
                   <div class="challenge-track"><div class="challenge-fill" style="width:0%"></div></div>
                 </div>
+              </div>
+            </div>
+
+            <div class="widget-card activity-card glass-panel">
+              <div class="widget-header"><span>RECENT ACTIVITY</span> <span class="accent-dot">●</span></div>
+              <div id="homeActivityFeed">
+                <p class="activity-empty muted">Loading…</p>
               </div>
             </div>
           </div>

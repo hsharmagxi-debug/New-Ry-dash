@@ -78,71 +78,57 @@
         </div>
       </nav>
 
-      <!-- Two-Column Master Dashboard Layout -->
-      <div class="home-master-container">
-        
-        <!-- LEFT COLUMN: Main Hero Action Area -->
-        <div class="home-left-col">
-          <div class="hero-tag-badge">
-            <span class="pulse-dot-green"></span>
-            <span>LIVE STREET RACING • SEASON 01</span>
-          </div>
-
-          <h1 class="hero-massive-title">
-            STREET<br />
-            RACING<br />
-            <span class="accent">REDEFINED</span>
-          </h1>
-
-          <p class="hero-identity">RYDASH — RACE THE CITY. OWN THE NIGHT.</p>
-
-          <p class="hero-desc">
-            Race the city. Own the night. Choose your ride, hit the neon streets and leave your rivals in the neon.
-          </p>
-
-          <!-- Main CTA Buttons -->
-          <div class="hero-cta-row">
-            <button id="playBtn" class="btn btn-primary btn-cyan-glow btn-game">
-              <span class="btn-icon">▶</span>
-              <span class="btn-text"><span class="btn-label">QUICK RACE</span><span class="btn-sub"><span id="homeCurrentWorldLabel">NEON DISTRICT</span> · AI TRAFFIC</span></span>
-            </button>
-            <button id="multiplayerBtn" class="btn btn-secondary btn-purple-outline btn-game">
-              <span class="btn-icon">🌐</span>
-              <span class="btn-text"><span class="btn-label">MULTIPLAYER</span><span class="btn-sub">NITRO ON</span></span>
-            </button>
-          </div>
-
-          <!-- Quick-launch shortcuts (secondary to the top nav) -->
-          <div class="hero-dock-row">
-            <button id="garageBtn" class="dock-btn-compact" data-nav="garage"><span class="dock-icon">🚗</span> GARAGE</button>
-            <button id="leaderboardBtn" class="dock-btn-compact" data-nav="leaderboard"><span class="dock-icon">🏆</span> LEADERBOARD</button>
-            <button class="dock-btn-compact" data-nav="world"><span class="dock-icon">🌐</span> WORLD</button>
-            <button id="settingsBtn" class="dock-btn-compact" data-nav="settings"><span class="dock-icon">⚙️</span> SETTINGS</button>
-            <button id="howtoBtn" class="dock-btn-compact" data-nav="howto"><span class="dock-icon">❓</span> HOW TO PLAY</button>
-          </div>
-        </div>
-
-        <!-- RIGHT COLUMN: Active Car Showcase, 5-Car Strip & Live Cards -->
-        <div class="home-right-col">
-          
-          <!-- Top Card: Active Selected Car Showcase & Stats -->
-          <div class="active-car-card glass-panel">
-            <div class="car-card-top-row">
-              <div>
-                <h3 id="heroCarName" class="active-car-title">SHADOW GT</h3>
-                <span id="heroCarRarity" class="rarity-badge rarity-legendary">LEGENDARY</span>
-              </div>
-              <div class="car-card-user">
-                <span class="user-sub-label">Driver: <b id="heroCarDriver">Guest</b></span>
-              </div>
+      <main class="rd-main">
+        <!-- HERO: copy / hero car / featured car+stats, three columns -->
+        <section class="rd-hero">
+          <div class="rd-copy">
+            <div class="hero-tag-badge">
+              <span class="pulse-dot-green"></span>
+              <span>LIVE STREET RACING • SEASON 01</span>
             </div>
 
-            <!-- Featured Car Photo -->
+            <h1 class="hero-massive-title">
+              STREET<br />
+              RACING<br />
+              <span class="accent">REDEFINED</span>
+            </h1>
+
+            <p class="hero-identity">RYDASH — RACE THE CITY. OWN THE NIGHT.</p>
+
+            <div class="rd-actions">
+              <button id="playBtn" class="rd-btn rd-btn-primary">
+                <span class="btn-icon">⚡</span>
+                <span class="btn-text"><span class="btn-label">QUICK RACE</span><small><span id="homeCurrentWorldLabel">NEON DISTRICT</span></small></span>
+              </button>
+              <button id="multiplayerBtn" class="rd-btn rd-btn-secondary">
+                <span class="btn-icon">🌐</span>
+                <span class="btn-text"><span class="btn-label">MULTIPLAYER</span><small>RACE PLAYERS ONLINE</small></span>
+              </button>
+            </div>
+
+            <div class="rd-shortcuts">
+              <button id="garageBtn" class="rd-shortcut" data-nav="garage"><span>🚗</span><small>GARAGE</small></button>
+              <button class="rd-shortcut" data-nav="world"><span>🌐</span><small>WORLD</small></button>
+              <button id="leaderboardBtn" class="rd-shortcut" data-nav="leaderboard"><span>🏆</span><small>LEADERBOARD</small></button>
+              <button id="settingsBtn" class="rd-shortcut" data-nav="settings"><span>⚙️</span><small>SETTINGS</small></button>
+              <button id="howtoBtn" class="rd-shortcut" data-nav="howto"><span>❓</span><small>HOW TO PLAY</small></button>
+            </div>
+          </div>
+
+          <div class="rd-hero-car">
+            <img id="heroCarPhotoLarge" class="rd-hero-car-img" src="/cars/car-0.jpg" alt="" aria-hidden="true" />
+            <div class="rd-hero-car-name" id="heroCarNameFloat">SHADOW GT</div>
+          </div>
+
+          <aside class="rd-featured glass-panel">
+            <div class="rd-eyebrow">FEATURED CAR</div>
+            <h2 id="heroCarName">SHADOW GT</h2>
+            <span id="heroCarRarity" class="rarity-badge rarity-legendary">LEGENDARY</span>
+
             <div class="hero-car-photo-wrap">
               <img id="heroCarPhoto" class="hero-car-photo" src="/cars/car-0.jpg" alt="SHADOW GT" />
             </div>
 
-            <!-- Real-time Stat Bars -->
             <div class="hero-stats-grid">
               <div class="stat-bar-item">
                 <span class="stat-lbl">SPEED</span>
@@ -170,82 +156,107 @@
                 <span class="stat-num" id="heroNumAccel">95</span>
               </div>
             </div>
-          </div>
 
-          <!-- Middle Row: 5-Car Quick Select Strip -->
-          <div class="quick-car-strip" id="quickCarStrip">
+            <button class="rd-view-btn" data-nav="garage">VIEW CAR IN GARAGE →</button>
+          </aside>
+        </section>
+
+        <!-- CHOOSE YOUR RIDE: all 10 cars, one row -->
+        <section class="rd-ride-section">
+          <div class="rd-section-title">CHOOSE YOUR RIDE</div>
+          <div class="rd-car-row" id="quickCarStrip">
             <button class="quick-car-btn active" data-car-idx="0">
-              <img src="./assets/car-0-DZRc-iFY.jpg" alt="SHADOW GT" class="qc-thumb" />
-              <span class="qc-name">SHADOW GT</span>
+              <img src="/cars/car-0.jpg" alt="" class="qc-thumb" />
+              <b class="qc-name">SHADOW GT</b><small class="qc-rarity">LEGENDARY</small>
             </button>
             <button class="quick-car-btn" data-car-idx="1">
-              <img src="./assets/car-1-B950szqJ.jpg" alt="INFERNO X" class="qc-thumb" />
-              <span class="qc-name">INFERNO X</span>
+              <img src="/cars/car-1.jpg" alt="" class="qc-thumb" />
+              <b class="qc-name">INFERNO X</b><small class="qc-rarity">LEGENDARY</small>
             </button>
             <button class="quick-car-btn" data-car-idx="2">
-              <img src="./assets/car-2-CbjOzt0s.jpg" alt="CYBER VELOCE" class="qc-thumb" />
-              <span class="qc-name">CYBER VELOCE</span>
+              <img src="/cars/car-2.jpg" alt="" class="qc-thumb" />
+              <b class="qc-name">CYBER VELOCE</b><small class="qc-rarity">EPIC</small>
             </button>
             <button class="quick-car-btn" data-car-idx="3">
-              <img src="./assets/car-3-C5uBfU8v.jpg" alt="NIGHTHAWK" class="qc-thumb" />
-              <span class="qc-name">NIGHTHAWK</span>
+              <img src="/cars/car-3.jpg" alt="" class="qc-thumb" />
+              <b class="qc-name">NIGHTHAWK</b><small class="qc-rarity">EPIC</small>
             </button>
             <button class="quick-car-btn" data-car-idx="4">
-              <img src="./assets/car-4-uMFU_Aqj.jpg" alt="VORTEX RS" class="qc-thumb" />
-              <span class="qc-name">VORTEX RS</span>
+              <img src="/cars/car-4.jpg" alt="" class="qc-thumb" />
+              <b class="qc-name">VORTEX RS</b><small class="qc-rarity">EPIC</small>
+            </button>
+            <button class="quick-car-btn" data-car-idx="5">
+              <img src="/cars/car-5.jpg" alt="" class="qc-thumb" />
+              <b class="qc-name">APEX R9</b><small class="qc-rarity">LEGENDARY</small>
+            </button>
+            <button class="quick-car-btn" data-car-idx="6">
+              <img src="/cars/car-6.jpg" alt="" class="qc-thumb" />
+              <b class="qc-name">TITAN S</b><small class="qc-rarity">RARE</small>
+            </button>
+            <button class="quick-car-btn" data-car-idx="7">
+              <img src="/cars/car-7.jpg" alt="" class="qc-thumb" />
+              <b class="qc-name">PHANTOM LX</b><small class="qc-rarity">RARE</small>
+            </button>
+            <button class="quick-car-btn" data-car-idx="8">
+              <img src="/cars/car-8.jpg" alt="" class="qc-thumb" />
+              <b class="qc-name">STORM XR</b><small class="qc-rarity">RARE</small>
+            </button>
+            <button class="quick-car-btn" data-car-idx="9">
+              <img src="/cars/car-9.jpg" alt="" class="qc-thumb" />
+              <b class="qc-name">RAPTOR ZX</b><small class="qc-rarity">RARE</small>
             </button>
           </div>
+        </section>
 
-          <!-- Bottom Row: News & Events + Daily Challenges & Live Races -->
-          <div class="home-bottom-widgets">
-            <div class="widget-card news-card glass-panel">
-              <div class="widget-header"><span>NEWS &amp; EVENTS</span> <span class="accent-dot">●</span></div>
-              <div class="news-item">
-                <span class="news-tag">SEASON 01</span>
-                <div><b>NEON DISTRICT</b><p class="muted">Live Now! High-stakes night circuits</p></div>
+        <!-- Daily Challenges / News / Recent Activity / Start Engine -->
+        <section class="rd-bottom-grid">
+          <article class="rd-info-card glass-panel">
+            <h3>DAILY CHALLENGES <span class="reset-timer">Resets in: 08:45:32</span></h3>
+            <div class="challenge-list">
+              <div class="challenge-row">
+                <div class="challenge-row-top"><span>Win 3 Races</span><span class="challenge-progress-num">0 / 3</span></div>
+                <div class="challenge-track"><div class="challenge-fill" style="width:0%"></div></div>
               </div>
-              <div class="news-item">
-                <span class="news-tag highlight">BONUS</span>
-                <div><b>DOUBLE REWARDS</b><p class="muted">+100% Credits this weekend</p></div>
+              <div class="challenge-row">
+                <div class="challenge-row-top"><span>Drift 5,000m</span><span class="challenge-progress-num">0 / 5,000</span></div>
+                <div class="challenge-track"><div class="challenge-fill" style="width:0%"></div></div>
               </div>
-              <div class="news-item">
-                <span class="news-tag">NEW CARS</span>
-                <div><b>SHADOW LEGENDS PACK</b><p class="muted">10 Hypercars unlocked</p></div>
+              <div class="challenge-row">
+                <div class="challenge-row-top"><span>Use Nitro 10 Times</span><span class="challenge-progress-num">0 / 10</span></div>
+                <div class="challenge-track"><div class="challenge-fill" style="width:0%"></div></div>
               </div>
             </div>
+          </article>
 
-            <div class="widget-card live-races-card glass-panel">
-              <div class="widget-header">
-                <span>DAILY CHALLENGES</span>
-                <span class="reset-timer">Resets in: 08:45:32</span>
-              </div>
-              <div class="challenge-list">
-                <div class="challenge-row">
-                  <div class="challenge-row-top"><span>Win 3 Races</span><span class="challenge-progress-num">0 / 3</span></div>
-                  <div class="challenge-track"><div class="challenge-fill" style="width:0%"></div></div>
-                </div>
-                <div class="challenge-row">
-                  <div class="challenge-row-top"><span>Drift 5,000m</span><span class="challenge-progress-num">0 / 5,000</span></div>
-                  <div class="challenge-track"><div class="challenge-fill" style="width:0%"></div></div>
-                </div>
-                <div class="challenge-row">
-                  <div class="challenge-row-top"><span>Use Nitro 10 Times</span><span class="challenge-progress-num">0 / 10</span></div>
-                  <div class="challenge-track"><div class="challenge-fill" style="width:0%"></div></div>
-                </div>
-              </div>
+          <article class="rd-info-card rd-news glass-panel">
+            <h3>NEWS &amp; EVENTS</h3>
+            <div class="news-item">
+              <span class="news-tag">SEASON 01</span>
+              <div><b>NEON DISTRICT</b><p class="muted">Live Now! High-stakes night circuits</p></div>
             </div>
-
-            <div class="widget-card activity-card glass-panel">
-              <div class="widget-header"><span>RECENT ACTIVITY</span> <span class="accent-dot">●</span></div>
-              <div id="homeActivityFeed">
-                <p class="activity-empty muted">Loading…</p>
-              </div>
+            <div class="news-item">
+              <span class="news-tag highlight">BONUS</span>
+              <div><b>DOUBLE REWARDS</b><p class="muted">+100% Credits this weekend</p></div>
             </div>
-          </div>
+            <div class="news-item">
+              <span class="news-tag">NEW CARS</span>
+              <div><b>SHADOW LEGENDS PACK</b><p class="muted">10 Hypercars unlocked</p></div>
+            </div>
+          </article>
 
-        </div>
+          <article class="rd-info-card glass-panel">
+            <h3>RECENT ACTIVITY <i class="accent-dot">●</i></h3>
+            <div id="homeActivityFeed">
+              <p class="activity-empty muted">Loading…</p>
+            </div>
+          </article>
 
-      </div>
+          <button id="startEngineBtn" class="rd-start-engine">
+            <div>START YOUR ENGINE</div>
+            <small>THE STREETS ARE CALLING →</small>
+          </button>
+        </section>
+      </main>
 
       <footer class="foot-credit-minimal">
         <p class="foot-tagline">❯❯ BUCKLE UP. THE STREETS ARE CALLING. ❮❮</p>

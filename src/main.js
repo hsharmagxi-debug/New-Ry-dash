@@ -108,6 +108,10 @@ function updateHomeHeroCardUI() {
     photoEl.src = `/cars/car-${state.carIndex}.jpg`;
     photoEl.alt = m.name;
   }
+  const photoLargeEl = $('heroCarPhotoLarge');
+  if (photoLargeEl) photoLargeEl.src = `/cars/car-${state.carIndex}.jpg`;
+  const nameFloatEl = $('heroCarNameFloat');
+  if (nameFloatEl) nameFloatEl.textContent = m.name;
   const nameEl = $('heroCarName');
   if (nameEl) nameEl.textContent = m.name;
   const rarityEl = $('heroCarRarity');
@@ -239,12 +243,13 @@ async function boot() {
 
   // Quick Race & Multiplayer
   const playBtn = $('playBtn') || $('heroRaceBtn');
-  if (playBtn) {
-    playBtn.onclick = () => {
-      sound.init();
-      startRaceFlow(false);
-    };
-  }
+  const startEngineBtn = $('startEngineBtn');
+  const quickRaceHandler = () => {
+    sound.init();
+    startRaceFlow(false);
+  };
+  if (playBtn) playBtn.onclick = quickRaceHandler;
+  if (startEngineBtn) startEngineBtn.onclick = quickRaceHandler;
   const multiplayerBtn = $('multiplayerBtn') || $('heroMultiBtn');
   if (multiplayerBtn) {
     multiplayerBtn.onclick = () => {

@@ -1,0 +1,20 @@
+{
+  "name": "rydash",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "RYDASH — Ride Fast. Race Live. A modern 3D multiplayer neon street racing game (Three.js + Supabase Realtime)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "cannon-es": "^0.20.0",
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.8"
+  }
+}

@@ -1,0 +1,68 @@
+import { supabase, supabaseReady } from './supabaseClient.js';
+
+const LOCAL_KEY = 'rydash_local_scores';
+const LOCAL_USER_KEY = 'rydash_guest_id';
+
+export function getGuestId() {
+  let id = localStorage.getItem(LOCAL_USER_KEY);
+  if (!id) {
+    id = 'guest_' + Math.random().toString(36).slice(2, 10);
+    localStorage.setItem(LOCAL_USER_KEY, id);
+  }
+  return id;
+}
+
+export async function getSession() {
+  if (!supabaseReady) return null;
+  const { data } = await supabase.auth.getSession();
+  return data.session;
+}
+
+export async function signUp(email, password) {
+  if (!supabaseReady) throw new Error('Supabase not configured.');
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  if (error) throw error;
+  return data;
+}
+
+export async function signIn(email, password) {
+  if (!supabaseReady) throw new Error('Supabase not configured.');
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data;
+}
+
+export async function signOut() {
+  if (!supabaseReady) return;
+  await supabase.auth.signOut();
+}
+
+export async function submitScore({ name, timeMs, car, livery }) {
+  if (supabaseReady) {
+    const { error } = await supabase.from('scores').insert({
+      driver_name: name,
+      time_ms: timeMs,
+      car,
+      livery,
+    });
+    if (error) console.warn('Supabase score insert failed, falling back locally:', error.message);
+    else return;
+  }
+  const scores = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+  scores.push({ driver_name: name, time_ms: timeMs, car, livery, created_at: new Date().toISOString() });
+  scores.sort((a, b) => a.time_ms - b.time_ms);
+  localStorage.setItem(LOCAL_KEY, JSON.stringify(scores.slice(0, 50)));
+}
+
+export async function fetchLeaderboard(limit = 20) {
+  if (supabaseReady) {
+    const { data, error } = await supabase
+      .from('scores')
+      .select('driver_name,time_ms,car,livery,created_at')
+      .order('time_ms', { ascending: true })
+      .limit(limit);
+    if (!error && data) return data;
+  }
+  const scores = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+  return scores.slice(0, limit);
+}

@@ -86,51 +86,172 @@
         </div>
       </nav>
 
-      <!-- Hero Section -->
-      <div class="hero">
-        <h1 class="hero-title">RACE THE CITY.<br /><span class="accent">OWN THE NIGHT.</span></h1>
-        <p class="hero-sub">Real-time multiplayer street racing. Drift. Nitro. Compete. Dominate.</p>
+      <!-- Two-Column Master Dashboard Layout -->
+      <div class="home-master-container">
         
-        <!-- Live 3D Showcase Turntable -->
-        <div id="homeHeroStage" class="home-hero-stage"></div>
+        <!-- LEFT COLUMN: Main Hero Action Area -->
+        <div class="home-left-col">
+          <div class="hero-tag-badge">
+            <span class="pulse-dot-green"></span>
+            <span>LIVE STREET RACING • SEASON 01</span>
+          </div>
+          
+          <h1 class="hero-massive-title">
+            STREET<br />
+            RACING<br />
+            <span class="accent">REDEFINED</span>
+          </h1>
 
-        <div class="hero-actions">
-          <button id="playBtn" class="btn btn-primary btn-lg"><span class="btn-icon">⚡</span> QUICK RACE</button>
-          <button id="multiplayerBtn" class="btn btn-secondary btn-lg"><span class="btn-icon">🌐</span> MULTIPLAYER</button>
+          <p class="hero-desc">
+            Race the city. Own the night. Choose your ride, hit the neon streets and leave your rivals in the neon.
+          </p>
+
+          <!-- Main CTA Buttons -->
+          <div class="hero-cta-row">
+            <button id="playBtn" class="btn btn-primary btn-cyan-glow">
+              <span class="btn-icon">▶</span> QUICK RACE
+            </button>
+            <button id="multiplayerBtn" class="btn btn-secondary btn-purple-outline">
+              <span class="btn-icon">🌐</span> MULTIPLAYER
+            </button>
+          </div>
+
+          <!-- 4-Button Action Dock -->
+          <div class="hero-dock-row">
+            <button id="garageBtn" class="dock-btn-compact"><span class="dock-icon">🚗</span> GARAGE</button>
+            <button id="leaderboardBtn" class="dock-btn-compact"><span class="dock-icon">🏆</span> LEADERBOARD</button>
+            <button id="settingsBtn" class="dock-btn-compact"><span class="dock-icon">⚙️</span> SETTINGS</button>
+            <button id="howtoBtn" class="dock-btn-compact"><span class="dock-icon">❓</span> HOW TO PLAY</button>
+          </div>
+
+          <!-- Status Bar -->
+          <div class="hero-status-chips">
+            <button id="worldmapBtn" class="status-chip active" title="Change Circuit Map">
+              <span class="chip-icon">🌌</span> <span id="homeCurrentWorldLabel">NEON DISTRICT</span>
+            </button>
+            <span class="status-chip"><span class="chip-icon">🚗</span> AI TRAFFIC</span>
+            <span class="status-chip"><span class="chip-icon">🔥</span> NITRO ON</span>
+          </div>
         </div>
 
-        <!-- 5-Button Primary Feature Dock -->
-        <div class="hero-nav-dock">
-          <button id="garageBtn" class="dock-btn"><span class="dock-icon">🚗</span> GARAGE</button>
-          <button id="leaderboardBtn" class="dock-btn"><span class="dock-icon">🏆</span> LEADERBOARD</button>
-          <button id="worldmapBtn" class="dock-btn"><span class="dock-icon">🌍</span> WORLD SELECT</button>
-          <button id="settingsBtn" class="dock-btn"><span class="dock-icon">⚙️</span> SETTINGS</button>
-          <button id="howtoBtn" class="dock-btn"><span class="dock-icon">❓</span> HOW TO PLAY</button>
+        <!-- RIGHT COLUMN: Active Car Showcase, 5-Car Strip & Live Cards -->
+        <div class="home-right-col">
+          
+          <!-- Top Card: Active Selected Car Showcase & Stats -->
+          <div class="active-car-card glass-panel">
+            <div class="car-card-top-row">
+              <div>
+                <h3 id="heroCarName" class="active-car-title">SHADOW GT</h3>
+                <span id="heroCarRarity" class="rarity-badge rarity-legendary">LEGENDARY</span>
+              </div>
+              <div class="car-card-user">
+                <span class="user-sub-label">Driver: <b id="heroCarDriver">Guest</b></span>
+              </div>
+            </div>
+
+            <!-- Live 3D Turntable Container -->
+            <div id="homeHeroStage" class="home-hero-stage"></div>
+
+            <!-- Real-time Stat Bars -->
+            <div class="hero-stats-grid">
+              <div class="stat-bar-item">
+                <span class="stat-lbl">SPEED</span>
+                <div class="stat-track"><div id="heroStatSpeed" class="stat-fill fill-orange" style="width:92%"></div></div>
+                <span class="stat-num" id="heroNumSpeed">92</span>
+              </div>
+              <div class="stat-bar-item">
+                <span class="stat-lbl">HANDLING</span>
+                <div class="stat-track"><div id="heroStatHandling" class="stat-fill fill-cyan" style="width:88%"></div></div>
+                <span class="stat-num" id="heroNumHandling">88</span>
+              </div>
+              <div class="stat-bar-item">
+                <span class="stat-lbl">DRIFT</span>
+                <div class="stat-track"><div id="heroStatDrift" class="stat-fill fill-purple" style="width:85%"></div></div>
+                <span class="stat-num" id="heroNumDrift">85</span>
+              </div>
+              <div class="stat-bar-item">
+                <span class="stat-lbl">NITRO</span>
+                <div class="stat-track"><div id="heroStatNitro" class="stat-fill fill-green" style="width:90%"></div></div>
+                <span class="stat-num" id="heroNumNitro">90</span>
+              </div>
+              <div class="stat-bar-item">
+                <span class="stat-lbl">ACCELERATION</span>
+                <div class="stat-track"><div id="heroStatAccel" class="stat-fill fill-cyan" style="width:95%"></div></div>
+                <span class="stat-num" id="heroNumAccel">95</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Middle Row: 5-Car Quick Select Strip -->
+          <div class="quick-car-strip" id="quickCarStrip">
+            <button class="quick-car-btn active" data-car-idx="0">
+              <span class="qc-name">SHADOW GT</span>
+            </button>
+            <button class="quick-car-btn" data-car-idx="1">
+              <span class="qc-name">INFERNO X</span>
+            </button>
+            <button class="quick-car-btn" data-car-idx="2">
+              <span class="qc-name">CYBER VELOCE</span>
+            </button>
+            <button class="quick-car-btn" data-car-idx="3">
+              <span class="qc-name">NIGHTHAWK</span>
+            </button>
+            <button class="quick-car-btn" data-car-idx="4">
+              <span class="qc-name">VORTEX RS</span>
+            </button>
+          </div>
+
+          <!-- Bottom Row: News & Events + Daily Challenges & Live Races -->
+          <div class="home-bottom-widgets">
+            <div class="widget-card news-card glass-panel">
+              <div class="widget-header"><span>NEWS &amp; EVENTS</span> <span class="accent-dot">●</span></div>
+              <div class="news-item">
+                <span class="news-tag">SEASON 01</span>
+                <div><b>NEON DISTRICT</b><p class="muted">Live Now! High-stakes night circuits</p></div>
+              </div>
+              <div class="news-item">
+                <span class="news-tag highlight">BONUS</span>
+                <div><b>DOUBLE REWARDS</b><p class="muted">+100% Credits this weekend</p></div>
+              </div>
+              <div class="news-item">
+                <span class="news-tag">NEW CARS</span>
+                <div><b>SHADOW LEGENDS PACK</b><p class="muted">10 Hypercars unlocked</p></div>
+              </div>
+            </div>
+
+            <div class="widget-card live-races-card glass-panel">
+              <div class="widget-header">
+                <span>DAILY CHALLENGES</span>
+                <span class="reset-timer">Resets in: 08:45:32</span>
+              </div>
+              <div class="live-status-box">
+                <div class="live-status-header">
+                  <span class="pulse-dot-green"></span>
+                  <span class="live-title">LIVE RACES</span>
+                </div>
+                <div class="live-count-big">1,248</div>
+                <div class="live-sub">DRIVERS ONLINE</div>
+                <div class="live-track-info">
+                  <span>NEON DISTRICT</span> • <span>3 LAPS</span>
+                </div>
+                <div class="live-radar-circle">
+                  <svg viewBox="0 0 100 100" class="radar-svg">
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(0,229,255,0.3)" stroke-width="2" stroke-dasharray="4 3" />
+                    <circle cx="50" cy="50" r="28" fill="none" stroke="rgba(255,46,136,0.25)" stroke-width="1.5" />
+                    <circle cx="68" cy="35" r="4" fill="#00e5ff" class="radar-blip" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
+
       </div>
 
-      <!-- Live Races Widget -->
-      <aside class="live-card">
-        <div class="live-card-top">
-          <span class="live-pulse-dot"></span>
-          <span class="live-status-txt">LIVE RACES</span>
-        </div>
-        <div class="live-number">1,248</div>
-        <div class="live-label">Players Online</div>
-        <div class="track-mini" aria-hidden="true">
-          <svg viewBox="0 0 100 50" class="track-mini-svg">
-            <path d="M15 25 C15 10, 35 10, 50 20 C65 30, 85 10, 85 25 C85 40, 65 40, 50 30 C35 20, 15 40, 15 25 Z" fill="none" stroke="#ff2e88" stroke-width="3" stroke-dasharray="2 1" />
-          </svg>
-        </div>
-      </aside>
-
-      <div class="hero-kicker-bar">
-        <span>❯❯ BUCKLE UP. THE STREETS ARE CALLING. ❮❮</span>
-      </div>
-
-      <footer class="foot-credit">
-        <p class="foot-tagline">RYD<span class="accent">ASH</span> <span class="tagline-dash">—</span> DRIVE. DRIFT. DOMINATE.</p>
-        <p class="foot-sub">Created by Urvashi Chandan • © 2026 All rights reserved.</p>
+      <footer class="foot-credit-minimal">
+        <p class="foot-tagline">❯❯ BUCKLE UP. THE STREETS ARE CALLING. ❮❮</p>
+        <p class="foot-sub">RYD<span class="accent">ASH</span> — DRIVE. DRIFT. DOMINATE. • Created by Urvashi Chandan • © 2026 All rights reserved.</p>
       </footer>
     </section>
 

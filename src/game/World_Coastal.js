@@ -250,9 +250,9 @@ export function buildWorld(scene) {
   moonLight.shadow.camera.top = 160; moonLight.shadow.camera.bottom = -160;
   moonLight.shadow.camera.far = 600; moonLight.shadow.bias = -0.0015;
   scene.add(moonLight);
-  scene.add(new THREE.HemisphereLight(0x2a4a7a, 0x050a10, 0.6));
-  scene.add(new THREE.AmbientLight(0x152030, 0.55));
-  scene.fog = new THREE.FogExp2(0x040810, 0.0015);
+  scene.add(new THREE.HemisphereLight(0x4a7aaa, 0x152030, 0.9));
+  scene.add(new THREE.AmbientLight(0x253040, 0.8));
+  scene.fog = new THREE.FogExp2(0x040810, 0.001);
 
   function update(dt) {
     ocean.material.uniforms.uTime.value += dt;

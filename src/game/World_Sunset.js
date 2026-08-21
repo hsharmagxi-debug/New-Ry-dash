@@ -294,9 +294,9 @@ export function buildWorld(scene) {
   sunLight.shadow.camera.far = 600; sunLight.shadow.bias = -0.0015;
   scene.add(sunLight);
 
-  scene.add(new THREE.HemisphereLight(0x7a6bff, 0x1a0f2e, 0.65));
-  scene.add(new THREE.AmbientLight(0x402a55, 0.5));
-  scene.fog = new THREE.FogExp2(0x1a0e2e, 0.0016);
+  scene.add(new THREE.HemisphereLight(0x9a8bff, 0x2a1a3e, 0.9));
+  scene.add(new THREE.AmbientLight(0x503a65, 0.75));
+  scene.fog = new THREE.FogExp2(0x1a0e2e, 0.001);
 
   function update(dt) {
     const t = performance.now() * 0.001;

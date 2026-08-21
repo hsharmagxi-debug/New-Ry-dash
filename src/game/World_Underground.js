@@ -148,10 +148,10 @@ export function buildWorld(scene) {
   const { curve, roadGroup, trackWidth } = buildTrack();
   scene.add(roadGroup);
 
-  const headlampFill = new THREE.HemisphereLight(0x2a3a55, 0x0a0a0d, 0.5);
+  const headlampFill = new THREE.HemisphereLight(0x4a6a95, 0x1a1a1d, 0.9);
   scene.add(headlampFill);
-  scene.add(new THREE.AmbientLight(0x151622, 0.6));
-  scene.fog = new THREE.FogExp2(0x040406, 0.006);
+  scene.add(new THREE.AmbientLight(0x2a2c42, 0.9));
+  scene.fog = new THREE.FogExp2(0x0a0c12, 0.0032);
 
   // A distant train light that sweeps past on a parallel "track" every so often
   const train = buildTrainLight();

@@ -580,7 +580,7 @@ function beginRace() {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  renderer.toneMappingExposure = 1.45;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(62, width / height, 0.1, 1400);
@@ -803,7 +803,10 @@ function beginRace() {
 
     input.gas = gas ? 1 : 0;
     input.brake = brake ? 1 : 0;
-    input.steer = (left ? -1 : 0) + (right ? 1 : 0);
+    // Note: the chase camera looks along +dir (opposite Three.js's default -Z view direction),
+    // which mirrors screen-left/right relative to world +X/-X -- so the sign here is intentionally
+    // inverted from the "obvious" left=-1/right=+1 mapping to actually turn the right way on screen.
+    input.steer = (left ? 1 : 0) + (right ? -1 : 0);
     input.handbrake = keys.has('Space') || (touchState.brake && gas);
     input.nitro = keys.has('ShiftLeft') || keys.has('ShiftRight') || touchState.nitro;
     input.horn = hornKey;

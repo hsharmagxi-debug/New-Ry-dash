@@ -365,8 +365,8 @@ export function buildWorld(scene) {
   const { group: trafficGroup, streaks } = buildTrafficStreaks();
   scene.add(trafficGroup);
 
-  // Lighting: cool blue moon key light + magenta/cyan neon fill, low ambient (moody night)
-  const moon = new THREE.DirectionalLight(0x7fb8ff, 0.55);
+  // Lighting: cool blue moon key light + magenta/cyan neon fill (moody but readable at speed)
+  const moon = new THREE.DirectionalLight(0x8fc4ff, 0.85);
   moon.position.set(-100, 160, -160);
   moon.castShadow = true;
   moon.shadow.mapSize.set(2048, 2048);
@@ -378,12 +378,12 @@ export function buildWorld(scene) {
   moon.shadow.bias = -0.0015;
   scene.add(moon);
 
-  const fillCyan = new THREE.HemisphereLight(0x00e5ff, 0x0a0616, 0.55);
+  const fillCyan = new THREE.HemisphereLight(0x2ae5ff, 0x1a1430, 0.85);
   scene.add(fillCyan);
-  const ambient = new THREE.AmbientLight(0x1a1030, 0.55);
+  const ambient = new THREE.AmbientLight(0x2c2050, 0.8);
   scene.add(ambient);
 
-  scene.fog = new THREE.FogExp2(0x0a0618, 0.0022);
+  scene.fog = new THREE.FogExp2(0x141c30, 0.0014);
 
   // Occasional lightning flash
   let lightningTimer = 4 + Math.random() * 6;

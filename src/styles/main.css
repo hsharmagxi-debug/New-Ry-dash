@@ -599,10 +599,11 @@ input, select {
 .topnav {
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: 18px;
-  padding: 18px 32px;
+  gap: 10px 18px;
+  padding: 14px 32px;
   z-index: 5;
 }
 .brand {
@@ -1930,6 +1931,12 @@ input, select {
   margin-right: 4px;
 }
 .hud-bottom-left { position: absolute; bottom: 20px; left: 24px; }
+#minimapCanvas {
+  border-radius: 50%;
+  background: rgba(4, 8, 18, 0.78);
+  border: 2px solid rgba(0, 229, 255, 0.55);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55);
+}
 .hud-bottom-right {
   position: absolute;
   bottom: 20px;
@@ -2064,6 +2071,22 @@ input, select {
   right: 20px;
   z-index: 20;
   pointer-events: auto;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(4, 8, 18, 0.85);
+  border: 1px solid rgba(0, 229, 255, 0.5);
+  color: #fff;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+.race-pause-btn:hover {
+  background: rgba(0, 229, 255, 0.2);
+  border-color: var(--neon-cyan);
 }
 .overlay-panel {
   position: absolute;

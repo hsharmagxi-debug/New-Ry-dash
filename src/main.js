@@ -50,7 +50,7 @@ const WORLDS = {
   },
   coastal: {
     label: 'Coastal Highway', subtitle: 'OCEAN DRIVE', location: 'PACIFIC',
-    build: buildCoastalWorld, image: '/bg/rome-light-trails.jpg',
+    build: buildCoastalWorld, image: '/bg/sport-car-roadside.jpg',
     color: '#39d9ff', difficulty: 3, laps: '4.5 km', weather: 'SEA BREEZE',
     description: 'Open coastal roads, ocean views and long flowing corners.'
   },
@@ -69,23 +69,51 @@ const WORLD_PHASES = {
   storm:  { label: 'STORM', icon: '⚡', sky: 0x52627c, fog: 0x60748a, light: 0.92, tint: '#a9c7ff' },
 };
 
-function applyWorldPhase(scene, phaseId = 'night') {
-  const phase = WORLD_PHASES[phaseId] || WORLD_PHASES.night;
-  scene.background = new THREE.Color(phase.sky);
+function applyRaceBackdrop(worldId, phaseId) {
+  const screen = $('screen-race');
+  const world = WORLDS[worldId] || WORLDS.neon;
+  const phase = WORLD_PHASES[phaseId] || WORLD_PHASES.sunset;
+  if (!screen) return;
+  const gradients = {
+    day: 'linear-gradient(180deg, rgba(78,170,225,.05), rgba(18,45,68,.22))',
+    sunset: 'linear-gradient(180deg, rgba(255,151,93,.06), rgba(24,43,65,.20))',
+    night: 'linear-gradient(180deg, rgba(16,39,64,.18), rgba(7,23,40,.28))',
+    storm: 'linear-gradient(180deg, rgba(81,110,139,.12), rgba(16,31,48,.30))'
+  };
+  screen.style.backgroundImage = `${gradients[phaseId] || gradients.sunset}, url("${world.image}")`;
+  screen.style.backgroundPosition = 'center 38%';
+  screen.style.backgroundSize = 'cover';
+  screen.style.backgroundAttachment = 'fixed';
+  screen.style.setProperty('--race-phase-tint', phase.tint);
+  screen.style.setProperty('--race-phase-id', phaseId);
+  screen.dataset.world = worldId;
+  screen.dataset.phase = phaseId;
+}
+
+function applyWorldPhase(scene, phaseId = 'sunset') {
+  const phase = WORLD_PHASES[phaseId] || WORLD_PHASES.sunset;
+  // The cinematic photo backdrop lives behind the transparent Three.js canvas.
+  // Keeping scene.background transparent lets the track + cars sit over a
+  // bright, readable world instead of a flat dark color.
+  scene.background = null;
   if (scene.fog) {
-    if (scene.fog.isFogExp2) scene.fog.color.setHex(phase.fog);
-    else scene.fog.color.setHex(phase.fog);
+    if (scene.fog.isFogExp2) scene.fog.density = Math.min(scene.fog.density || 0.002, phaseId === 'storm' ? 0.0022 : 0.00165);
+    scene.fog.color.setHex(phase.fog);
   }
   scene.traverse((obj) => {
     if (obj.isLight) {
-      obj.intensity = Math.max(0.06, obj.userData.rydashBaseIntensity ?? obj.intensity) * phase.light;
-      if (obj.userData.rydashBaseIntensity == null) obj.userData.rydashBaseIntensity = obj.intensity / phase.light;
+      const base = obj.userData.rydashBaseIntensity ?? obj.intensity;
+      if (obj.userData.rydashBaseIntensity == null) obj.userData.rydashBaseIntensity = base;
+      obj.intensity = base * Math.max(1.05, phase.light);
     }
     if (obj.isMesh && obj.material) {
       const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
       mats.forEach((mat) => {
-        if ('envMapIntensity' in mat) mat.envMapIntensity = Math.max(mat.envMapIntensity || 0, 1.8);
-        if (mat.isMeshPhysicalMaterial && mat.roughness > 0.5) mat.roughness = 0.42;
+        if ('envMapIntensity' in mat) mat.envMapIntensity = Math.max(mat.envMapIntensity || 0, 2.4);
+        if (mat.isMeshPhysicalMaterial) {
+          mat.roughness = Math.min(mat.roughness, 0.38);
+          mat.clearcoat = Math.max(mat.clearcoat || 0, 0.7);
+        }
       });
     }
   });
@@ -108,8 +136,8 @@ const state = {
   playerName: localStorage.getItem('rydash_name') || localStorage.getItem('vx_name') || 'RACER',
   quality: localStorage.getItem('rydash_quality') || localStorage.getItem('vx_quality') || 'high',
   cameraMode: localStorage.getItem('rydash_camera') || localStorage.getItem('vx_camera') || 'chase',
-  worldId: localStorage.getItem('rydash_world') || localStorage.getItem('vx_world') || 'neon',
-  worldPhase: localStorage.getItem('rydash_world_phase') || 'sunset',
+  worldId: localStorage.getItem('rydash_world') || localStorage.getItem('vx_world') || 'coastal',
+  worldPhase: localStorage.getItem('rydash_world_phase') || 'day',
   soundOn: (localStorage.getItem('rydash_sound') ?? localStorage.getItem('vx_sound')) !== 'false',
   showFps: (localStorage.getItem('rydash_fps') ?? localStorage.getItem('vx_fps')) === 'true',
   totalLaps: Number(localStorage.getItem('rydash_laps')) || 3,
@@ -176,11 +204,11 @@ function updateHomeHeroCardUI() {
   const m = CAR_MODELS[state.carIndex] || CAR_MODELS[0];
   const photoEl = $('heroCarPhoto');
   if (photoEl) {
-    photoEl.src = `/cars/car-${state.carIndex}.jpg`;
+    photoEl.src = `/cars/car-${state.carIndex}-hd.jpg`;
     photoEl.alt = m.name;
   }
   const photoLargeEl = $('heroCarPhotoLarge');
-  if (photoLargeEl) photoLargeEl.src = `/cars/car-${state.carIndex}.jpg`;
+  if (photoLargeEl) photoLargeEl.src = `/cars/car-${state.carIndex}-hd.jpg`;
   const nameFloatEl = $('heroCarNameFloat');
   if (nameFloatEl) nameFloatEl.textContent = m.name;
   const nameEl = $('heroCarName');
@@ -473,7 +501,7 @@ function buildGarageCards() {
         <span class="rarity-tag ${rarityClass}">${(m.rarity || 'RARE').toUpperCase()}</span>
       </div>
       <div class="car-class">${(m.class || 'EXOTIC GT').toUpperCase()}</div>
-      <img src="./cars/car-${idx}.jpg" alt="${m.name}" class="car-card-img" />
+      <img src="./cars/car-${idx}-hd.jpg" alt="${m.name}" class="car-card-img" />
       <div class="car-stats">
         <div class="stat-row">
           <span class="stat-name">SPEED</span>
@@ -642,6 +670,7 @@ function beginRace() {
   const renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: true,
+    alpha: true,
     powerPreference: 'high-performance',
     preserveDrawingBuffer: true,
   });
@@ -651,20 +680,27 @@ function beginRace() {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = state.quality === 'high' ? 1.82 : 1.68;
+  renderer.setClearColor(0x000000, 0);
+  renderer.toneMappingExposure = state.quality === 'high' ? 2.08 : 1.86;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(62, width / height, 0.1, 1400);
 
   // 2026 readability rig: a neutral sky fill plus a moving cool key keep the
   // player's paint, wheels and bodywork readable even in dark environments.
-  const raceSkyFill = new THREE.HemisphereLight(0xc9ecff, 0x233b54, 1.15);
-  raceSkyFill.userData.rydashBaseIntensity = 1.15;
+  const raceSkyFill = new THREE.HemisphereLight(0xe8f7ff, 0x355875, 1.65);
+  raceSkyFill.userData.rydashBaseIntensity = 1.65;
   scene.add(raceSkyFill);
-  const carKey = new THREE.PointLight(0x9edfff, 2.8, 30, 2);
+  const carKey = new THREE.PointLight(0xb9eaff, 4.6, 34, 2);
+  carKey.userData.rydashBaseIntensity = 4.6;
   scene.add(carKey);
+  const carRim = new THREE.DirectionalLight(0xffffff, 1.15);
+  carRim.userData.rydashBaseIntensity = 1.15;
+  carRim.position.set(6, 10, -8);
+  scene.add(carRim);
 
   const activeWorld = WORLDS[state.worldId] || WORLDS.neon;
+  applyRaceBackdrop(state.worldId, state.worldPhase);
   const { curve, trackWidth, update: updateWorld, ramps = [] } = activeWorld.build(scene);
   applyWorldPhase(scene, state.worldPhase);
 
@@ -1054,7 +1090,7 @@ function beginRace() {
         carPos.z - Math.cos(orbitAngle) * orbitDist
       );
       camera.lookAt(carPos.x, carPos.y + 0.9, carPos.z);
-      camera.fov = 62;
+      camera.fov = 68;
       camera.updateProjectionMatrix();
       return;
     }
@@ -1062,8 +1098,8 @@ function beginRace() {
     if (camMode === 'chase') {
       // Tighter dynamic chase camera
       const speedRatio = THREE.MathUtils.clamp(player.speedKmh / 300, 0, 1);
-      const targetDist = player.nitroActive ? 5.8 : (4.9 + speedRatio * 0.8);
-      const targetHeight = 1.82 + speedRatio * 0.32;
+      const targetDist = player.nitroActive ? 7.0 : (6.0 + speedRatio * 0.9);
+      const targetHeight = 2.05 + speedRatio * 0.38;
       
       camOffset.set(-dir.x * targetDist, targetHeight, -dir.z * targetDist);
       const target = carPos.clone().add(camOffset);
@@ -1071,13 +1107,13 @@ function beginRace() {
       camera.position.x += shakeX;
       camera.position.y += shakeY;
 
-      const lookTarget = carPos.clone().add(new THREE.Vector3(dir.x * 2.2, 0.95, dir.z * 2.2));
+      const lookTarget = carPos.clone().add(new THREE.Vector3(dir.x * 4.2, 1.05, dir.z * 4.2));
       camera.lookAt(lookTarget);
 
       const targetRoll = -player.steerInput * 0.045 * THREE.MathUtils.clamp(player.speedKmh / 60, 0, 1);
       camera.rotation.z = THREE.MathUtils.lerp(camera.rotation.z, targetRoll, Math.min(1, dt * 6));
 
-      const baseFov = 62;
+      const baseFov = 68;
       const speedFov = (player.speedKmh / 320) * 13;
       const nitroFov = player.nitroActive ? 6.5 : 0;
       camera.fov = THREE.MathUtils.lerp(camera.fov, baseFov + speedFov + nitroFov, Math.min(1, dt * 6));
@@ -1116,9 +1152,11 @@ function beginRace() {
   if (hudWorldName) hudWorldName.textContent = (WORLDS[state.worldId] || WORLDS.neon).label.toUpperCase();
   const hudWorldPhase = $('hudWorldPhase');
   if (hudWorldPhase) {
-    const phase = WORLD_PHASES[state.worldPhase] || WORLD_PHASES.night;
+    const phase = WORLD_PHASES[state.worldPhase] || WORLD_PHASES.sunset;
     hudWorldPhase.textContent = `${phase.icon} ${phase.label}`;
   }
+  const hudLast = $('hudLast');
+  if (hudLast) hudLast.textContent = '--:--.---';
   
   const resumeBtn = $('resumeBtn');
   if (resumeBtn) resumeBtn.onclick = togglePause;
@@ -1321,6 +1359,8 @@ function beginRace() {
         }
         const lapTime = elapsedMs - lastLapStartMs;
         lastLapStartMs = elapsedMs;
+        const hudLast = $('hudLast');
+        if (hudLast) hudLast.textContent = formatRaceTime(lapTime);
         if (bestLapMs === null || lapTime < bestLapMs) {
           bestLapMs = lapTime;
           const hudBest = $('hudBest');
@@ -1529,6 +1569,23 @@ function updateHud(player, opponents, elapsedMs, remoteRacers = null) {
   if (hudPos) hudPos.textContent = String(myRank).padStart(2, '0');
   const hudPosTotal = $('hudPosTotal');
   if (hudPosTotal) hudPosTotal.textContent = String(standings.length).padStart(2, '0');
+
+  const hudPositions = $('hudPositions');
+  if (hudPositions) {
+    hudPositions.innerHTML = standings.slice(0, 8).map((s, idx) => {
+      const label = s.me ? 'YOU' : String(s.name || 'RACER').replace(' (you)', '').slice(0, 12).toUpperCase();
+      const lapLabel = `L${Math.min(state.totalLaps, Number(s.lap) || 1)}`;
+      const active = s.me ? ' you' : '';
+      return `<div class="race-order-row${active}"><b>${idx + 1}</b><span>${escapeHtml(label)}</span><em>${lapLabel}</em></div>`;
+    }).join('');
+  }
+
+  const currentLap = Math.min(state.totalLaps, Math.max(1, Number(player.lap) || 1));
+  const cpProgress = THREE.MathUtils.clamp((Number(player.nextCP) || 1) / CP_COUNT, 0, 1);
+  const lapFill = $('hudLapProgressFill');
+  if (lapFill) lapFill.style.width = `${cpProgress * 100}%`;
+  const lapProgressText = $('hudLapProgressText');
+  if (lapProgressText) lapProgressText.textContent = `LAP ${currentLap} / ${state.totalLaps}`;
 }
 
 function showResults(timeMs, opponents) {
@@ -1720,6 +1777,16 @@ function renderWorldPreview() {
   if (phaseLabel) phaseLabel.textContent = `${p.icon} ${p.label}`;
   document.querySelectorAll('.world-card').forEach((card) => card.classList.toggle('active', card.dataset.world === state.worldId));
   document.querySelectorAll('.world-phase-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.phase === state.worldPhase));
+
+  // Keep the multiplayer track preview in sync with the selected world.
+  const lobbyImage = $('lobbyWorldImage');
+  if (lobbyImage) lobbyImage.src = w.image;
+  const lobbyName = $('lobbyWorldName');
+  if (lobbyName) lobbyName.textContent = w.label.toUpperCase();
+  const lobbyMeta = $('lobbyWorldMeta');
+  if (lobbyMeta) lobbyMeta.textContent = `${w.subtitle} • ${w.location} • ${w.laps}`;
+  const lobbyWeather = $('lobbyWorldWeather');
+  if (lobbyWeather) lobbyWeather.textContent = w.weather;
 }
 
 function setWorld(id) {

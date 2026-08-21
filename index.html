@@ -114,7 +114,7 @@
 
           <div class="rd-hero-car">
             <div class="rd-hero-glow"></div>
-            <img id="heroCarPhotoLarge" class="rd-hero-car-img" src="/cars/car-0.jpg" alt="" aria-hidden="true" />
+            <img id="heroCarPhotoLarge" class="rd-hero-car-img" src="/cars/car-0-hd.jpg" alt="" aria-hidden="true" />
             <div class="rd-hero-car-name" id="heroCarNameFloat">SHADOW GT</div>
           </div>
 
@@ -124,7 +124,7 @@
             <span id="heroCarRarity" class="rarity-badge rarity-legendary">LEGENDARY</span>
 
             <div class="hero-car-photo-wrap">
-              <img id="heroCarPhoto" class="hero-car-photo" src="/cars/car-0.jpg" alt="SHADOW GT" />
+              <img id="heroCarPhoto" class="hero-car-photo" src="/cars/car-0-hd.jpg" alt="SHADOW GT" />
             </div>
 
             <div class="hero-stats-grid">
@@ -159,43 +159,43 @@
           <div class="rd-section-title">CHOOSE YOUR RIDE</div>
           <div class="rd-car-row" id="quickCarStrip">
             <button class="quick-car-btn active" data-car-idx="0">
-              <img src="/cars/car-0.jpg" alt="" class="qc-thumb" />
+              <img src="/cars/car-0-hd.jpg" alt="" class="qc-thumb" />
               <b class="qc-name">SHADOW GT</b><small class="qc-rarity">LEGENDARY</small>
             </button>
             <button class="quick-car-btn" data-car-idx="1">
-              <img src="/cars/car-1.jpg" alt="" class="qc-thumb" />
+              <img src="/cars/car-1-hd.jpg" alt="" class="qc-thumb" />
               <b class="qc-name">INFERNO X</b><small class="qc-rarity">LEGENDARY</small>
             </button>
             <button class="quick-car-btn" data-car-idx="2">
-              <img src="/cars/car-2.jpg" alt="" class="qc-thumb" />
+              <img src="/cars/car-2-hd.jpg" alt="" class="qc-thumb" />
               <b class="qc-name">CYBER VELOCE</b><small class="qc-rarity">EPIC</small>
             </button>
             <button class="quick-car-btn" data-car-idx="3">
-              <img src="/cars/car-3.jpg" alt="" class="qc-thumb" />
+              <img src="/cars/car-3-hd.jpg" alt="" class="qc-thumb" />
               <b class="qc-name">NIGHTHAWK</b><small class="qc-rarity">EPIC</small>
             </button>
             <button class="quick-car-btn" data-car-idx="4">
-              <img src="/cars/car-4.jpg" alt="" class="qc-thumb" />
+              <img src="/cars/car-4-hd.jpg" alt="" class="qc-thumb" />
               <b class="qc-name">VORTEX RS</b><small class="qc-rarity">EPIC</small>
             </button>
             <button class="quick-car-btn" data-car-idx="5">
-              <img src="/cars/car-5.jpg" alt="" class="qc-thumb" />
+              <img src="/cars/car-5-hd.jpg" alt="" class="qc-thumb" />
               <b class="qc-name">APEX R9</b><small class="qc-rarity">LEGENDARY</small>
             </button>
             <button class="quick-car-btn" data-car-idx="6">
-              <img src="/cars/car-6.jpg" alt="" class="qc-thumb" />
+              <img src="/cars/car-6-hd.jpg" alt="" class="qc-thumb" />
               <b class="qc-name">TITAN S</b><small class="qc-rarity">RARE</small>
             </button>
             <button class="quick-car-btn" data-car-idx="7">
-              <img src="/cars/car-7.jpg" alt="" class="qc-thumb" />
+              <img src="/cars/car-7-hd.jpg" alt="" class="qc-thumb" />
               <b class="qc-name">PHANTOM LX</b><small class="qc-rarity">RARE</small>
             </button>
             <button class="quick-car-btn" data-car-idx="8">
-              <img src="/cars/car-8.jpg" alt="" class="qc-thumb" />
+              <img src="/cars/car-8-hd.jpg" alt="" class="qc-thumb" />
               <b class="qc-name">STORM XR</b><small class="qc-rarity">RARE</small>
             </button>
             <button class="quick-car-btn" data-car-idx="9">
-              <img src="/cars/car-9.jpg" alt="" class="qc-thumb" />
+              <img src="/cars/car-9-hd.jpg" alt="" class="qc-thumb" />
               <b class="qc-name">RAPTOR ZX</b><small class="qc-rarity">RARE</small>
             </button>
           </div>
@@ -338,39 +338,71 @@
     </section>
 
     <!-- ===================== 06 MULTIPLAYER - NIGHT CIRCUIT LOBBY ===================== -->
-    <section id="screen-lobby" class="screen">
-      <button class="btn-back" data-back="screen-home">← Back</button>
-      <div class="lobby-header">
-        <span class="screen-idx-tag">06 MULTIPLAYER</span>
-        <h2 class="panel-title">NIGHT CIRCUIT <span class="accent">LOBBY</span></h2>
-      </div>
+    <section id="screen-lobby" class="screen multiplayer-screen">
+      <button class="btn-back lobby-back" data-back="screen-home">← BACK</button>
+      <div class="multiplayer-shell">
+        <div class="lobby-titlebar">
+          <div>
+            <span class="screen-idx-tag">06 MULTIPLAYER</span>
+            <h2 class="lobby-title">MULTIPLAYER <span>LOBBY</span></h2>
+            <p>Build a room, choose your world and race live competitors.</p>
+          </div>
+          <div class="lobby-online-badge"><i></i> LIVE RACING <strong>8 MAX</strong></div>
+        </div>
 
-      <div class="lobby-layout">
-        <div class="lobby-card glass-panel">
-          <h3>Create Private Room</h3>
-          <p class="muted">Start a high-stakes multiplayer lobby and share your 5-letter code.</p>
-          <button id="createRoomBtn" class="btn btn-primary btn-block">CREATE ROOM</button>
-        </div>
-        <div class="lobby-card glass-panel">
-          <h3>Join Race Room</h3>
-          <p class="muted">Enter room code to join live competitors on the grid.</p>
-          <input id="joinCodeInput" maxlength="5" placeholder="ABCDE" class="code-input" autocomplete="off" />
-          <button id="joinRoomBtn" class="btn btn-secondary btn-block">JOIN ROOM</button>
-        </div>
-      </div>
+        <div class="lobby-feature-grid">
+          <article class="lobby-track-hero">
+            <img id="lobbyWorldImage" src="/bg/atlanta-sunset-highway.jpg" alt="Selected RYDASH track">
+            <div class="lobby-track-shade"></div>
+            <div class="lobby-track-copy">
+              <span>SELECTED TRACK</span>
+              <h3 id="lobbyWorldName">SUNLINE HIGHWAY</h3>
+              <p id="lobbyWorldMeta">GOLDEN COAST • USA • 4.1 KM</p>
+              <div class="lobby-track-tags"><b id="lobbyWorldWeather">CLEAR</b><b>3 LAPS</b><b>RANKED READY</b></div>
+            </div>
+          </article>
 
-      <div id="roomInfo" class="room-info glass-panel hidden">
-        <div class="room-header-row">
-          <div>Room Code: <span id="roomCodeDisplay" class="room-code"></span></div>
-          <div id="playerCount" class="badge-pill">1 / 8 Racers</div>
+          <div class="lobby-action-stack">
+            <div class="lobby-card glass-panel">
+              <div class="lobby-card-kicker">PRIVATE RACE</div>
+              <h3>CREATE ROOM</h3>
+              <p class="muted">Host a live race and share your 5-letter code.</p>
+              <button id="createRoomBtn" class="btn btn-primary btn-block">CREATE ROOM</button>
+            </div>
+            <div class="lobby-card glass-panel">
+              <div class="lobby-card-kicker">JOIN FRIENDS</div>
+              <h3>JOIN RACE ROOM</h3>
+              <p class="muted">Enter the code from another racer.</p>
+              <div class="lobby-join-row">
+                <input id="joinCodeInput" maxlength="5" placeholder="ABCDE" class="code-input" autocomplete="off" />
+                <button id="joinRoomBtn" class="btn btn-secondary">JOIN</button>
+              </div>
+            </div>
+          </div>
+
+          <aside class="lobby-live-card">
+            <div class="lobby-live-head"><span>LIVE ROOMS</span><b>ASIA</b></div>
+            <div class="lobby-room-row"><strong>SPEED KINGS</strong><span>MIAMI COAST</span><em>6/8</em><i>RACING</i></div>
+            <div class="lobby-room-row"><strong>DRIFT ARENA</strong><span>VERTICAL CITY</span><em>3/8</em><i class="waiting">WAITING</i></div>
+            <div class="lobby-room-row"><strong>PRO RACERS</strong><span>ALPINE PEAKS</span><em>7/8</em><i>RACING</i></div>
+            <div class="lobby-room-row"><strong>NITRO BOOST</strong><span>SUNLINE HIGHWAY</span><em>5/8</em><i>RACING</i></div>
+            <div class="lobby-ping">● 32 MS <span>LOW LATENCY</span></div>
+          </aside>
         </div>
-        <ul id="lobbyPlayerList" class="lobby-player-list"></ul>
-        <div class="room-actions">
-          <button id="leaveRoomBtn" class="btn btn-ghost">LEAVE LOBBY</button>
-          <button id="startRaceBtn" class="btn btn-primary btn-lg">READY TO RACE 🏁</button>
+
+        <div id="roomInfo" class="room-info glass-panel hidden">
+          <div class="room-header-row">
+            <div><span class="room-kicker">ROOM CODE</span><strong id="roomCodeDisplay" class="room-code"></strong></div>
+            <div id="playerCount" class="badge-pill">1 / 8 Racers</div>
+          </div>
+          <ul id="lobbyPlayerList" class="lobby-player-list"></ul>
+          <div class="room-actions">
+            <button id="leaveRoomBtn" class="btn btn-ghost">LEAVE LOBBY</button>
+            <button id="startRaceBtn" class="btn btn-primary btn-lg">START RACE 🏁</button>
+          </div>
         </div>
+        <p id="lobbyMsg" class="form-msg"></p>
       </div>
-      <p id="lobbyMsg" class="form-msg"></p>
     </section>
 
     <!-- ===================== 05 QUICK RACE - IN-GAME HUD ===================== -->
@@ -386,15 +418,20 @@
           <span id="hudWorldPhase">🌙 NIGHT</span>
         </div>
         <div class="hud-top-left">
-          <div class="hud-pos-lap-row">
-            <div class="hud-chip"><span class="hud-chip-label">POS</span><span id="hudPos">03</span><span class="hud-chip-sep">/</span><span id="hudPosTotal">08</span></div>
-            <div class="hud-chip"><span class="hud-chip-label">LAP</span><span id="hudLap">1</span><span class="hud-chip-sep">/</span><span id="hudTotalLaps">3</span></div>
+          <div class="race-stat-row">
+            <div class="race-stat-card pos-card"><span class="race-stat-label">POS</span><strong id="hudPos">03</strong><b>/</b><strong id="hudPosTotal">08</strong></div>
+            <div class="race-stat-card lap-card"><span class="race-stat-label">LAP</span><strong id="hudLap">1</strong><b>/</b><strong id="hudTotalLaps">3</strong></div>
+          </div>
+          <div class="lap-progress-card">
+            <div class="lap-progress-head"><span>RACE PROGRESS</span><strong id="hudLapProgressText">LAP 1 / 3</strong></div>
+            <div class="lap-progress-track"><i id="hudLapProgressFill"></i></div>
           </div>
           <div id="hudPositions" class="hud-positions"></div>
         </div>
         <div class="hud-top-right">
           <div class="hud-chip hud-chip-time"><span class="hud-chip-label">TIME</span><span id="hudTimer">00:00.000</span></div>
           <div class="hud-chip hud-chip-time"><span class="hud-chip-label">BEST</span><span id="hudBest">--:--.---</span></div>
+          <div class="hud-chip hud-chip-time"><span class="hud-chip-label">LAST</span><span id="hudLast">--:--.---</span></div>
         </div>
         <div class="hud-bottom-left">
           <canvas id="minimapCanvas" width="140" height="140"></canvas>

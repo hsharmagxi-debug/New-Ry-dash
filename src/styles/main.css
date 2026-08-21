@@ -2588,3 +2588,377 @@ input, select {
   .world-phase-buttons { grid-template-columns:repeat(2,1fr); }
   .hud-world-identity { top:70px; }
 }
+
+/* ==========================================================================
+   RYDASH 2026 FINAL RACE / WORLD / MULTIPLAYER PRESENTATION
+   Clear gameplay first. Cinematic environment second. UI never hides the car.
+   ========================================================================== */
+
+/* --- Real-world cinematic backdrop behind transparent 3D race canvas --- */
+#screen-race {
+  background-color:#83bfe0;
+  background-position:center;
+  background-size:cover;
+  background-attachment:fixed;
+  overflow:hidden;
+}
+#screen-race #gameCanvas {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:2;
+  display:block;
+}
+#screen-race .race-hud { z-index:12; }
+#screen-race .race-pause-btn { z-index:18; }
+
+/* --- Crisp, reference-style lap / position HUD --- */
+.race-stat-row { display:flex; gap:8px; }
+.race-stat-card {
+  min-width:104px;
+  height:58px;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:7px 12px;
+  border-radius:11px;
+  background:rgba(8,25,41,.78);
+  border:1px solid rgba(111,220,255,.34);
+  box-shadow:0 8px 24px rgba(2,16,28,.28), inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter:blur(12px);
+}
+.race-stat-card.lap-card { min-width:126px; border-color:rgba(255,46,136,.34); }
+.race-stat-label {
+  color:#42d8ff;
+  font-size:9px;
+  font-weight:1000;
+  letter-spacing:.11em;
+  margin-right:auto;
+}
+.race-stat-card.lap-card .race-stat-label { color:#ff62b2; }
+.race-stat-card strong {
+  color:#fff;
+  font-family:var(--font-display);
+  font-size:23px;
+  line-height:1;
+}
+.race-stat-card b { color:#7897aa; font-size:14px; }
+.lap-progress-card {
+  width:240px;
+  margin-top:7px;
+  padding:9px 11px 10px;
+  border-radius:10px;
+  background:rgba(7,24,40,.72);
+  border:1px solid rgba(109,210,246,.22);
+  backdrop-filter:blur(10px);
+}
+.lap-progress-head {
+  display:flex;
+  justify-content:space-between;
+  color:#9ab4c5;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.1em;
+}
+.lap-progress-head strong { color:#fff; font-size:9px; }
+.lap-progress-track {
+  height:5px;
+  margin-top:7px;
+  background:rgba(255,255,255,.12);
+  border-radius:99px;
+  overflow:hidden;
+}
+.lap-progress-track i {
+  display:block;
+  width:5%;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#0de0ff,#2a8fff,#ff2e88);
+  box-shadow:0 0 12px rgba(0,216,255,.65);
+  transition:width .18s linear;
+}
+
+/* Actual live order list — always readable over any environment. */
+.hud-positions {
+  width:240px;
+  margin-top:7px;
+  padding:6px;
+  border-radius:10px;
+  background:rgba(5,20,34,.66);
+  border:1px solid rgba(110,203,255,.20);
+  backdrop-filter:blur(11px);
+  box-shadow:0 10px 24px rgba(0,0,0,.22);
+}
+.race-order-row {
+  height:25px;
+  display:grid;
+  grid-template-columns:22px 1fr 26px;
+  align-items:center;
+  gap:4px;
+  padding:0 7px;
+  border-radius:5px;
+  color:#d8e8f2;
+  font-size:9px;
+  font-weight:800;
+}
+.race-order-row:nth-child(odd) { background:rgba(255,255,255,.035); }
+.race-order-row b { color:#8ea8b9; text-align:center; }
+.race-order-row span { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.race-order-row em { color:#7da2b8; font-style:normal; font-size:8px; text-align:right; }
+.race-order-row.you {
+  background:linear-gradient(90deg,rgba(0,207,255,.22),rgba(255,46,136,.10));
+  outline:1px solid rgba(0,220,255,.35);
+  color:#fff;
+}
+.race-order-row.you b { color:#37dcff; }
+.race-order-row.you em { color:#ff68b3; }
+
+/* Make race timing cards closer to the reference. */
+.hud-top-right .hud-chip {
+  min-width:160px;
+  justify-content:space-between;
+  padding:9px 13px;
+  background:rgba(6,23,39,.78);
+}
+.hud-chip-time .hud-chip-label { font-size:8px; }
+.hud-chip-time span:last-child { font-size:16px; letter-spacing:.02em; }
+
+/* Bigger, clearer speedometer and controls. */
+.speedo-circular { width:158px; height:158px; }
+.speedo-value { font-size:2.7rem; text-shadow:0 3px 18px rgba(0,0,0,.5); }
+.speedo-unit { font-size:.7rem; }
+.gear { font-size:1.8rem; }
+.nitro-bar { width:108px; height:10px; }
+
+/* --- World cards: the previous negative z-index hid the images --- */
+.world-card { position:relative; isolation:isolate; }
+.world-card-img {
+  z-index:0 !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+.world-card-shade { z-index:1 !important; }
+.world-card-copy, .world-card-status { z-index:2; }
+
+/* --- Multiplayer: reference-style clear, structured dashboard --- */
+.multiplayer-screen {
+  background:
+    linear-gradient(180deg,rgba(4,19,31,.18),rgba(4,19,31,.56)),
+    url('/bg/atlanta-sunset-highway.jpg') center/cover fixed;
+  overflow-y:auto;
+}
+.multiplayer-shell {
+  width:min(1480px,calc(100vw - 44px));
+  margin:0 auto;
+  padding:32px 0 40px;
+}
+.lobby-back { margin-bottom:4px; position:relative; z-index:4; }
+.lobby-titlebar {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:24px;
+  margin:4px 0 20px;
+}
+.lobby-title {
+  margin-top:6px;
+  font-family:var(--font-display);
+  font-size:clamp(30px,4vw,52px);
+  letter-spacing:-1.5px;
+}
+.lobby-title span { color:#08c7ff; }
+.lobby-titlebar p { color:#c9dbe7; font-weight:700; margin-top:7px; }
+.lobby-online-badge {
+  padding:10px 14px;
+  border-radius:10px;
+  background:rgba(6,27,43,.72);
+  border:1px solid rgba(79,218,255,.3);
+  color:#a7c3d3;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.lobby-online-badge i {
+  display:inline-block;
+  width:7px;height:7px;border-radius:50%;
+  background:#39e98b; box-shadow:0 0 10px #39e98b;
+  margin-right:6px;
+}
+.lobby-online-badge strong { color:#fff; margin-left:12px; }
+.lobby-feature-grid {
+  display:grid;
+  grid-template-columns:minmax(420px,1.25fr) minmax(300px,.8fr) minmax(290px,.78fr);
+  gap:16px;
+  align-items:stretch;
+}
+.lobby-track-hero {
+  position:relative;
+  min-height:430px;
+  overflow:hidden;
+  border-radius:18px;
+  border:1px solid rgba(130,220,255,.28);
+  box-shadow:0 20px 48px rgba(3,21,36,.32);
+}
+.lobby-track-hero img { width:100%;height:100%;min-height:430px;object-fit:cover;display:block; }
+.lobby-track-shade {
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(2,14,25,.02),rgba(2,14,25,.10) 42%,rgba(2,14,25,.92));
+}
+.lobby-track-copy { position:absolute;left:22px;right:22px;bottom:20px; }
+.lobby-track-copy>span { color:#55ddff;font-size:9px;font-weight:900;letter-spacing:.15em; }
+.lobby-track-copy h3 { font-family:var(--font-display);font-size:32px;margin-top:5px; }
+.lobby-track-copy p { color:#c5d8e4;font-size:11px;font-weight:800;margin-top:4px; }
+.lobby-track-tags { display:flex;gap:7px;margin-top:12px;flex-wrap:wrap; }
+.lobby-track-tags b {
+  padding:6px 8px;border-radius:7px;background:rgba(5,22,37,.68);
+  border:1px solid rgba(123,214,245,.20);color:#d5e9f4;font-size:8px;
+}
+.lobby-action-stack { display:flex;flex-direction:column;gap:16px; }
+.lobby-card {
+  padding:20px;
+  border-radius:16px;
+  min-height:0;
+  background:rgba(9,31,50,.78);
+  border-color:rgba(105,218,255,.22);
+}
+.lobby-card-kicker { color:#56dbff;font-size:8px;font-weight:900;letter-spacing:.15em; }
+.lobby-card h3 { margin-top:6px;font-family:var(--font-display);font-size:22px; }
+.lobby-card p { margin:7px 0 16px; }
+.lobby-join-row { display:grid;grid-template-columns:1fr auto;gap:8px; }
+.lobby-join-row .code-input { min-width:0; }
+.lobby-live-card {
+  padding:18px;
+  border-radius:16px;
+  background:rgba(5,25,41,.84);
+  border:1px solid rgba(105,218,255,.22);
+  box-shadow:0 18px 42px rgba(2,17,29,.26);
+}
+.lobby-live-head { display:flex;justify-content:space-between;color:#b7d1df;font-size:10px;font-weight:900;letter-spacing:.12em;margin-bottom:10px; }
+.lobby-live-head b { color:#3fe99b; }
+.lobby-room-row {
+  display:grid;grid-template-columns:1.1fr .95fr 38px 62px;gap:7px;align-items:center;
+  padding:11px 0;border-top:1px solid rgba(255,255,255,.07);
+  font-size:8px;
+}
+.lobby-room-row strong { color:#fff;font-size:9px; }
+.lobby-room-row span { color:#9db7c7; }
+.lobby-room-row em { color:#cce0ea;font-style:normal;text-align:center; }
+.lobby-room-row i { color:#4df29a;font-style:normal;font-weight:900;text-align:right; }
+.lobby-room-row i.waiting { color:#ffc44e; }
+.lobby-ping { margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07);color:#45e99b;font-size:9px;font-weight:900; }
+.lobby-ping span { float:right;color:#7694a6; }
+.room-info {
+  margin-top:16px;
+  padding:18px;
+  border-radius:16px;
+  background:rgba(7,27,44,.86);
+}
+.room-kicker { display:block;color:#7ca6ba;font-size:8px;letter-spacing:.14em;font-weight:900; }
+.room-header-row strong.room-code { display:block;color:#4cdbff;font-family:var(--font-display);font-size:30px;letter-spacing:.18em;margin-top:3px; }
+.lobby-player-list { display:grid;grid-template-columns:repeat(4,1fr);gap:8px;list-style:none;padding:0;margin:16px 0; }
+.lobby-player-list li {
+  padding:11px;border-radius:9px;background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.07);color:#d7e7ef;font-size:10px;font-weight:800;
+}
+.room-actions { display:flex;justify-content:space-between;gap:10px; }
+.form-msg { text-align:center;margin-top:10px;color:#71dcff;font-weight:800; }
+
+/* Home + garage image crispness */
+.rd-hero-car-img, .hero-car-photo, .car-card-img {
+  image-rendering:auto !important;
+  image-rendering:-webkit-optimize-contrast !important;
+  backface-visibility:hidden;
+  transform:translateZ(0);
+}
+.rd-hero-car-img { filter:saturate(1.08) contrast(1.04); }
+
+/* Avoid dark "black everything" treatment on major surfaces. */
+#screen-home .rd-featured,
+#screen-home .rd-hero-car,
+#screen-garage .glass-panel {
+  background-color:rgba(21,48,72,.70);
+}
+#screen-home::after {
+  content:"";
+  position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(0,45,75,.12));
+  z-index:0;
+}
+#screen-home > * { position:relative; z-index:1; }
+
+@media (max-width:1100px) {
+  .lobby-feature-grid { grid-template-columns:1fr 1fr; }
+  .lobby-track-hero { grid-row:span 2; }
+  .lobby-live-card { grid-column:2; }
+}
+@media (max-width:760px) {
+  .race-stat-card { min-width:88px; }
+  .lap-progress-card,.hud-positions { width:205px; }
+  .hud-top-right .hud-chip { min-width:125px; }
+  .hud-world-identity { display:none; }
+  .lobby-feature-grid { grid-template-columns:1fr; }
+  .lobby-track-hero,.lobby-track-hero img { min-height:300px; }
+  .lobby-live-card { grid-column:auto; }
+  .lobby-player-list { grid-template-columns:repeat(2,1fr); }
+}
+
+/* ========================================================================
+   RYDASH 2026 TARGET RACE VIEW — bright identifiable world presentation
+   ======================================================================== */
+#screen-race {
+  isolation:isolate;
+  background-color:#77b9df;
+  background-repeat:no-repeat;
+  background-position:center 38%;
+  background-size:cover;
+}
+#screen-race::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.04) 0%, rgba(15,57,83,.02) 48%, rgba(3,20,34,.12) 100%);
+  mix-blend-mode:normal;
+}
+#screen-race::after {
+  content:"";
+  position:absolute;
+  left:0;right:0;bottom:0;
+  height:28%;
+  z-index:3;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(4,18,30,0),rgba(4,18,30,.07));
+}
+#screen-race #gameCanvas { z-index:2; }
+#screen-race .race-hud { z-index:12; }
+#screen-race .touch-controls { z-index:14; }
+#screen-race .hud-world-identity {
+  background:rgba(7,29,47,.62);
+  border-color:rgba(255,255,255,.22);
+  box-shadow:0 8px 30px rgba(0,0,0,.20);
+}
+#screen-race .race-stat-card,
+#screen-race .lap-progress-card,
+#screen-race .hud-positions,
+#screen-race .hud-chip-time {
+  background:rgba(7,25,40,.72);
+  border-color:rgba(255,255,255,.22);
+  box-shadow:0 8px 24px rgba(0,0,0,.22);
+}
+#screen-race .race-stat-card strong,
+#screen-race .hud-chip-time span:last-child { text-shadow:0 2px 10px rgba(0,0,0,.32); }
+#screen-race[data-phase="day"]::before {
+  background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(42,137,191,.03) 55%,rgba(6,38,57,.08));
+}
+#screen-race[data-phase="sunset"]::before {
+  background:linear-gradient(180deg,rgba(255,178,104,.08),rgba(255,102,84,.04) 48%,rgba(26,31,48,.12));
+}
+#screen-race[data-phase="night"]::before {
+  background:linear-gradient(180deg,rgba(8,28,62,.20),rgba(17,25,54,.22) 58%,rgba(3,14,28,.28));
+}
+#screen-race[data-phase="storm"]::before {
+  background:linear-gradient(180deg,rgba(82,110,140,.22),rgba(38,66,91,.18) 55%,rgba(7,24,39,.28));
+}

@@ -15,7 +15,7 @@
   <div id="app">
 
     <!-- ===================== LOADING ===================== -->
-    <section id="screen-loading" class="screen active">
+    <section id="screen-loading" class="screen">
       <div class="loader-wrap">
         <h1 class="logo">RYD<span class="accent">ASH</span><span class="trademark">™</span></h1>
         <p class="loader-tagline">RACE THE CITY. OWN THE NIGHT.</p>
@@ -29,7 +29,7 @@
     </section>
 
     <!-- ===================== 01 HOME - NEON DISTRICT ===================== -->
-    <section id="screen-home" class="screen">
+    <section id="screen-home" class="screen active">
       <!-- 60fps Live Atmospheric Background Canvas (8 World Concepts) -->
       <canvas id="homeAtmosphereCanvas" class="home-atmosphere-canvas" aria-hidden="true"></canvas>
 
@@ -813,6 +813,50 @@
     <div id="toast" class="toast hidden"></div>
   </div>
 
+  <!-- RYDASH boot safety: the visual home screen must never be hidden by a failed/non-blocking initializer. -->
+  <script>
+    (function () {
+      var home = document.getElementById('screen-home');
+      var loading = document.getElementById('screen-loading');
+
+      function revealHome() {
+        if (loading) loading.classList.remove('active');
+        if (home) home.classList.add('active');
+      }
+
+      // Show the actual product UI immediately; the module enhances it afterwards.
+      revealHome();
+
+      // If a later initializer throws, keep the home screen visible instead of
+      // leaving the player on a full-screen loading layer.
+      window.addEventListener('error', revealHome);
+      window.addEventListener('unhandledrejection', revealHome);
+
+      // Lightweight navigation fallback. The full router in main.js replaces
+      // these handlers when the application module is ready.
+      document.addEventListener('click', function (event) {
+        var btn = event.target.closest('[data-nav]');
+        if (!btn) return;
+        var map = {
+          home: 'screen-home',
+          garage: 'screen-garage',
+          world: 'screen-worldmap',
+          leaderboard: 'screen-leaderboard',
+          multiplayer: 'screen-lobby',
+          settings: 'screen-settings',
+          howto: 'screen-howto'
+        };
+        var id = map[btn.getAttribute('data-nav')];
+        if (!id) return;
+        var target = document.getElementById(id);
+        if (!target) return;
+        document.querySelectorAll('.screen').forEach(function (screen) {
+          screen.classList.remove('active');
+        });
+        target.classList.add('active');
+      });
+    })();
+  </script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

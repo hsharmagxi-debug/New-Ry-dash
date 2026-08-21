@@ -2962,3 +2962,24 @@ input, select {
 #screen-race[data-phase="storm"]::before {
   background:linear-gradient(180deg,rgba(82,110,140,.22),rgba(38,66,91,.18) 55%,rgba(7,24,39,.28));
 }
+
+/* RYDASH 2026 boot safety: never let a stale loading layer cover the product UI. */
+#screen-loading { z-index: 0 !important; }
+#screen-loading:not(.active) { display: none !important; }
+#screen-home.active {
+  z-index: 20 !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+#screen-home.active > .topnav,
+#screen-home.active > .rd-main,
+#screen-home.active > .foot-credit-minimal,
+#screen-home.active > .home-atmosphere-canvas {
+  visibility: visible !important;
+}
+#screen-home.active > .topnav,
+#screen-home.active > .rd-main,
+#screen-home.active > .foot-credit-minimal {
+  opacity: 1 !important;
+}

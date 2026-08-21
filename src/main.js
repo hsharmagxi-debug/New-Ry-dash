@@ -273,31 +273,41 @@ function initGarageStage() {
 /* ============================== SCREEN ROUTER ============================== */
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach((el) => el.classList.remove('active'));
-  const target = $(id);
+  const target = $(id) || $('screen-home');
   if (target) {
     target.classList.add('active');
-    state.screen = id;
+    state.screen = target.id;
   }
+
+  // Navigation must remain usable even if a visual/remote subsystem fails.
   document.querySelectorAll('[data-back]').forEach((btn) => {
     btn.onclick = () => showScreen(btn.dataset.back);
   });
 
-  if (id === 'screen-home' || id === 'screen-worldmap') {
-    initHomeAtmosphere();
-    homeAtmosphere?.start();
-  } else {
-    homeAtmosphere?.stop();
+  try {
+    if (id === 'screen-home' || id === 'screen-worldmap') {
+      initHomeAtmosphere();
+      homeAtmosphere?.start();
+    } else {
+      homeAtmosphere?.stop();
+    }
+  } catch (error) {
+    console.warn('[RYDASH] Home atmosphere unavailable; UI remains active.', error);
   }
 
-  if (id === 'screen-home') {
-    updateHomeHeroCardUI();
-    loadHomeActivityFeed();
-    garageStage?.stop();
-  } else if (id === 'screen-garage') {
-    initGarageStage();
-    garageStage?.start();
-  } else {
-    garageStage?.stop();
+  try {
+    if (id === 'screen-home') {
+      updateHomeHeroCardUI();
+      loadHomeActivityFeed().catch((error) => console.warn('[RYDASH] Activity feed unavailable.', error));
+      garageStage?.stop();
+    } else if (id === 'screen-garage') {
+      initGarageStage();
+      garageStage?.start();
+    } else {
+      garageStage?.stop();
+    }
+  } catch (error) {
+    console.warn('[RYDASH] Optional screen enhancement failed; navigation remains active.', error);
   }
 }
 
@@ -332,7 +342,13 @@ if (navSoundToggle) {
 
 /* ============================== BOOT / INIT ============================== */
 async function boot() {
-  const authStatus = $('authStatus') || $('navPlayerName');
+  // Reveal the product immediately. Authentication, audio, atmosphere and
+  // backend services are enhancements and must never block the home screen.
+  showScreen('screen-home');
+  window.__RYDASH_BOOTED = true;
+
+  try {
+    const authStatus = $('authStatus') || $('navPlayerName');
   if (authStatus) authStatus.textContent = state.playerName;
   updateSoundUI();
   startChallengeResetCountdown();
@@ -415,7 +431,12 @@ async function boot() {
       if (navAuthBtn) navAuthBtn.textContent = '👤 ' + state.playerName;
       updateHomeHeroCardUI();
     }
-  }).catch(() => {});
+    }).catch(() => {});
+  } catch (error) {
+    console.error('[RYDASH] Non-fatal boot initializer error:', error);
+    // The home screen is already active; keep it usable.
+    try { showScreen('screen-home'); } catch (_) {}
+  }
 }
 
 /* ============================== AUTH HANDLERS ============================== */

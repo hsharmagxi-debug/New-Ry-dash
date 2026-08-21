@@ -1673,8 +1673,8 @@ input, select {
    04 WORLD SELECT - RYDASH MAP
    ========================================================================= */
 #screen-worldmap {
-  background-color: #02040b;
-  background-image: linear-gradient(180deg, rgba(2, 4, 11, 0.65) 0%, rgba(2, 4, 11, 0.92) 70%, rgba(2, 4, 11, 0.98) 100%),
+  background-color: #14213a;
+  background-image: linear-gradient(180deg, rgba(18, 28, 52, 0.28) 0%, rgba(14, 22, 42, 0.48) 70%, rgba(10, 16, 32, 0.62) 100%),
                     url('/bg/shibuya-neon-town.jpg');
   background-position: center;
   background-size: cover;
@@ -1684,8 +1684,8 @@ input, select {
 }
 
 #screen-leaderboard, #screen-lobby, #screen-auth, #screen-howto, #screen-settings {
-  background-color: #02040b;
-  background-image: linear-gradient(180deg, rgba(2, 4, 11, 0.72) 0%, rgba(2, 4, 11, 0.94) 70%, rgba(2, 4, 11, 0.99) 100%),
+  background-color: #14213a;
+  background-image: linear-gradient(180deg, rgba(18, 28, 52, 0.32) 0%, rgba(14, 22, 42, 0.5) 70%, rgba(10, 16, 32, 0.64) 100%),
                     url('/bg/foggy-night-street.jpg');
   background-position: center;
   background-size: cover;

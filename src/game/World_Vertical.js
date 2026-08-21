@@ -61,7 +61,7 @@ function buildTowerCanyon(billboardList) {
     let x = (Math.random() - 0.5) * 600;
     if (Math.abs(x) < 40) x += Math.sign(x || 1) * 40; // keep the racing canyon clear
     const z = (Math.random() - 0.5) * 900;
-    const bld = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: 0x06070d, roughness: 0.4, metalness: 0.6, emissive: 0x040611, emissiveIntensity: 0.35 }));
+    const bld = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: 0x28304c, roughness: 0.45, metalness: 0.45, emissive: 0x141c30, emissiveIntensity: 0.55 }));
     bld.position.set(x, h / 2, z);
     group.add(bld);
     const color = NEON_COLORS[Math.floor(Math.random() * NEON_COLORS.length)];
@@ -219,7 +219,7 @@ export function buildTrack() {
 }
 
 function buildGround() {
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x04050a, roughness: 0.85 }));
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x1c2436, roughness: 0.85 }));
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.y = -0.03;
   mesh.receiveShadow = true;

@@ -202,7 +202,7 @@ export function buildTrack() {
 }
 
 function buildGround() {
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x0a0e14, roughness: 1 }));
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x1e2c3a, roughness: 0.9 }));
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.y = -0.05;
   mesh.receiveShadow = true;

@@ -113,7 +113,7 @@ function buildCitySkyline() {
   for (let i = 0; i < 40; i++) {
     const w = 8 + Math.random() * 14, h = 30 + Math.random() * 140, d = 8 + Math.random() * 14;
     const x = (Math.random() - 0.5) * 1400, z = -420 - Math.random() * 180;
-    const bld = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: 0x0c0f1e, roughness: 0.6, metalness: 0.3, emissive: 0x060812, emissiveIntensity: 0.4 }));
+    const bld = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: 0x2c3550, roughness: 0.6, metalness: 0.3, emissive: 0x181e38, emissiveIntensity: 0.6 }));
     bld.position.set(x, h / 2, z);
     group.add(bld);
     if (Math.random() > 0.4) {
@@ -266,7 +266,7 @@ export function buildTrack() {
 }
 
 function buildGround() {
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x0f1a14, roughness: 1 }));
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x24382c, roughness: 0.9 }));
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.y = -0.02;
   mesh.receiveShadow = true;

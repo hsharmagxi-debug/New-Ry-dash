@@ -120,7 +120,7 @@ function buildCitySkyline(flickerList) {
     const z = -380 - Math.random() * 260;
     const bld = new THREE.Mesh(
       new THREE.BoxGeometry(w, h, d),
-      new THREE.MeshStandardMaterial({ color: 0x07080f, roughness: 0.5, metalness: 0.5, emissive: 0x030309, emissiveIntensity: 0.3 })
+      new THREE.MeshStandardMaterial({ color: 0x2a3550, roughness: 0.55, metalness: 0.35, emissive: 0x141c30, emissiveIntensity: 0.55 })
     );
     bld.position.set(x, h / 2, z);
     group.add(bld);
@@ -149,7 +149,7 @@ function buildCitySkyline(flickerList) {
 
 function buildGround() {
   const geo = new THREE.PlaneGeometry(3000, 3000, 1, 1);
-  const mat = new THREE.MeshStandardMaterial({ color: 0x03040a, roughness: 0.9, metalness: 0.1 });
+  const mat = new THREE.MeshStandardMaterial({ color: 0x1c2436, roughness: 0.85, metalness: 0.15 });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.y = -0.03;
@@ -169,7 +169,7 @@ function buildStreetlight(color) {
   const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 12), new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 3.2 }));
   lamp.position.set(1.5, 5.75, 0);
   g.add(lamp);
-  const pl = new THREE.PointLight(color, 1.6, 15, 2);
+  const pl = new THREE.PointLight(color, 4.5, 32, 1.5);
   pl.position.copy(lamp.position);
   g.add(pl);
   return g;
@@ -224,13 +224,18 @@ export function buildTrack() {
   roadGeo.computeVertexNormals();
 
   const asphaltTex = makeAsphaltTexture();
-  // Wet asphalt: dark, low roughness so it catches neon-colored specular highlights
-  // and the environment reflection texture — reads as rain-slicked street.
-  const roadMat = new THREE.MeshStandardMaterial({
+  // Wet asphalt: a thin clearcoat layer over the base asphalt gives it the same sharp,
+  // defined specular highlight the car paint gets (both use the same env reflection map),
+  // instead of the softer/flatter highlight a plain roughness/metalness material produces --
+  // this is the same technique that makes top browser racers' wet/showroom surfaces read as
+  // reflective rather than just "dark".
+  const roadMat = new THREE.MeshPhysicalMaterial({
     map: asphaltTex,
-    roughness: 0.22,
-    metalness: 0.35,
-    envMapIntensity: 1.6,
+    roughness: 0.35,
+    metalness: 0.2,
+    clearcoat: 0.85,
+    clearcoatRoughness: 0.15,
+    envMapIntensity: 1.8,
   });
   const road = new THREE.Mesh(roadGeo, roadMat);
   road.receiveShadow = true;

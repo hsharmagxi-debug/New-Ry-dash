@@ -52,7 +52,7 @@ const RadialBlurShader = {
 export function buildComposer(renderer, scene, camera, width, height) {
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(width, height), 0.95, 0.45, 0.7);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(width, height), 0.95, 0.45, 0.6);
   composer.addPass(bloom);
   const motionBlur = new ShaderPass(RadialBlurShader);
   composer.addPass(motionBlur);

@@ -84,7 +84,7 @@ function buildGlowSkyline() {
   for (let i = 0; i < 45; i++) {
     const w = 7 + Math.random() * 15, h = 35 + Math.random() * 200, d = 7 + Math.random() * 15;
     const x = (Math.random() - 0.5) * 1500, z = -400 - Math.random() * 260;
-    const bld = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: 0x140a10, roughness: 0.5, metalness: 0.4, emissive: 0x1a0a12, emissiveIntensity: 0.35 }));
+    const bld = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: 0x3a2430, roughness: 0.55, metalness: 0.3, emissive: 0x2a1420, emissiveIntensity: 0.55 }));
     bld.position.set(x, h / 2, z);
     group.add(bld);
     const glowColor = colors[Math.floor(Math.random() * colors.length)];

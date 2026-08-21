@@ -90,7 +90,7 @@ function buildTowers() {
     // World.buildTrack keeps the loop within roughly [-160,160] on x/z — push towers outward
     const distFromCenter = Math.hypot(x, z);
     if (distFromCenter < 45) continue;
-    const bld = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: 0x06070d, roughness: 0.45, metalness: 0.55, emissive: 0x03040a, emissiveIntensity: 0.35 }));
+    const bld = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: 0x28304c, roughness: 0.5, metalness: 0.4, emissive: 0x141c30, emissiveIntensity: 0.55 }));
     bld.position.set(x, h / 2 - 90, z); // base sits well below roof plane, top pokes above
     group.add(bld);
     const glowColor = NEON_COLORS[Math.floor(Math.random() * NEON_COLORS.length)];
@@ -128,7 +128,7 @@ function buildHelipadMarkers() {
 }
 
 function buildGround() {
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x05050a, roughness: 0.6, metalness: 0.4 }));
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x1e2438, roughness: 0.6, metalness: 0.35 }));
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.y = -0.02;
   mesh.receiveShadow = true;

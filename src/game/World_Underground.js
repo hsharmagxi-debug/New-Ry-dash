@@ -29,7 +29,7 @@ function makeAsphaltTexture() {
 }
 
 function buildGround() {
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x08090c, roughness: 0.95 }));
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x222838, roughness: 0.9 }));
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.y = -0.02;
   mesh.receiveShadow = true;
@@ -37,7 +37,7 @@ function buildGround() {
 }
 
 function buildCeiling() {
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x0a0b10, roughness: 1, side: THREE.DoubleSide }));
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x1c2030, roughness: 0.95, side: THREE.DoubleSide }));
   mesh.rotation.x = Math.PI / 2;
   mesh.position.y = 42;
   return mesh;

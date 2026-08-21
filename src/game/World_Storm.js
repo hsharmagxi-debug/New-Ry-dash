@@ -73,7 +73,7 @@ function buildCitySkyline() {
   for (let i = 0; i < 55; i++) {
     const w = 8 + Math.random() * 16, h = 40 + Math.random() * 190, d = 8 + Math.random() * 16;
     const x = (Math.random() - 0.5) * 1500, z = -380 - Math.random() * 260;
-    const bld = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: 0x08060f, roughness: 0.4, metalness: 0.6, emissive: 0x0a0618, emissiveIntensity: 0.3 }));
+    const bld = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: 0x2c2450, roughness: 0.45, metalness: 0.45, emissive: 0x1c1638, emissiveIntensity: 0.55 }));
     bld.position.set(x, h / 2, z);
     group.add(bld);
     const windows = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.92, h * 0.92), new THREE.MeshBasicMaterial({ map: billboardTexture(colors[Math.floor(Math.random() * colors.length)]), transparent: true, opacity: 0.85 }));
@@ -84,7 +84,7 @@ function buildCitySkyline() {
 }
 
 function buildGround() {
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x03040a, roughness: 0.15, metalness: 0.5 }));
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: 0x1c1e30, roughness: 0.25, metalness: 0.45 }));
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.y = -0.03;
   mesh.receiveShadow = true;

@@ -301,8 +301,9 @@ export function buildCar(modelDef, liveryColor) {
   const rr = buildWheel(wheelR); rr.position.set(track, wheelR, axleRear);
   [fl, fr, rl, rr].forEach((w) => car.add(w));
 
-  // Underglow (nice arcade touch, subtle)
-  const underGlow = new THREE.PointLight(liveryColor, 0.6, 3.4, 2);
+  // Underglow — a signature NFS Underground look, not a subtle touch: a real colored light
+  // pool that visibly lights the road under and around the car.
+  const underGlow = new THREE.PointLight(liveryColor, 3.2, 8, 1.5);
   underGlow.position.set(0, 0.05, 0);
   car.add(underGlow);
 

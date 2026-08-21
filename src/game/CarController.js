@@ -231,7 +231,7 @@ export class CarController {
 
     // 10. Underglow Intensity Surge with Nitro
     if (this.rig.underGlow) {
-      this.rig.underGlow.intensity = this.nitroActive ? 1.8 : 0.65;
+      this.rig.underGlow.intensity = this.nitroActive ? 5.5 : 3.2;
     }
   }
 

@@ -177,8 +177,8 @@ input, select {
    01 HOME SCREEN & DOCK
    ========================================================================= */
 #screen-home {
-  background-color: #0c1424;
-  background-image: linear-gradient(180deg, rgba(10, 16, 34, 0.28) 0%, rgba(8, 12, 26, 0.62) 55%, rgba(6, 9, 20, 0.88) 100%),
+  background-color: #16233d;
+  background-image: linear-gradient(180deg, rgba(18, 28, 52, 0.12) 0%, rgba(14, 22, 42, 0.32) 55%, rgba(10, 16, 32, 0.52) 100%),
                     url('/bg/atlanta-sunset-highway.jpg');
   background-position: center 38%;
   background-size: cover;
@@ -200,9 +200,9 @@ input, select {
 /* Home-only: quieter panels so the featured car photo and background stay the focal point
    instead of competing card glow (Garage keeps the shared --panel tokens untouched). */
 #screen-home .glass-panel {
-  background: rgba(8, 13, 28, 0.68);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
-  border-color: rgba(0, 229, 255, 0.12);
+  background: rgba(14, 22, 42, 0.5);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+  border-color: rgba(0, 229, 255, 0.16);
 }
 
 /* =========================================================================
@@ -388,10 +388,10 @@ input, select {
 .rd-featured {
   padding: 20px;
   align-self: stretch;
-  border: 1px solid rgba(145, 72, 255, 0.45);
-  background: linear-gradient(145deg, rgba(12, 18, 39, 0.94), rgba(4, 8, 20, 0.9));
+  border: 1px solid rgba(145, 72, 255, 0.5);
+  background: linear-gradient(145deg, rgba(20, 27, 52, 0.72), rgba(10, 15, 32, 0.68));
   border-radius: 12px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
 }
 .rd-eyebrow {
   font-family: var(--font-display);
@@ -453,7 +453,7 @@ input, select {
   align-items: flex-start;
   min-width: 0;
   padding: 7px;
-  background: rgba(5, 11, 27, 0.9);
+  background: rgba(10, 16, 34, 0.62);
   border: 1px solid rgba(100, 140, 195, 0.25);
   border-radius: 7px;
   color: #fff;
@@ -492,7 +492,7 @@ input, select {
 .rd-info-card {
   padding: 15px;
   border: 1px solid rgba(100, 140, 195, 0.25);
-  background: rgba(5, 11, 27, 0.9);
+  background: rgba(10, 16, 34, 0.62);
   border-radius: 9px;
 }
 .rd-info-card h3 {

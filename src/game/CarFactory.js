@@ -79,23 +79,27 @@ export const RARITY = {
 function paintMaterial(liveryColor) {
   return new THREE.MeshPhysicalMaterial({
     color: liveryColor,
-    metalness: 0.6,
-    roughness: 0.2,
+    metalness: 0.88,
+    roughness: 0.12,
     clearcoat: 1.0,
-    clearcoatRoughness: 0.06,
-    reflectivity: 0.7,
-    envMapIntensity: 1.6,
+    clearcoatRoughness: 0.04,
+    reflectivity: 0.95,
+    envMapIntensity: 2.6,
+    sheen: 0.6,
+    sheenRoughness: 0.3,
+    sheenColor: new THREE.Color(0xffffff),
+    specularIntensity: 1.4
   });
 }
 
-const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x0a1420, metalness: 0.2, roughness: 0.05, transmission: 0.6, transparent: true, opacity: 0.85, envMapIntensity: 1 });
-const darkTrim = new THREE.MeshStandardMaterial({ color: 0x0c0d10, metalness: 0.7, roughness: 0.35 });
-const chromeMat = new THREE.MeshStandardMaterial({ color: 0xe8edf2, metalness: 1, roughness: 0.1 });
-const tireMat = new THREE.MeshStandardMaterial({ color: 0x111214, roughness: 0.9, metalness: 0.05 });
-const headlightMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xbfe9ff, emissiveIntensity: 3 });
-const taillightMat = new THREE.MeshStandardMaterial({ color: 0xff2a2a, emissive: 0xff0033, emissiveIntensity: 2.6 });
-const brakeCaliperMat = new THREE.MeshStandardMaterial({ color: 0xff2e2e, metalness: 0.3, roughness: 0.4 });
-const exhaustMat = new THREE.MeshStandardMaterial({ color: 0xcfd6dd, metalness: 1, roughness: 0.2 });
+const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x0a1420, metalness: 0.3, roughness: 0.04, transmission: 0.7, transparent: true, opacity: 0.88, envMapIntensity: 2.0 });
+const darkTrim = new THREE.MeshStandardMaterial({ color: 0x0c0d10, metalness: 0.8, roughness: 0.25, envMapIntensity: 1.5 });
+const chromeMat = new THREE.MeshStandardMaterial({ color: 0xf0f4f8, metalness: 1.0, roughness: 0.08, envMapIntensity: 2.8 });
+const tireMat = new THREE.MeshStandardMaterial({ color: 0x111214, roughness: 0.85, metalness: 0.08 });
+const headlightMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xd6f0ff, emissiveIntensity: 4.5 });
+const taillightMat = new THREE.MeshStandardMaterial({ color: 0xff1a2a, emissive: 0xff0033, emissiveIntensity: 3.8 });
+const brakeCaliperMat = new THREE.MeshStandardMaterial({ color: 0xff2e2e, metalness: 0.4, roughness: 0.3 });
+const exhaustMat = new THREE.MeshStandardMaterial({ color: 0xdae2ec, metalness: 1, roughness: 0.15, envMapIntensity: 2.2 });
 
 function buildWheel(radius = 0.36, width = 0.28) {
   const g = new THREE.Group();
@@ -115,8 +119,8 @@ function buildWheel(radius = 0.36, width = 0.28) {
   hub.rotation.z = Math.PI / 2;
   g.add(hub);
   // brake caliper peeking through the rim — small visual detail that reads well up close
-  const caliper = new THREE.Mesh(new THREE.BoxGeometry(radius * 0.5, radius * 0.34, radius * 0.34), brakeCaliperMat);
-  caliper.position.set(0, radius * 0.35, radius * 0.1);
+  const caliper = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.16, 0.22), brakeCaliperMat);
+  caliper.position.set(0, radius * 0.45, 0);
   g.add(caliper);
   return g;
 }
@@ -134,6 +138,25 @@ export function buildCar(modelDef, liveryColor) {
   const wide = modelDef.wide;
 
   const paint = paintMaterial(liveryColor);
+
+  // Deep contact shadow plane beneath car
+  const shadowCanvas = document.createElement('canvas');
+  shadowCanvas.width = shadowCanvas.height = 128;
+  const sCtx = shadowCanvas.getContext('2d');
+  const sGrad = sCtx.createRadialGradient(64, 64, 15, 64, 64, 62);
+  sGrad.addColorStop(0, 'rgba(0, 0, 0, 0.88)');
+  sGrad.addColorStop(0.6, 'rgba(0, 0, 0, 0.45)');
+  sGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  sCtx.fillStyle = sGrad;
+  sCtx.fillRect(0, 0, 128, 128);
+  const shadowTex = new THREE.CanvasTexture(shadowCanvas);
+  const shadowMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.3 * wide, 4.6),
+    new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, opacity: 0.85, depthWrite: false })
+  );
+  shadowMesh.rotation.x = -Math.PI / 2;
+  shadowMesh.position.y = 0.02;
+  car.add(shadowMesh);
 
   // Lower chassis / floor
   const chassis = new THREE.Mesh(new THREE.BoxGeometry(1.92 * wide, 0.26, 4.25), darkTrim);

@@ -722,7 +722,7 @@ function beginRace() {
 
   const activeWorld = WORLDS[state.worldId] || WORLDS.neon;
   applyRaceBackdrop(state.worldId, state.worldPhase);
-  const { curve, trackWidth, update: updateWorld, ramps = [] } = activeWorld.build(scene);
+  const { curve, trackWidth, update: updateWorld, ramps = [] } = activeWorld.build(scene, { phase: state.worldPhase });
   applyWorldPhase(scene, state.worldPhase);
 
   // Race gates are ordered around the actual closed track.  The previous build

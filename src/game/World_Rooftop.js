@@ -308,8 +308,8 @@ export function buildWorld(scene) {
   scene.add(key);
 
   scene.add(new THREE.HemisphereLight(0x40eaff, 0x1a1630, 0.85));
-  scene.add(new THREE.AmbientLight(0x2c2050, 0.8));
-  scene.fog = new THREE.FogExp2(0x05050f, 0.0011);
+  scene.add(new THREE.AmbientLight(0x4c5e7d, 1.0));
+  scene.fog = new THREE.FogExp2(0x152038, 0.0009);
 
   function update() {
     // static scene — towers/skyline are fixed; kept for API parity with the other worlds.

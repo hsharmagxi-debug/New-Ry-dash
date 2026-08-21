@@ -1,7 +1,7 @@
 :root {
-  --bg: #030713;
-  --bg2: #070e22;
-  --panel: rgba(10, 16, 36, 0.78);
+  --bg: #12243a;
+  --bg2: #1d3553;
+  --panel: rgba(27, 48, 76, 0.70);
   --panel-border: rgba(0, 229, 255, 0.22);
   --panel-glow: rgba(0, 229, 255, 0.15);
   --neon-cyan: #00e5ff;
@@ -12,8 +12,8 @@
   --neon-green: #39ff9d;
   --neon-red: #ff334b;
   --text: #f1f5f9;
-  --text-dim: #94a3b8;
-  --text-muted: #64748b;
+  --text-dim: #d0dced;
+  --text-muted: #8293aa;
   --radius: 16px;
   --font-display: 'Orbitron', sans-serif;
   --font-body: 'Rajdhani', sans-serif;
@@ -98,7 +98,7 @@ input, select {
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
   border: 1px solid var(--panel-border);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65), 0 0 20px var(--panel-glow);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.38), 0 0 20px var(--panel-glow);
   border-radius: var(--radius);
 }
 
@@ -158,7 +158,7 @@ input, select {
   top: 20px;
   left: 24px;
   z-index: 10;
-  background: rgba(10, 16, 36, 0.8);
+  background: rgba(24, 42, 68, 0.82);
   backdrop-filter: blur(12px);
   color: var(--text-dim);
   padding: 10px 18px;
@@ -177,8 +177,8 @@ input, select {
    01 HOME SCREEN & DOCK
    ========================================================================= */
 #screen-home {
-  background-color: #16233d;
-  background-image: linear-gradient(180deg, rgba(18, 28, 52, 0.12) 0%, rgba(14, 22, 42, 0.32) 55%, rgba(10, 16, 32, 0.52) 100%),
+  background-color: #203b5b;
+  background-image: linear-gradient(180deg, rgba(25, 45, 75, 0.06) 0%, rgba(15, 30, 55, 0.20) 55%, rgba(8, 18, 34, 0.36) 100%),
                     url('/bg/atlanta-sunset-highway.jpg');
   background-position: center 38%;
   background-size: cover;
@@ -2273,3 +2273,318 @@ input, select {
   .howto-layout { grid-template-columns: 1fr; }
 }
 
+
+
+/* =========================================================================
+   RYDASH 2026 VISUAL POLISH — brighter cockpit, readable glass, real-race UI
+   ========================================================================= */
+#screen-race {
+  background: #15243a;
+}
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.race-back-btn {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  z-index: 50;
+  padding: 10px 15px;
+  border-radius: 10px;
+  color: #f5fbff;
+  background: rgba(16, 34, 55, 0.72);
+  border: 1px solid rgba(110, 203, 255, 0.42);
+  backdrop-filter: blur(12px);
+  font: 800 0.7rem/1 var(--font-display);
+  letter-spacing: .08em;
+  box-shadow: 0 8px 24px rgba(0,0,0,.22);
+}
+.race-back-btn:hover {
+  background: rgba(35, 64, 95, .9);
+  border-color: var(--neon-cyan);
+  transform: translateY(-1px);
+}
+.race-hud .hud-chip {
+  background: rgba(19, 37, 61, .78);
+  border-color: rgba(150, 220, 255, .24);
+  box-shadow: 0 8px 22px rgba(0,0,0,.18);
+}
+#minimapCanvas {
+  border: 1px solid rgba(150,220,255,.28);
+  background: rgba(13,27,44,.68);
+  box-shadow: 0 8px 24px rgba(0,0,0,.24);
+}
+
+/* 2026 global readability pass */
+.glass-panel,
+.panel,
+.card,
+.modal,
+.settings-card,
+.garage-panel,
+.lobby-panel {
+  color: var(--text);
+}
+.screen:not(#screen-race) {
+  scrollbar-color: rgba(110,203,255,.35) transparent;
+}
+.screen:not(#screen-race)::-webkit-scrollbar { width: 8px; }
+.screen:not(#screen-race)::-webkit-scrollbar-thumb {
+  background: rgba(110,203,255,.3);
+  border-radius: 99px;
+}
+
+/* RYDASH 2026 FINAL PRESENTATION PASS */
+:root {
+  --panel: rgba(29, 52, 82, 0.68);
+  --panel-border: rgba(105, 218, 255, 0.24);
+}
+#screen-race {
+  background: #18324e;
+}
+#screen-race .glass-panel,
+#screen-lobby .glass-panel,
+#screen-results .glass-panel {
+  background: rgba(30, 54, 84, 0.72);
+  border-color: rgba(105, 218, 255, 0.22);
+}
+.res-row .dnf {
+  color: #ff9b9b;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+/* ==========================================================================
+   RYDASH 2026 WORLD SELECT / VISUAL SYSTEM
+   Bright, cinematic and readable — the world itself is the hero.
+   ========================================================================== */
+.worldmap-screen {
+  background:
+    radial-gradient(circle at 72% 10%, rgba(77,190,255,.16), transparent 28%),
+    linear-gradient(135deg, #d9efff 0%, #8fc8e9 38%, #142b45 100%);
+  color: #f7fbff;
+  overflow-y: auto;
+}
+.world-select-shell {
+  width: min(1480px, calc(100vw - 48px));
+  margin: 0 auto;
+  padding: 34px 0 38px;
+}
+.world-select-head {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:24px;
+  margin: 6px 0 20px;
+}
+.world-select-title {
+  margin-top:8px;
+  font-family:var(--font-display);
+  font-size:clamp(32px,4vw,60px);
+  line-height:.95;
+  letter-spacing:-2px;
+}
+.world-select-title span { color:#078de0; }
+.world-select-sub {
+  margin-top:10px;
+  max-width:680px;
+  font-size:16px;
+  color:#38516b;
+  font-weight:700;
+}
+.world-phase-legend {
+  min-width:180px;
+  padding:12px 16px;
+  border-radius:14px;
+  background:rgba(255,255,255,.74);
+  border:1px solid rgba(10,67,105,.15);
+  box-shadow:0 12px 30px rgba(18,57,85,.14);
+  text-align:right;
+}
+.world-phase-legend span { display:block; font-size:10px; color:#59718a; letter-spacing:.12em; }
+.world-phase-legend b { display:block; margin-top:5px; color:#102d47; font-size:14px; }
+
+.world-select-layout {
+  display:grid;
+  grid-template-columns:minmax(0,1.55fr) minmax(360px,.78fr);
+  gap:18px;
+  align-items:stretch;
+}
+.world-card-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.world-card {
+  position:relative;
+  min-height:172px;
+  padding:0;
+  overflow:hidden;
+  border-radius:16px;
+  border:2px solid rgba(255,255,255,.65);
+  background:#17314a;
+  box-shadow:0 12px 32px rgba(8,31,52,.22);
+  text-align:left;
+  color:#fff;
+  isolation:isolate;
+  transition:transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+.world-card:hover { transform:translateY(-4px); border-color:#fff; box-shadow:0 18px 38px rgba(8,31,52,.30); }
+.world-card.active {
+  border-color:var(--world-accent);
+  box-shadow:0 0 0 2px color-mix(in srgb, var(--world-accent) 40%, transparent), 0 20px 44px rgba(8,31,52,.32);
+}
+.world-card-img {
+  position:absolute;
+  inset:0;
+  background-image:var(--world-image);
+  background-size:cover;
+  background-position:center;
+  transform:scale(1.03);
+  z-index:-3;
+}
+.world-card-shade {
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg, rgba(2,15,27,.04) 5%, rgba(2,15,27,.20) 42%, rgba(2,12,23,.92) 100%);
+  z-index:-2;
+}
+.world-card-copy {
+  position:absolute;
+  left:14px;
+  bottom:13px;
+  right:50px;
+  display:flex;
+  flex-direction:column;
+}
+.world-card-copy small { font-size:9px; color:#dceeff; letter-spacing:.13em; font-weight:800; }
+.world-card-copy strong { font-family:var(--font-display); font-size:15px; line-height:1.05; margin-top:4px; }
+.world-card-copy em { font-style:normal; font-size:10px; margin-top:4px; color:#c4d9eb; letter-spacing:.08em; }
+.world-card-status {
+  position:absolute;
+  top:12px;
+  right:12px;
+  padding:5px 8px;
+  border-radius:8px;
+  background:rgba(4,16,29,.66);
+  color:#fff;
+  font-size:11px;
+  font-weight:900;
+  border:1px solid rgba(255,255,255,.18);
+}
+
+.world-preview-panel {
+  overflow:hidden;
+  border-radius:20px;
+  background:rgba(5,22,38,.92);
+  border:1px solid rgba(110,205,255,.32);
+  box-shadow:0 24px 58px rgba(5,27,48,.30);
+  min-height:100%;
+}
+.world-preview-hero { position:relative; height:240px; overflow:hidden; }
+.world-preview-hero img {
+  width:100%; height:100%; object-fit:cover;
+  display:block; filter:saturate(1.08) contrast(1.02);
+}
+.world-preview-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(3,15,27,.02), rgba(3,15,27,.22) 45%, rgba(3,15,27,.92));
+}
+.world-preview-title-wrap {
+  position:absolute; left:20px; right:20px; bottom:18px;
+}
+.world-preview-kicker { font-size:9px; color:#72dcff; font-weight:900; letter-spacing:.16em; }
+.world-preview-title-wrap h3 { margin-top:5px; font-family:var(--font-display); font-size:30px; }
+.world-preview-title-wrap p { margin-top:3px; color:#b8d3e7; font-size:11px; font-weight:800; letter-spacing:.1em; }
+.world-preview-body { padding:18px; }
+.world-preview-label { display:block; font-size:9px; color:#8fa9bd; font-weight:900; letter-spacing:.13em; }
+.world-phase-buttons { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:8px; }
+.world-phase-btn {
+  padding:9px 5px;
+  border-radius:9px;
+  background:#102b45;
+  border:1px solid rgba(129,203,239,.18);
+  color:#cfe6f6;
+  font-size:9px;
+  font-weight:900;
+}
+.world-phase-btn:hover,.world-phase-btn.active {
+  background:#eaf8ff;
+  color:#08263e;
+  border-color:#54d2ff;
+}
+.world-preview-description { color:#c4d8e7; font-size:13px; line-height:1.45; margin:14px 0; }
+.world-preview-meta { display:flex; gap:7px; flex-wrap:wrap; }
+.world-preview-meta span {
+  padding:6px 9px;
+  border-radius:7px;
+  background:#0d2942;
+  color:#87dbff;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.06em;
+}
+.world-progress-block { margin:15px 0 10px; }
+.world-progress-block > div:first-child { display:flex; justify-content:space-between; color:#91aabe; font-size:9px; font-weight:900; }
+.world-progress-block b { color:#45dc9a; }
+.world-progress-track { margin-top:7px; height:5px; background:#183a56; border-radius:99px; overflow:hidden; }
+.world-progress-track i { display:block; width:76%; height:100%; background:linear-gradient(90deg,#22cfff,#45e89e); border-radius:inherit; }
+.world-laps { margin:10px 0 12px; padding:0; background:transparent; border:0; }
+.world-laps .lap-selector-label { color:#91aabe; }
+.world-laps .lap-pills { flex-wrap:wrap; }
+.world-laps .lap-pill { background:#0d2942; border-color:#244b66; color:#c5dbea; }
+.world-laps .lap-pill.active { background:#e9f9ff; color:#09283f; border-color:#4bd4ff; }
+.world-launch-btn {
+  width:100%; padding:15px 18px; border-radius:12px;
+  background:linear-gradient(90deg,#09a9ef,#0879db);
+  color:#fff; font-family:var(--font-display); font-size:14px; font-weight:900;
+  box-shadow:0 10px 26px rgba(0,150,235,.28);
+}
+.world-launch-btn:hover { transform:translateY(-2px); box-shadow:0 15px 32px rgba(0,150,235,.38); }
+.world-launch-btn span { float:right; font-size:20px; line-height:12px; }
+
+.hud-world-identity {
+  position:absolute;
+  top:18px;
+  left:50%;
+  transform:translateX(-50%);
+  min-width:180px;
+  text-align:center;
+  padding:7px 16px 8px;
+  border-radius:12px;
+  background:rgba(10,28,45,.66);
+  border:1px solid rgba(117,219,255,.24);
+  backdrop-filter:blur(10px);
+  box-shadow:0 8px 24px rgba(0,0,0,.16);
+  pointer-events:none;
+}
+.hud-world-kicker { display:block; color:#6fdcff; font-size:7px; font-weight:900; letter-spacing:.16em; }
+.hud-world-identity strong { display:block; color:#fff; font-family:var(--font-display); font-size:12px; letter-spacing:.05em; margin-top:2px; }
+.hud-world-identity span:last-child { display:block; color:#c8e5f4; font-size:8px; margin-top:2px; font-weight:800; }
+
+#screen-home {
+  background-color:#76b8df;
+  background-image:
+    linear-gradient(180deg,rgba(66,151,207,.08),rgba(11,41,67,.30)),
+    url('/bg/atlanta-sunset-highway.jpg');
+}
+#screen-home .glass-panel { background:rgba(19,47,72,.48); border-color:rgba(255,255,255,.18); }
+#screen-home .rd-btn-secondary { background:rgba(10,32,53,.58); }
+#screen-home .rd-shortcut { background:rgba(10,32,53,.55); }
+
+@media (max-width:1100px) {
+  .world-select-layout { grid-template-columns:1fr; }
+  .world-card-grid { grid-template-columns:repeat(2,1fr); }
+  .world-preview-panel { max-width:none; }
+}
+@media (max-width:680px) {
+  .world-select-shell { width:calc(100vw - 28px); padding-top:52px; }
+  .world-select-head { align-items:flex-start; flex-direction:column; }
+  .world-card-grid { grid-template-columns:1fr; }
+  .world-card { min-height:150px; }
+  .world-phase-buttons { grid-template-columns:repeat(2,1fr); }
+  .hud-world-identity { top:70px; }
+}

@@ -233,8 +233,8 @@ export function buildWorld(scene) {
   moon.shadow.camera.far = 600; moon.shadow.bias = -0.0015;
   scene.add(moon);
   scene.add(new THREE.HemisphereLight(0xab60ff, 0x1a1630, 0.85));
-  scene.add(new THREE.AmbientLight(0x2c2050, 0.8));
-  scene.fog = new THREE.FogExp2(0x0a0618, 0.0017);
+  scene.add(new THREE.AmbientLight(0x4c5e7d, 1.0));
+  scene.fog = new THREE.FogExp2(0x18233a, 0.0012);
 
   // Frequent lightning (every 2-4s per the brief), synchronized with a "headlight sweep" — a
   // fast-moving spotlight streaking across the scene right after each flash.

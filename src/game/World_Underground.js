@@ -150,8 +150,8 @@ export function buildWorld(scene) {
 
   const headlampFill = new THREE.HemisphereLight(0x4a6a95, 0x1a1a1d, 0.9);
   scene.add(headlampFill);
-  scene.add(new THREE.AmbientLight(0x2a2c42, 0.9));
-  scene.fog = new THREE.FogExp2(0x0a0c12, 0.0032);
+  scene.add(new THREE.AmbientLight(0x4a5268, 1.0));
+  scene.fog = new THREE.FogExp2(0x18202f, 0.0024);
 
   // A distant train light that sweeps past on a parallel "track" every so often
   const train = buildTrainLight();

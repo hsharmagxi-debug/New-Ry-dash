@@ -12,15 +12,85 @@ import { loadGhost, saveGhostIfBest, GhostRecorder, GhostPlayer } from './game/G
 import { HomeAtmosphere } from './game/HomeAtmosphere.js';
 
 const WORLDS = {
-  neon: { label: 'Neon Rain City', build: buildNeonWorld },
-  sunset: { label: 'Sunset Highway', build: buildSunsetWorld },
-  desert: { label: 'Neon Desert', build: buildDesertWorld },
-  underground: { label: 'Underground District (RAVEX)', build: buildUndergroundWorld },
-  rooftop: { label: 'Rooftop City Racing', build: buildRooftopWorld },
-  storm: { label: 'Electric Storm City', build: buildStormWorld },
-  coastal: { label: 'Night Coastal Highway', build: buildCoastalWorld },
-  vertical: { label: 'Vertical Mega-City', build: buildVerticalWorld },
+  neon: {
+    label: 'Neon District', subtitle: 'RAIN CITY', location: 'USA',
+    build: buildNeonWorld, image: '/bg/rainy-traffic-city.jpg',
+    color: '#29d8ff', difficulty: 5, laps: '3.2 km', weather: 'RAIN',
+    description: 'Wet streets, reflected neon and dense night traffic.'
+  },
+  sunset: {
+    label: 'Sunline Highway', subtitle: 'GOLDEN COAST', location: 'USA',
+    build: buildSunsetWorld, image: '/bg/atlanta-sunset-highway.jpg',
+    color: '#ffb84d', difficulty: 4, laps: '4.1 km', weather: 'CLEAR',
+    description: 'Fast sweeping highway runs through golden-hour light.'
+  },
+  desert: {
+    label: 'Black Desert', subtitle: 'NEON DUNES', location: 'UAE',
+    build: buildDesertWorld, image: '/bg/sport-car-roadside.jpg',
+    color: '#ff8b3d', difficulty: 5, laps: '4.7 km', weather: 'DRY',
+    description: 'High-speed desert straights, dunes and futuristic towers.'
+  },
+  underground: {
+    label: 'Deep Run', subtitle: 'UNDERGROUND', location: 'RAVEX',
+    build: buildUndergroundWorld, image: '/bg/foggy-night-street.jpg',
+    color: '#a77dff', difficulty: 5, laps: '3.0 km', weather: 'FOG',
+    description: 'A technical tunnel circuit packed with lights and tight bends.'
+  },
+  rooftop: {
+    label: 'Skyline', subtitle: 'ROOFTOP CITY', location: 'TOKYO',
+    build: buildRooftopWorld, image: '/bg/panoramic-city-night.jpg',
+    color: '#65e8ff', difficulty: 4, laps: '2.8 km', weather: 'CLEAR',
+    description: 'Rooftop launches, elevated roads and skyline jumps.'
+  },
+  storm: {
+    label: 'Storm City', subtitle: 'ELECTRIC FRONT', location: 'EUROPE',
+    build: buildStormWorld, image: '/bg/bangkok-chinatown-night.jpg',
+    color: '#c28bff', difficulty: 5, laps: '3.6 km', weather: 'STORM',
+    description: 'Lightning, rain and low visibility turn every corner into a risk.'
+  },
+  coastal: {
+    label: 'Coastal Highway', subtitle: 'OCEAN DRIVE', location: 'PACIFIC',
+    build: buildCoastalWorld, image: '/bg/rome-light-trails.jpg',
+    color: '#39d9ff', difficulty: 3, laps: '4.5 km', weather: 'SEA BREEZE',
+    description: 'Open coastal roads, ocean views and long flowing corners.'
+  },
+  vertical: {
+    label: 'Vertical City', subtitle: 'MEGA-CITY', location: 'NEO TOKYO',
+    build: buildVerticalWorld, image: '/bg/shibuya-neon-town.jpg',
+    color: '#ff5fb2', difficulty: 5, laps: '3.4 km', weather: 'NEON',
+    description: 'Towering city blocks, elevated lanes and extreme visual scale.'
+  },
 };
+
+const WORLD_PHASES = {
+  day:    { label: 'DAY', icon: '☀️', sky: 0x83c9f4, fog: 0xa9d7eb, light: 1.28, tint: '#66cfff' },
+  sunset: { label: 'SUNSET', icon: '🌅', sky: 0xd88470, fog: 0x8f6570, light: 1.08, tint: '#ffad72' },
+  night:  { label: 'NIGHT', icon: '🌙', sky: 0x10233d, fog: 0x18324f, light: 0.98, tint: '#54b9ff' },
+  storm:  { label: 'STORM', icon: '⚡', sky: 0x52627c, fog: 0x60748a, light: 0.92, tint: '#a9c7ff' },
+};
+
+function applyWorldPhase(scene, phaseId = 'night') {
+  const phase = WORLD_PHASES[phaseId] || WORLD_PHASES.night;
+  scene.background = new THREE.Color(phase.sky);
+  if (scene.fog) {
+    if (scene.fog.isFogExp2) scene.fog.color.setHex(phase.fog);
+    else scene.fog.color.setHex(phase.fog);
+  }
+  scene.traverse((obj) => {
+    if (obj.isLight) {
+      obj.intensity = Math.max(0.06, obj.userData.rydashBaseIntensity ?? obj.intensity) * phase.light;
+      if (obj.userData.rydashBaseIntensity == null) obj.userData.rydashBaseIntensity = obj.intensity / phase.light;
+    }
+    if (obj.isMesh && obj.material) {
+      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+      mats.forEach((mat) => {
+        if ('envMapIntensity' in mat) mat.envMapIntensity = Math.max(mat.envMapIntensity || 0, 1.8);
+        if (mat.isMeshPhysicalMaterial && mat.roughness > 0.5) mat.roughness = 0.42;
+      });
+    }
+  });
+}
+
 
 import { CarController, AIDriver } from './game/CarController.js';
 import { buildComposer, SmokeSystem, SparkSystem, WaterSpraySystem, NitroJetSystem } from './game/Effects.js';
@@ -39,6 +109,7 @@ const state = {
   quality: localStorage.getItem('rydash_quality') || localStorage.getItem('vx_quality') || 'high',
   cameraMode: localStorage.getItem('rydash_camera') || localStorage.getItem('vx_camera') || 'chase',
   worldId: localStorage.getItem('rydash_world') || localStorage.getItem('vx_world') || 'neon',
+  worldPhase: localStorage.getItem('rydash_world_phase') || 'sunset',
   soundOn: (localStorage.getItem('rydash_sound') ?? localStorage.getItem('vx_sound')) !== 'false',
   showFps: (localStorage.getItem('rydash_fps') ?? localStorage.getItem('vx_fps')) === 'true',
   totalLaps: Number(localStorage.getItem('rydash_laps')) || 3,
@@ -580,16 +651,69 @@ function beginRace() {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.45;
+  renderer.toneMappingExposure = state.quality === 'high' ? 1.82 : 1.68;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(62, width / height, 0.1, 1400);
 
+  // 2026 readability rig: a neutral sky fill plus a moving cool key keep the
+  // player's paint, wheels and bodywork readable even in dark environments.
+  const raceSkyFill = new THREE.HemisphereLight(0xc9ecff, 0x233b54, 1.15);
+  raceSkyFill.userData.rydashBaseIntensity = 1.15;
+  scene.add(raceSkyFill);
+  const carKey = new THREE.PointLight(0x9edfff, 2.8, 30, 2);
+  scene.add(carKey);
+
   const activeWorld = WORLDS[state.worldId] || WORLDS.neon;
   const { curve, trackWidth, update: updateWorld, ramps = [] } = activeWorld.build(scene);
+  applyWorldPhase(scene, state.worldPhase);
 
-  const CP_COUNT = 10;
-  const checkpoints = curve.getSpacedPoints(CP_COUNT).slice(0, CP_COUNT);
+  // Race gates are ordered around the actual closed track.  The previous build
+  // used a very wide 10-point proximity test, which could skip gates at speed
+  // and make laps feel like a dummy counter.  We use 20 narrow, directional gates.
+  const CP_COUNT = 20;
+  const checkpointPoints = curve.getSpacedPoints(CP_COUNT);
+  const checkpoints = checkpointPoints.slice(0, CP_COUNT).map((p) => p.clone());
+  const checkpointRadius = Math.max(4.2, trackWidth * 0.48);
+
+  function buildRaceGates() {
+    const group = new THREE.Group();
+    group.name = 'RYDASH_RACE_GATES';
+    checkpoints.forEach((p, i) => {
+      const tangent = curve.getTangentAt(i / CP_COUNT).normalize();
+      const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
+      const isStart = i === 0;
+      const gate = new THREE.Group();
+      gate.position.set(p.x, 0, p.z);
+      gate.lookAt(p.x + tangent.x, 0, p.z + tangent.z);
+
+      const postMat = new THREE.MeshStandardMaterial({
+        color: isStart ? 0x39ff9d : 0x6ecbff,
+        emissive: isStart ? 0x39ff9d : 0x168cff,
+        emissiveIntensity: isStart ? 1.8 : 0.9,
+        metalness: 0.35, roughness: 0.28
+      });
+      const postGeo = new THREE.CylinderGeometry(0.11, 0.14, 3.0, 10);
+      [-trackWidth * 0.48, trackWidth * 0.48].forEach((x) => {
+        const post = new THREE.Mesh(postGeo, postMat);
+        post.position.set(x, 1.5, 0);
+        gate.add(post);
+      });
+
+      if (isStart) {
+        const banner = new THREE.Mesh(
+          new THREE.BoxGeometry(trackWidth * 0.96, 0.55, 0.16),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x39ff9d, emissiveIntensity: 0.9 })
+        );
+        banner.position.y = 3.0;
+        gate.add(banner);
+      }
+      group.add(gate);
+    });
+    scene.add(group);
+    return group;
+  }
+  const raceGates = buildRaceGates();
 
   // Minimap
   const minimapCanvas = $('minimapCanvas');
@@ -622,6 +746,15 @@ function beginRace() {
     minimapCtx.strokeStyle = 'rgba(0,229,255,.55)';
     minimapCtx.lineWidth = 3;
     minimapCtx.stroke();
+
+    remoteRacers.forEach((r) => {
+      if (!r.rig.group.visible) return;
+      const p = mapProject(r.rig.group.position.x, r.rig.group.position.z);
+      minimapCtx.fillStyle = '#ffd166';
+      minimapCtx.beginPath();
+      minimapCtx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      minimapCtx.fill();
+    });
 
     opponents.forEach((o) => {
       const p = mapProject(o.ctrl.position.x, o.ctrl.position.z);
@@ -710,8 +843,12 @@ function beginRace() {
   const startPoint = checkpoints[0];
   const startTangent = curve.getTangentAt(0);
   const startHeading = Math.atan2(startTangent.x, startTangent.z);
-  player.setStartTransform(new THREE.Vector3(startPoint.x - 2, 0, startPoint.z), startHeading);
+  const startNormal = new THREE.Vector3(-startTangent.z, 0, startTangent.x).normalize();
+  player.setStartTransform(startPoint.clone().addScaledVector(startNormal, -2.4), startHeading);
   player.nextCP = 1;
+  player.lap = 1;
+  $('hudLap') && ($('hudLap').textContent = '1');
+  $('hudTotalLaps') && ($('hudTotalLaps').textContent = String(state.totalLaps));
 
   // Opponents: 7 AI racers
   const opponents = [];
@@ -734,12 +871,76 @@ function beginRace() {
     const row = Math.floor(i / 2);
     const col = i % 2;
     const t0 = -(row + 1) * 0.012;
-    const p0 = curve.getPointAt(((t0 % 1) + 1) % 1);
-    const lateral = (col === 0 ? -1 : 1) * 3;
-    oppCtrl.setStartTransform(new THREE.Vector3(p0.x + lateral, 0, p0.z), startHeading);
+    const tStart = ((t0 % 1) + 1) % 1;
+    const p0 = curve.getPointAt(tStart);
+    const tangent0 = curve.getTangentAt(tStart).normalize();
+    const normal0 = new THREE.Vector3(-tangent0.z, 0, tangent0.x).normalize();
+    const lateral = (col === 0 ? -1 : 1) * 3.1;
+    oppCtrl.setStartTransform(p0.clone().addScaledVector(normal0, lateral), Math.atan2(tangent0.x, tangent0.z));
+    // Race progress belongs to the controller itself. The previous build kept
+    // nextCP/lap only on the wrapper object, while checkpointAdvance() reads
+    // ctrl.nextCP/ctrl.lap — making AI lap progression effectively a dummy state.
+    oppCtrl.nextCP = 1;
+    oppCtrl.lap = 1;
+    oppCtrl.finished = false;
     const ai = new AIDriver(oppCtrl, curve, { tOffset: ((t0 % 1) + 1) % 1, targetSpeedKmh: oppModel.topSpeed * 290, aggro: 0.82 + i * 0.03 });
-    opponents.push({ ctrl: oppCtrl, ai, name: def.name, nextCP: 1, lap: 1, finishTimeMs: null });
+    opponents.push({ ctrl: oppCtrl, ai, name: def.name, finishTimeMs: null });
   });
+
+  // Live multiplayer cars: remote racers are real Three.js car rigs driven by
+  // Supabase Realtime transforms, not placeholder dots in the lobby.
+  const remoteRacers = new Map();
+
+  function ensureRemoteRacer(id, meta = {}) {
+    if (!state.multiplayer || id === state.multiplayer.local.id) return null;
+    if (remoteRacers.has(id)) return remoteRacers.get(id);
+
+    const model = CAR_MODELS.find((c) => c.id === meta.carModel) || CAR_MODELS[0];
+    const liver = CAR_LIVERIES.find((l) => l.id === meta.livery) || CAR_LIVERIES[0];
+    const rig = buildCar(model, liver.color);
+    rig.group.scale.multiplyScalar(1.01);
+    scene.add(rig.group);
+    const racer = {
+      id, name: meta.name || 'Racer', rig,
+      target: null, lastSeen: performance.now(),
+      lap: 1, nextCP: 1, finished: false
+    };
+    // Put a connected racer into a visible grid slot immediately instead of
+    // leaving an invisible car at world origin until its first network packet.
+    const gridIndex = Math.max(0, remoteRacers.size);
+    const gridT = (((gridIndex + 2) * -0.012) % 1 + 1) % 1;
+    const gridPoint = curve.getPointAt(gridT);
+    const gridTangent = curve.getTangentAt(gridT).normalize();
+    const gridNormal = new THREE.Vector3(-gridTangent.z, 0, gridTangent.x).normalize();
+    racer.rig.group.position.copy(gridPoint.clone().addScaledVector(gridNormal, gridIndex % 2 ? 3.1 : -3.1));
+    racer.rig.group.rotation.y = Math.atan2(gridTangent.x, gridTangent.z);
+    remoteRacers.set(id, racer);
+    return racer;
+  }
+
+  function removeRemoteRacer(id) {
+    const racer = remoteRacers.get(id);
+    if (!racer) return;
+    scene.remove(racer.rig.group);
+    remoteRacers.delete(id);
+  }
+
+  if (state.multiplayer) {
+    const room = state.multiplayer;
+    room.remotePlayers.forEach((meta, id) => ensureRemoteRacer(id, meta));
+    room.onPlayerJoin = (id, meta) => { ensureRemoteRacer(id, meta); updateLobbyUI(room); };
+    room.onPlayerLeave = (id) => { removeRemoteRacer(id); updateLobbyUI(room); };
+    room.onTransform = (payload) => {
+      const racer = ensureRemoteRacer(payload.id, room.remotePlayers.get(payload.id) || {});
+      if (racer) {
+        racer.target = payload;
+        racer.lap = Number(payload.lap) || racer.lap;
+        racer.nextCP = Number(payload.cp) || racer.nextCP;
+        racer.finished = Boolean(payload.finished);
+        racer.lastSeen = performance.now();
+      }
+    };
+  }
 
   // Effects
   const smoke = new SmokeSystem(scene, 140);
@@ -911,6 +1112,13 @@ function beginRace() {
 
   const hudTotalLaps = $('hudTotalLaps');
   if (hudTotalLaps) hudTotalLaps.textContent = state.totalLaps;
+  const hudWorldName = $('hudWorldName');
+  if (hudWorldName) hudWorldName.textContent = (WORLDS[state.worldId] || WORLDS.neon).label.toUpperCase();
+  const hudWorldPhase = $('hudWorldPhase');
+  if (hudWorldPhase) {
+    const phase = WORLD_PHASES[state.worldPhase] || WORLD_PHASES.night;
+    hudWorldPhase.textContent = `${phase.icon} ${phase.label}`;
+  }
   
   const resumeBtn = $('resumeBtn');
   if (resumeBtn) resumeBtn.onclick = togglePause;
@@ -920,6 +1128,14 @@ function beginRace() {
   if (quitBtn) quitBtn.onclick = () => { teardownRace(); showScreen('screen-home'); };
   const pauseBtn = $('pauseBtn');
   if (pauseBtn) pauseBtn.onclick = togglePause;
+  const raceBackBtn = $('raceBackBtn');
+  if (raceBackBtn) raceBackBtn.onclick = () => {
+    if (raceFinished || confirm('Leave this race? Your current race will end.')) {
+      teardownRace();
+      state.isMultiplayerRace = false;
+      showScreen(state.multiplayer ? 'screen-lobby' : 'screen-home');
+    }
+  };
 
   let paused = false;
   function togglePause() {
@@ -930,9 +1146,14 @@ function beginRace() {
   }
 
   function checkpointAdvance(ctrl, pos) {
+    if (!ctrl || ctrl.finished) return false;
     const cp = checkpoints[ctrl.nextCP];
-    if (pos.distanceTo(new THREE.Vector3(cp.x, 0, cp.z)) < trackWidth) {
-      ctrl.nextCP++;
+    if (!cp) return false;
+
+    const dx = pos.x - cp.x;
+    const dz = pos.z - cp.z;
+    if ((dx * dx + dz * dz) <= checkpointRadius * checkpointRadius) {
+      ctrl.nextCP += 1;
       if (ctrl.nextCP >= CP_COUNT) {
         ctrl.nextCP = 0;
         ctrl.lap = (ctrl.lap || 1) + 1;
@@ -1052,6 +1273,29 @@ function beginRace() {
       player.applyPlayerInput(input, dt);
       player.step(dt);
 
+      if (state.multiplayer) {
+        state.multiplayer.sendTransform({
+          x: player.position.x, y: player.position.y, z: player.position.z,
+          heading: player.heading, speed: player.speed, lap: player.lap,
+          cp: player.nextCP, finished: Boolean(player.finished)
+        });
+      }
+
+      remoteRacers.forEach((racer) => {
+        if (!racer.target) return;
+        const t = racer.target;
+        racer.rig.group.position.lerp(
+          new THREE.Vector3(Number(t.x) || 0, Number(t.y) || 0, Number(t.z) || 0),
+          Math.min(1, dt * 12)
+        );
+        if (Number.isFinite(Number(t.heading))) {
+          racer.rig.group.rotation.y = THREE.MathUtils.lerp(
+            racer.rig.group.rotation.y, Number(t.heading), Math.min(1, dt * 10)
+          );
+        }
+        racer.rig.group.visible = performance.now() - racer.lastSeen < 5000;
+      });
+
       // Check gear shift pop
       if (player.gear !== lastGear && player.gear !== 'R') {
         sound.playGearShift();
@@ -1065,6 +1309,16 @@ function beginRace() {
       if (checkpointAdvance(player, player.rig.group.position)) {
         const hudLap = $('hudLap');
         if (hudLap) hudLap.textContent = Math.min(player.lap, state.totalLaps);
+        if (player.lap <= state.totalLaps) {
+          const msgOverlay = $('raceMsgOverlay');
+          const msgText = $('raceMsgText');
+          if (msgOverlay && msgText) {
+            msgText.textContent = `LAP ${player.lap - 1} COMPLETE  •  ${formatRaceTime(elapsedMs - lastLapStartMs)}`;
+            msgOverlay.classList.remove('hidden');
+            clearTimeout(window.__rydashLapToast);
+            window.__rydashLapToast = setTimeout(() => msgOverlay.classList.add('hidden'), 1700);
+          }
+        }
         const lapTime = elapsedMs - lastLapStartMs;
         lastLapStartMs = elapsedMs;
         if (bestLapMs === null || lapTime < bestLapMs) {
@@ -1072,7 +1326,11 @@ function beginRace() {
           const hudBest = $('hudBest');
           if (hudBest) hudBest.textContent = formatRaceTime(bestLapMs);
         }
-        if (player.lap > state.totalLaps) finishRace();
+        if (player.lap > state.totalLaps) {
+          player.finished = true;
+          if (state.multiplayer) state.multiplayer.sendFinish({ timeMs: Math.round(elapsedMs), lap: player.lap });
+          finishRace();
+        }
       }
 
       // Tire smoke on drift / hard acceleration
@@ -1101,6 +1359,7 @@ function beginRace() {
         o.ctrl.step(dt);
         if (checkpointAdvance(o.ctrl, o.ctrl.rig.group.position)) {
           if (o.ctrl.lap > state.totalLaps && !o.finishTimeMs) {
+            o.ctrl.finished = true;
             o.finishTimeMs = Math.round(elapsedMs);
           }
         }
@@ -1116,7 +1375,7 @@ function beginRace() {
       opponents.forEach((o) => checkNitroPickup(o.ctrl));
 
       updateCamera(dt);
-      updateHud(player, opponents, elapsedMs);
+      updateHud(player, opponents, elapsedMs, remoteRacers);
       updateMinimap();
 
       if (motionBlur.enabled) {
@@ -1134,6 +1393,9 @@ function beginRace() {
     sparks.update(dt);
     waterSpray.update(dt);
     updateWorld(dt);
+    if (player) {
+      carKey.position.set(player.position.x - Math.sin(player.heading) * 2.5, player.position.y + 4.5, player.position.z - Math.cos(player.heading) * 2.5);
+    }
     composer.render();
 
     if (state.showFps) {
@@ -1215,7 +1477,7 @@ function formatRaceTime(ms) {
 const SPEEDO_MAX_KMH = 320;
 const SPEEDO_CIRCUMFERENCE = 2 * Math.PI * 70;
 
-function updateHud(player, opponents, elapsedMs) {
+function updateHud(player, opponents, elapsedMs, remoteRacers = null) {
   const hudSpeed = $('hudSpeed');
   if (hudSpeed) hudSpeed.textContent = Math.round(player.speedKmh);
   
@@ -1246,9 +1508,21 @@ function updateHud(player, opponents, elapsedMs) {
   const speedLines = $('speedLines');
   if (speedLines) speedLines.style.opacity = linesOpacity;
 
+  const progressOf = (r) => {
+    const lap = Math.max(1, Number(r.lap) || 1);
+    const cp = Math.max(0, Number(r.nextCP) || 0);
+    return ((lap - 1) * CP_COUNT) + cp;
+  };
+  const remoteStandings = remoteRacers ? Array.from(remoteRacers.values()).map((r) => ({
+    name: r.name || 'Racer',
+    lap: Number(r.target?.lap || r.lap || 1),
+    cp: Number(r.target?.cp || r.nextCP || 0),
+    me: false
+  })) : [];
   const standings = [{ name: state.playerName + ' (you)', lap: player.lap || 1, cp: player.nextCP || 0, me: true }]
-    .concat(opponents.map((o) => ({ name: o.name, lap: o.ctrl?.lap || 1, cp: o.ctrl?.nextCP || 0, me: false })));
-  standings.sort((a, b) => (b.lap - a.lap) || (b.cp - a.cp));
+    .concat(opponents.map((o) => ({ name: o.name, lap: o.ctrl?.lap || 1, cp: o.ctrl?.nextCP || 0, me: false })))
+    .concat(remoteStandings);
+  standings.sort((a, b) => progressOf(b) - progressOf(a));
   
   const myRank = standings.findIndex((s) => s.me) + 1;
   const hudPos = $('hudPos');
@@ -1269,15 +1543,22 @@ function showResults(timeMs, opponents) {
   // player finished, project their time from their own simulated lap progress instead
   // of inventing a random number.
   (opponents || []).forEach((o) => {
-    const lapsDone = Math.max(o.ctrl?.lap || 1, 1);
-    const oppTime = o.finishTimeMs ?? Math.round(timeMs * (state.totalLaps / lapsDone));
-    list.push({ name: o.name, time: oppTime, me: false });
+    // Never invent a finish time. A racer who has not crossed the line is DNF.
+    list.push({ name: o.name, time: o.finishTimeMs, me: false, dnf: o.finishTimeMs == null });
   });
 
-  list.sort((a, b) => a.time - b.time);
+  list.sort((a, b) => {
+    if (a.dnf && !b.dnf) return 1;
+    if (!a.dnf && b.dnf) return -1;
+    if (a.dnf && b.dnf) return 0;
+    return a.time - b.time;
+  });
   const resultsList = $('resultsList');
   if (resultsList) {
     resultsList.innerHTML = list.map((r, i) => {
+      if (r.dnf) {
+        return `<div class="res-row ${r.me ? 'me' : ''}"><span>${i + 1}. ${escapeHtml(r.name)}</span><span class="dnf">DNF</span></div>`;
+      }
       const m = Math.floor(r.time / 60000);
       const s = ((r.time % 60000) / 1000).toFixed(3);
       return `<div class="res-row ${r.me ? 'me' : ''}"><span>${i + 1}. ${escapeHtml(r.name)}</span><span>${m}:${s.padStart(6, '0')}</span></div>`;
@@ -1419,15 +1700,44 @@ if (applySettingsBtn) {
   });
 }
 
+function renderWorldPreview() {
+  const w = WORLDS[state.worldId] || WORLDS.neon;
+  const p = WORLD_PHASES[state.worldPhase] || WORLD_PHASES.night;
+  const img = $('worldPreviewImage');
+  if (img) {
+    img.src = w.image;
+    img.alt = `${w.label} ${p.label}`;
+  }
+  const title = $('worldPreviewTitle');
+  if (title) title.textContent = w.label;
+  const sub = $('worldPreviewSubtitle');
+  if (sub) sub.textContent = `${w.subtitle} • ${w.location}`;
+  const desc = $('worldPreviewDescription');
+  if (desc) desc.textContent = w.description;
+  const meta = $('worldPreviewMeta');
+  if (meta) meta.innerHTML = `<span>${w.weather}</span><span>${w.laps}</span><span>${'★'.repeat(w.difficulty)}${'☆'.repeat(5-w.difficulty)}</span>`;
+  const phaseLabel = $('worldPreviewPhase');
+  if (phaseLabel) phaseLabel.textContent = `${p.icon} ${p.label}`;
+  document.querySelectorAll('.world-card').forEach((card) => card.classList.toggle('active', card.dataset.world === state.worldId));
+  document.querySelectorAll('.world-phase-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.phase === state.worldPhase));
+}
+
 function setWorld(id) {
+  if (!WORLDS[id]) return;
   state.worldId = id;
   localStorage.setItem('rydash_world', id);
-  document.querySelectorAll('.world-node').forEach((n) => n.classList.toggle('active', n.dataset.world === id));
-  const label = (WORLDS[id] || WORLDS.neon).label;
-  const sel = $('worldMapSelected');
-  if (sel) sel.textContent = `Selected: ${label}`;
+  document.querySelectorAll('.world-node, .world-card').forEach((n) => n.classList.toggle('active', n.dataset.world === id));
   if (homeAtmosphere) homeAtmosphere.setWorld(id);
+  renderWorldPreview();
   updateHomeHeroCardUI();
+}
+
+function setWorldPhase(id) {
+  if (!WORLD_PHASES[id]) return;
+  state.worldPhase = id;
+  localStorage.setItem('rydash_world_phase', id);
+  renderWorldPreview();
+  toast(`World phase: ${WORLD_PHASES[id].label}`);
 }
 
 function updateLapPillsUI() {
@@ -1445,9 +1755,16 @@ document.querySelectorAll('.lap-pill').forEach((pill) => {
   });
 });
 
-document.querySelectorAll('.world-node').forEach((node) => {
+document.querySelectorAll('.world-node, .world-card').forEach((node) => {
   node.addEventListener('click', () => setWorld(node.dataset.world));
 });
+document.querySelectorAll('.world-phase-btn').forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setWorldPhase(btn.dataset.phase);
+  });
+});
+renderWorldPreview();
 
 const worldSelectConfirmBtn = $('worldSelectConfirmBtn');
 if (worldSelectConfirmBtn) {

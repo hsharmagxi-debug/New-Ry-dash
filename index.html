@@ -287,6 +287,7 @@
 
     <!-- ===================== 02 GARAGE - SELECT YOUR RIDE ===================== -->
     <section id="screen-garage" class="screen garage-screen">
+      <button class="btn-back" data-back="screen-home">← Back</button>
       <div class="garage-topbar-master">
         <div class="garage-brand-block">
           <div class="brand-title">RYD<span class="accent">ASH</span></div>
@@ -375,19 +376,25 @@
     <!-- ===================== 05 QUICK RACE - IN-GAME HUD ===================== -->
     <section id="screen-race" class="screen">
       <canvas id="gameCanvas"></canvas>
+      <button id="raceBackBtn" class="race-back-btn" aria-label="Leave race">← EXIT RACE</button>
       <div id="speedLines" class="speed-lines"></div>
 
       <div id="raceHud" class="race-hud">
+        <div class="hud-world-identity">
+          <span class="hud-world-kicker">RYDASH WORLD</span>
+          <strong id="hudWorldName">NEON DISTRICT</strong>
+          <span id="hudWorldPhase">🌙 NIGHT</span>
+        </div>
         <div class="hud-top-left">
           <div class="hud-pos-lap-row">
             <div class="hud-chip"><span class="hud-chip-label">POS</span><span id="hudPos">03</span><span class="hud-chip-sep">/</span><span id="hudPosTotal">08</span></div>
-            <div class="hud-chip"><span class="hud-chip-label">LAP</span><span id="hudLap">2</span><span class="hud-chip-sep">/</span><span id="hudTotalLaps">3</span></div>
+            <div class="hud-chip"><span class="hud-chip-label">LAP</span><span id="hudLap">1</span><span class="hud-chip-sep">/</span><span id="hudTotalLaps">3</span></div>
           </div>
           <div id="hudPositions" class="hud-positions"></div>
         </div>
         <div class="hud-top-right">
-          <div class="hud-chip hud-chip-time"><span class="hud-chip-label">TIME</span><span id="hudTimer">01:24.632</span></div>
-          <div class="hud-chip hud-chip-time"><span class="hud-chip-label">BEST</span><span id="hudBest">01:18.543</span></div>
+          <div class="hud-chip hud-chip-time"><span class="hud-chip-label">TIME</span><span id="hudTimer">00:00.000</span></div>
+          <div class="hud-chip hud-chip-time"><span class="hud-chip-label">BEST</span><span id="hudBest">--:--.---</span></div>
         </div>
         <div class="hud-bottom-left">
           <canvas id="minimapCanvas" width="140" height="140"></canvas>
@@ -399,9 +406,9 @@
               <circle cx="80" cy="80" r="70" class="speedo-fill" id="speedoFillRing" />
             </svg>
             <div class="speedo-center">
-              <span id="hudSpeed" class="speedo-value">187</span>
+              <span id="hudSpeed" class="speedo-value">0</span>
               <span class="speedo-unit">KM/H</span>
-              <span id="hudRpm" class="speedo-rpm">4,200 RPM</span>
+              <span id="hudRpm" class="speedo-rpm">900 RPM</span>
             </div>
           </div>
           <div class="gear-nitro">
@@ -438,6 +445,7 @@
 
     <!-- ===================== RESULTS ===================== -->
     <section id="screen-results" class="screen">
+      <button class="btn-back" data-back="screen-home">← Back</button>
       <div class="panel-center glass-panel">
         <h2 class="panel-title center">RACE <span class="accent">RESULTS</span></h2>
         <div id="resultsList" class="results-list"></div>
@@ -577,68 +585,112 @@
 
     <!-- ===================== 04 WORLD SELECT - RYDASH MAP ===================== -->
     <section id="screen-worldmap" class="screen worldmap-screen">
-      <button class="btn-back" data-back="screen-home">← Back</button>
-      <div class="worldmap-header">
-        <span class="screen-idx-tag">04 WORLD SELECT</span>
-        <h2 class="panel-title center">RYDASH <span class="accent">MAP</span></h2>
-        <p class="muted center worldmap-sub">Choose a world and conquer the streets across 8 unique concepts.</p>
-      </div>
+      <button class="btn-back" data-back="screen-home">← BACK</button>
 
-      <div class="world-map world-map-8">
-        <svg class="world-map-lines" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet">
-          <line x1="300" y1="300" x2="300" y2="108" /><line x1="300" y1="300" x2="436" y2="164" />
-          <line x1="300" y1="300" x2="492" y2="300" /><line x1="300" y1="300" x2="436" y2="436" />
-          <line x1="300" y1="300" x2="300" y2="492" /><line x1="300" y1="300" x2="164" y2="436" />
-          <line x1="300" y1="300" x2="108" y2="300" /><line x1="300" y1="300" x2="164" y2="164" />
-        </svg>
-        <div class="world-hub">RYDASH</div>
-        <button class="world-node active" data-world="neon" style="left:50%;top:18%">
-          <span class="world-node-num">01</span><span class="world-node-name">NEON DISTRICT</span>
-          <span class="world-node-desc">🌧️ Rain City</span><span class="world-node-stars">★★★★★</span>
-        </button>
-        <button class="world-node" data-world="sunset" style="left:72.6%;top:27.4%">
-          <span class="world-node-num">02</span><span class="world-node-name">SUNLINE</span>
-          <span class="world-node-desc">🌅 Sunset Highway</span><span class="world-node-stars">★★★★☆</span>
-        </button>
-        <button class="world-node" data-world="desert" style="left:82%;top:50%">
-          <span class="world-node-num">03</span><span class="world-node-name">BLACK DESERT</span>
-          <span class="world-node-desc">🏜️ Neon Desert</span><span class="world-node-stars">★★★★★</span>
-        </button>
-        <button class="world-node" data-world="underground" style="left:72.6%;top:72.6%">
-          <span class="world-node-num">04</span><span class="world-node-name">DEEP RUN</span>
-          <span class="world-node-desc">🚇 Underground</span><span class="world-node-stars">★★★★★</span>
-        </button>
-        <button class="world-node" data-world="rooftop" style="left:50%;top:82%">
-          <span class="world-node-num">05</span><span class="world-node-name">SKYLINE</span>
-          <span class="world-node-desc">🌃 Rooftop City</span><span class="world-node-stars">★★★★☆</span>
-        </button>
-        <button class="world-node" data-world="storm" style="left:27.4%;top:72.6%">
-          <span class="world-node-num">06</span><span class="world-node-name">STORM CITY</span>
-          <span class="world-node-desc">⚡ Electric Storm</span><span class="world-node-stars">★★★★★</span>
-        </button>
-        <button class="world-node" data-world="coastal" style="left:18%;top:50%">
-          <span class="world-node-num">07</span><span class="world-node-name">COASTAL HWY</span>
-          <span class="world-node-desc">🌊 Night Coastal</span><span class="world-node-stars">★★★★☆</span>
-        </button>
-        <button class="world-node" data-world="vertical" style="left:27.4%;top:27.4%">
-          <span class="world-node-num">08</span><span class="world-node-name">VERTICAL CITY</span>
-          <span class="world-node-desc">🏙️ Mega-City</span><span class="world-node-stars">★★★★★</span>
-        </button>
-      </div>
-      <div id="worldMapSelected" class="worldmap-selected">Selected: NEON DISTRICT (Rain City)</div>
-      
-      <!-- Lap Configuration Selector -->
-      <div class="lap-selector-wrap">
-        <span class="lap-selector-label">RACE LENGTH:</span>
-        <div class="lap-pills">
-          <button class="lap-pill" data-laps="1">1 LAP (SPRINT)</button>
-          <button class="lap-pill" data-laps="2">2 LAPS (QUICK)</button>
-          <button class="lap-pill active" data-laps="3">3 LAPS (STANDARD)</button>
-          <button class="lap-pill" data-laps="5">5 LAPS (ENDURANCE)</button>
+      <div class="world-select-shell">
+        <div class="world-select-head">
+          <div>
+            <span class="screen-idx-tag">04 WORLD SELECT</span>
+            <h2 class="world-select-title">CHOOSE YOUR <span>WORLD</span></h2>
+            <p class="world-select-sub">Every world has its own circuit, weather identity, lighting and race atmosphere.</p>
+          </div>
+          <div class="world-phase-legend">
+            <span>LIVE RACE PHASE</span>
+            <b id="worldPreviewPhase">🌅 SUNSET</b>
+          </div>
+        </div>
+
+        <div class="world-select-layout">
+          <div class="world-card-grid">
+            <button class="world-card active" data-world="neon" style="--world-image:url('/bg/rainy-traffic-city.jpg');--world-accent:#29d8ff">
+              <span class="world-card-img"></span><span class="world-card-shade"></span>
+              <span class="world-card-copy"><small>01 • USA</small><strong>NEON DISTRICT</strong><em>RAIN CITY</em></span>
+              <span class="world-card-status">5★</span>
+            </button>
+            <button class="world-card" data-world="sunset" style="--world-image:url('/bg/atlanta-sunset-highway.jpg');--world-accent:#ffb84d">
+              <span class="world-card-img"></span><span class="world-card-shade"></span>
+              <span class="world-card-copy"><small>02 • USA</small><strong>SUNLINE HIGHWAY</strong><em>GOLDEN COAST</em></span>
+              <span class="world-card-status">4★</span>
+            </button>
+            <button class="world-card" data-world="desert" style="--world-image:url('/bg/sport-car-roadside.jpg');--world-accent:#ff8b3d">
+              <span class="world-card-img"></span><span class="world-card-shade"></span>
+              <span class="world-card-copy"><small>03 • UAE</small><strong>BLACK DESERT</strong><em>NEON DUNES</em></span>
+              <span class="world-card-status">5★</span>
+            </button>
+            <button class="world-card" data-world="underground" style="--world-image:url('/bg/foggy-night-street.jpg');--world-accent:#a77dff">
+              <span class="world-card-img"></span><span class="world-card-shade"></span>
+              <span class="world-card-copy"><small>04 • RAVEX</small><strong>DEEP RUN</strong><em>UNDERGROUND</em></span>
+              <span class="world-card-status">5★</span>
+            </button>
+            <button class="world-card" data-world="rooftop" style="--world-image:url('/bg/panoramic-city-night.jpg');--world-accent:#65e8ff">
+              <span class="world-card-img"></span><span class="world-card-shade"></span>
+              <span class="world-card-copy"><small>05 • TOKYO</small><strong>SKYLINE</strong><em>ROOFTOP CITY</em></span>
+              <span class="world-card-status">4★</span>
+            </button>
+            <button class="world-card" data-world="storm" style="--world-image:url('/bg/bangkok-chinatown-night.jpg');--world-accent:#c28bff">
+              <span class="world-card-img"></span><span class="world-card-shade"></span>
+              <span class="world-card-copy"><small>06 • EUROPE</small><strong>STORM CITY</strong><em>ELECTRIC FRONT</em></span>
+              <span class="world-card-status">5★</span>
+            </button>
+            <button class="world-card" data-world="coastal" style="--world-image:url('/bg/rome-light-trails.jpg');--world-accent:#39d9ff">
+              <span class="world-card-img"></span><span class="world-card-shade"></span>
+              <span class="world-card-copy"><small>07 • PACIFIC</small><strong>COASTAL HIGHWAY</strong><em>OCEAN DRIVE</em></span>
+              <span class="world-card-status">3★</span>
+            </button>
+            <button class="world-card" data-world="vertical" style="--world-image:url('/bg/shibuya-neon-town.jpg');--world-accent:#ff5fb2">
+              <span class="world-card-img"></span><span class="world-card-shade"></span>
+              <span class="world-card-copy"><small>08 • NEO TOKYO</small><strong>VERTICAL CITY</strong><em>MEGA-CITY</em></span>
+              <span class="world-card-status">5★</span>
+            </button>
+          </div>
+
+          <aside class="world-preview-panel">
+            <div class="world-preview-hero">
+              <img id="worldPreviewImage" src="/bg/atlanta-sunset-highway.jpg" alt="Selected RYDASH world" />
+              <div class="world-preview-overlay"></div>
+              <div class="world-preview-title-wrap">
+                <span class="world-preview-kicker">SELECTED WORLD</span>
+                <h3 id="worldPreviewTitle">Sunline Highway</h3>
+                <p id="worldPreviewSubtitle">GOLDEN COAST • USA</p>
+              </div>
+            </div>
+
+            <div class="world-preview-body">
+              <div class="world-preview-row">
+                <div>
+                  <span class="world-preview-label">RACE PHASE</span>
+                  <div class="world-phase-buttons">
+                    <button class="world-phase-btn" data-phase="day">☀️ DAY</button>
+                    <button class="world-phase-btn active" data-phase="sunset">🌅 SUNSET</button>
+                    <button class="world-phase-btn" data-phase="night">🌙 NIGHT</button>
+                    <button class="world-phase-btn" data-phase="storm">⚡ STORM</button>
+                  </div>
+                </div>
+              </div>
+
+              <p id="worldPreviewDescription" class="world-preview-description">Fast sweeping highway runs through golden-hour light.</p>
+              <div id="worldPreviewMeta" class="world-preview-meta"><span>CLEAR</span><span>4.1 km</span><span>★★★★☆</span></div>
+
+              <div class="world-progress-block">
+                <div><span>WORLD PROGRESS</span><b>LIVE</b></div>
+                <div class="world-progress-track"><i></i></div>
+              </div>
+
+              <div class="lap-selector-wrap world-laps">
+                <span class="lap-selector-label">RACE LENGTH</span>
+                <div class="lap-pills">
+                  <button class="lap-pill" data-laps="1">1 LAP</button>
+                  <button class="lap-pill" data-laps="2">2 LAPS</button>
+                  <button class="lap-pill active" data-laps="3">3 LAPS</button>
+                  <button class="lap-pill" data-laps="5">5 LAPS</button>
+                </div>
+              </div>
+
+              <button id="worldSelectConfirmBtn" class="world-launch-btn">START RACE <span>→</span></button>
+            </div>
+          </aside>
         </div>
       </div>
-
-      <button id="worldSelectConfirmBtn" class="btn btn-primary btn-lg" style="margin-top:16px;">CONFIRM WORLD &amp; RACE</button>
     </section>
 
     <!-- ===================== 09 HOW TO PLAY - TRAINING CIRCUIT ===================== -->

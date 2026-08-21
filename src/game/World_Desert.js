@@ -240,8 +240,8 @@ export function buildWorld(scene) {
   scene.add(sunLight);
 
   scene.add(new THREE.HemisphereLight(0xff9a5d, 0x3a1e20, 0.85));
-  scene.add(new THREE.AmbientLight(0x5a3a30, 0.8));
-  scene.fog = new THREE.FogExp2(0x2a1418, 0.0012);
+  scene.add(new THREE.AmbientLight(0x755443, 0.95));
+  scene.fog = new THREE.FogExp2(0x3a2228, 0.0009);
 
   // A handful of drones drifting across the sky, tracing lazy loops
   const drones = [];

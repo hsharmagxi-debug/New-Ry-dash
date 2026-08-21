@@ -385,10 +385,10 @@ export function buildWorld(scene) {
 
   const fillCyan = new THREE.HemisphereLight(0x2ae5ff, 0x1a1430, 0.85);
   scene.add(fillCyan);
-  const ambient = new THREE.AmbientLight(0x2c2050, 0.8);
+  const ambient = new THREE.AmbientLight(0x4a5b78, 1.0);
   scene.add(ambient);
 
-  scene.fog = new THREE.FogExp2(0x141c30, 0.0014);
+  scene.fog = new THREE.FogExp2(0x223149, 0.0010);
 
   // Occasional lightning flash
   let lightningTimer = 4 + Math.random() * 6;

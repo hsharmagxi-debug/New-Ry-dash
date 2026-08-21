@@ -1,9 +1,9 @@
 {
   "name": "rydash",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
-  "description": "RYDASH — Ride Fast. Race Live. A modern 3D multiplayer neon street racing game (Three.js + Supabase Realtime)",
+  "description": "RYDASH \u2014 2026 live 3D arcade racing game with sequential laps, dynamic environments and optional realtime multiplayer",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

@@ -253,8 +253,8 @@ export function buildWorld(scene) {
   key.shadow.camera.far = 600; key.shadow.bias = -0.0015;
   scene.add(key);
   scene.add(new THREE.HemisphereLight(0x40eaff, 0x151530, 0.85));
-  scene.add(new THREE.AmbientLight(0x252c50, 0.8));
-  scene.fog = new THREE.FogExp2(0x03040a, 0.0013);
+  scene.add(new THREE.AmbientLight(0x465978, 1.0));
+  scene.fog = new THREE.FogExp2(0x101b2e, 0.0010);
 
   function update(dt) {
     const t = performance.now() * 0.001;

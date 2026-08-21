@@ -295,8 +295,8 @@ export function buildWorld(scene) {
   scene.add(sunLight);
 
   scene.add(new THREE.HemisphereLight(0x9a8bff, 0x2a1a3e, 0.9));
-  scene.add(new THREE.AmbientLight(0x503a65, 0.75));
-  scene.fog = new THREE.FogExp2(0x1a0e2e, 0.001);
+  scene.add(new THREE.AmbientLight(0x72567f, 0.95));
+  scene.fog = new THREE.FogExp2(0x352447, 0.0008);
 
   function update(dt) {
     const t = performance.now() * 0.001;

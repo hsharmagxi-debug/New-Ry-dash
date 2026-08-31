@@ -7,7 +7,6 @@ export default defineConfig({
       output: {
         manualChunks: {
           three: ['three'],
-          supabase: ['@supabase/supabase-js'],
         },
       },
     },

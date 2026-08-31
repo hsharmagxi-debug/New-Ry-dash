@@ -1,0 +1,186 @@
+/* Genesis proving-ground shell — PC + mobile first-class, dark
+   instrumentation aesthetic (an original design language, not any
+   franchise's actual UI). */
+
+:root {
+  --g-bg: #05070a;
+  --g-panel: rgba(10, 16, 24, 0.72);
+  --g-line: rgba(57, 255, 224, 0.25);
+  --g-accent: #39ffe0;
+  --g-accent-2: #6ecbff;
+  --g-text: #e8f4ff;
+  --g-text-dim: #7f93a8;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--g-bg);
+  color: var(--g-text);
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+}
+
+#genesis-viewport {
+  position: fixed;
+  inset: 0;
+}
+#genesis-viewport canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.genesis-hud {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  display: grid;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.genesis-hud-speed {
+  background: var(--g-panel);
+  border: 1px solid var(--g-line);
+  border-radius: 10px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  backdrop-filter: blur(6px);
+}
+.genesis-hud-value {
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--g-accent);
+  font-variant-numeric: tabular-nums;
+}
+.genesis-hud-unit {
+  color: var(--g-text-dim);
+  font-size: 13px;
+}
+.genesis-hud-band {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--g-accent-2);
+  border: 1px solid var(--g-line);
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
+.genesis-hud-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(110px, 1fr));
+  gap: 6px;
+  background: var(--g-panel);
+  border: 1px solid var(--g-line);
+  border-radius: 10px;
+  padding: 10px;
+  backdrop-filter: blur(6px);
+}
+.genesis-hud-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.genesis-hud-cell b {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.genesis-hud-cell small {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--g-text-dim);
+}
+
+/* Touch controls (mobile-first-class, not a PC afterthought) */
+.genesis-touch-controls {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+.genesis-touch-controls > * {
+  pointer-events: auto;
+}
+
+.genesis-touch-stick {
+  position: fixed;
+  left: 24px;
+  bottom: 28px;
+  width: 120px;
+  height: 60px;
+  border-radius: 30px;
+  background: var(--g-panel);
+  border: 1px solid var(--g-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.genesis-touch-stick-knob {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--g-accent);
+  opacity: 0.85;
+  transition: transform 0.05s linear;
+}
+
+.genesis-touch-thrust {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.genesis-touch-throttle {
+  width: 46px;
+  height: 130px;
+  border-radius: 23px;
+  background: var(--g-panel);
+  border: 1px solid var(--g-line);
+  position: relative;
+  overflow: hidden;
+}
+.genesis-touch-throttle-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 0%;
+  background: linear-gradient(180deg, var(--g-accent-2), var(--g-accent));
+}
+.genesis-touch-boost {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--g-panel);
+  border: 1px solid var(--g-line);
+  color: var(--g-accent);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.genesis-touch-boost:active {
+  background: var(--g-accent);
+  color: #05070a;
+}
+
+@media (min-width: 900px) {
+  .genesis-hud-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+}
+@media (max-width: 560px) {
+  .genesis-hud { top: 10px; left: 10px; }
+  .genesis-hud-value { font-size: 26px; }
+  .genesis-hud-grid { grid-template-columns: repeat(2, minmax(90px, 1fr)); padding: 8px; }
+  .genesis-hud-cell b { font-size: 12px; }
+}

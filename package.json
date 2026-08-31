@@ -1,22 +1,19 @@
 {
-  "name": "rydash",
+  "name": "genesis-proving-ground",
   "private": true,
-  "version": "1.1.0",
+  "version": "0.1.0-genesis",
   "type": "module",
-  "description": "RYDASH \u2014 2026 live 3D arcade racing game with sequential laps, dynamic environments and optional realtime multiplayer",
+  "description": "PROJECT GENESIS (web substitution track) — an original space-academy craft-racing proving ground: one craft, one graybox track, physics, camera, telemetry, sense of speed.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --port 4173"
+    "preview": "vite preview --port 4173",
+    "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.4",
     "three": "^0.169.0"
   },
   "devDependencies": {
     "vite": "^5.4.8"
-  },
-  "allowScripts": {
-    "esbuild@0.21.5": true
   }
 }

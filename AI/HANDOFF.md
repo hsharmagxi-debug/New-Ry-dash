@@ -18,8 +18,12 @@ substitution:
   Per constitution §38 (never copy fictional branding/lore), this was
   substituted with an **original** space-academy aesthetic — same tone
   (cadet pilots, training proving-grounds, sleek dark instrumentation UI),
-  no Star Trek names, insignia, or copyrighted material. Needs a human-
-  approved name; current codename is `PROJECT GENESIS`.
+  no Star Trek names, insignia, or copyrighted material.
+- **Name:** the human approved **NITRO DUST** as the game's name.
+  `PROJECT GENESIS` remains the name of the current development milestone
+  (per the constitution), not the game itself — the two are not
+  synonyms. Applied across `package.json`, `index.html` title, the
+  in-game HUD brand line, and `README.md`.
 - **Platforms:** built PC + mobile as first-class from the start (per the
   human's explicit correction mid-session) — `InputSystem.js` has real
   touch controls (steer stick, throttle slider, boost button), not a
@@ -92,7 +96,8 @@ Benchmarks/Genesis/                    reserved for six-speed-band data
 ## Human approvals needed
 - Confirm the engine substitution (UE5 → Three.js) as permanent for this
   machine, or as a temporary prototyping track pending a better workstation.
-- Approve or reject the placeholder theme substitution and pick a final name.
+- ~~Approve or reject the placeholder theme substitution and pick a final
+  name.~~ **Resolved:** game name is **Nitro Dust** (human-approved).
 - Approve moving from this informal smoke test to a structured G2/G3 pass.
 
 ## Unmerged worktrees

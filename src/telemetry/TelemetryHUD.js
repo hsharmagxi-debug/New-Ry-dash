@@ -31,6 +31,7 @@ export class TelemetryHUD {
   update(state, t, perf) {
     if (!this.visible) return;
     this.el.innerHTML = `
+      <div class="genesis-hud-brand">NITRO DUST <span>· Genesis proving ground</span></div>
       <div class="genesis-hud-row genesis-hud-speed">
         <span class="genesis-hud-value">${t.speedKmh.toFixed(0)}</span>
         <span class="genesis-hud-unit">km/h</span>

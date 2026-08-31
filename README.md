@@ -1,22 +1,23 @@
-# PROJECT GENESIS — Proving Ground
+# NITRO DUST
 
 **"Can we reinvent the feeling of speed?"**
 
-An original space-academy craft-racing prototype, built as this
-workstation's substitution track for Unreal Engine 5.8.2 (no local disk
-budget for a UE5 install — see `AI/ADR/ADR-000-Engine-Substitution.md`).
+An original space-academy craft-racing game, built as this workstation's
+substitution track for Unreal Engine 5.8.2 (no local disk budget for a
+UE5 install — see `AI/ADR/ADR-000-Engine-Substitution.md`).
 
-This is **not** a finished game. It is `PROJECT GENESIS`: the foundational
-driving-technology proving ground defined by `AI/MASTER-CONSTITUTION.md`
-and `AI/GENESIS-EXECUTION-PROMPT.md` — one craft, one graybox track,
-physics, camera, sense of speed, and telemetry. Nothing else.
+The game is **not** finished. It is currently in its **PROJECT GENESIS**
+milestone: the foundational driving-technology proving ground defined by
+`AI/MASTER-CONSTITUTION.md` and `AI/GENESIS-EXECUTION-PROMPT.md` — one
+craft, one graybox track, physics, camera, sense of speed, and telemetry.
+Nothing else yet.
 
 > **Naming note:** an earlier direction asked for a literal "Starfleet
 > Academy" (Star Trek) theme. Per the constitution's own originality rule
 > (never copy fictional branding/lore), this project uses an **original**
-> space-academy aesthetic instead — same tone, no Star Trek IP. The
-> in-repo codename is still `PROJECT GENESIS` pending a human-approved
-> final name.
+> space-academy aesthetic instead — same tone, no Star Trek IP. The game's
+> name is **Nitro Dust** (human-approved); `PROJECT GENESIS` remains the
+> name of this current development milestone, not the game itself.
 
 ## Stack
 - **Three.js** + **Vite**, vanilla ES modules — chosen as the lowest-

@@ -1,9 +1,9 @@
 {
-  "name": "genesis-proving-ground",
+  "name": "nitro-dust",
   "private": true,
-  "version": "0.1.0-genesis",
+  "version": "0.1.1-genesis",
   "type": "module",
-  "description": "PROJECT GENESIS (web substitution track) — an original space-academy craft-racing proving ground: one craft, one graybox track, physics, camera, telemetry, sense of speed.",
+  "description": "NITRO DUST — an original space-academy craft-racing game (web substitution track for UE5). Currently in its PROJECT GENESIS milestone: one craft, one graybox track, physics, camera, telemetry, sense of speed.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

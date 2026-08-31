@@ -46,6 +46,19 @@ html, body {
   pointer-events: none;
 }
 
+.genesis-hud-brand {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--g-accent-2);
+  opacity: 0.85;
+}
+.genesis-hud-brand span {
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--g-text-dim);
+}
+
 .genesis-hud-speed {
   background: var(--g-panel);
   border: 1px solid var(--g-line);

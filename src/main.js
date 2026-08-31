@@ -1,5 +1,5 @@
 /**
- * main.js — PROJECT GENESIS bootstrap (web substitution track)
+ * main.js — NITRO DUST bootstrap, PROJECT GENESIS milestone (web substitution track)
  *
  * Wires: PhysicsAdapter (behind CraftSimulationInterface) + ProvingGround +
  * CraftMesh + ChaseCamera + InputSystem + TelemetryHUD into one render loop.

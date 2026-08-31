@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1-genesis] — Game named: NITRO DUST
+
+- Human-approved game name applied across the project: `package.json`,
+  `index.html` title, in-game HUD brand line, `README.md`, `AI/HANDOFF.md`.
+  `PROJECT GENESIS` remains the name of the current development milestone
+  (per the constitution), not the game itself.
+
 ## [0.1.0-genesis] — Full rebuild: PROJECT GENESIS
 
 - Removed all prior RyDash code, assets, and docs (full from-scratch

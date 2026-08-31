@@ -1,73 +1,66 @@
-# RYDASH — 2026 Live Racing Build
+# NITRO DUST
 
-**RACE. DRIFT. DOMINATE.**  
-A browser-based 3D arcade racing game built with Three.js + Vite, with optional Supabase Realtime multiplayer.
+**"Can we reinvent the feeling of speed?"**
 
-## What was fixed in this build
+An original space-academy craft-racing game, built as this workstation's
+substitution track for Unreal Engine 5.8.2 (no local disk budget for a
+UE5 install — see `AI/ADR/ADR-000-Engine-Substitution.md`).
 
-- Real sequential 20-gate lap system instead of a loose dummy counter.
-- Visible start/finish and checkpoint gates in every 3D environment.
-- Correct starting grid orientation based on each track's tangent/normal.
-- Live lap completion feedback and real race-start HUD values.
-- Brighter, more readable UI and environment lighting across the worlds.
-- Live multiplayer remote cars rendered in the actual 3D race.
-- Remote-player interpolation and minimap markers.
-- Exit Race navigation plus Back buttons across previously missing pages.
-- Preserved the 10-car garage and the existing eight environments.
-- Mobile/touch controls remain supported.
-- Existing Supabase score/leaderboard integration is preserved.
+The game is **not** finished. It is currently in its **PROJECT GENESIS**
+milestone: the foundational driving-technology proving ground defined by
+`AI/MASTER-CONSTITUTION.md` and `AI/GENESIS-EXECUTION-PROMPT.md` — one
+craft, one graybox track, physics, camera, sense of speed, and telemetry.
+Nothing else yet.
 
-## Environments
+> **Naming note:** an earlier direction asked for a literal "Starfleet
+> Academy" (Star Trek) theme. Per the constitution's own originality rule
+> (never copy fictional branding/lore), this project uses an **original**
+> space-academy aesthetic instead — same tone, no Star Trek IP. The game's
+> name is **Nitro Dust** (human-approved); `PROJECT GENESIS` remains the
+> name of this current development milestone, not the game itself.
 
-Neon Rain City, Sunset Highway, Neon Desert, Underground District, Rooftop City Racing, Electric Storm City, Night Coastal Highway, Vertical Mega-City.
+## Stack
+- **Three.js** + **Vite**, vanilla ES modules — chosen as the lowest-
+  footprint real-time-3D substitute for UE5 that still runs identically on
+  desktop and mobile browsers. See `AI/ADR/ADR-000-Engine-Substitution.md`.
+- Gameplay code depends only on `src/domain/CraftSimulationInterface.js`
+  (engine-neutral contract) — never directly on `three` or the physics
+  implementation, per the constitution's mandatory Vehicle Simulation
+  Interface pattern.
 
-## Run locally
-
+## Run it
 ```bash
 npm install
-npm run dev
+npm run dev       # local dev server with HMR
+npm run build     # production build -> dist/
+npm run preview   # serve the production build
+npm test          # automated validation (node --test)
 ```
 
-Then open the Vite URL shown in the terminal.
+## Platforms
+Built PC + mobile as co-equal first-class targets from the start — the
+input layer (`src/input/InputSystem.js`) implements real touch controls
+(steer stick, throttle slider, boost button) alongside keyboard/mouse, not
+a mobile afterthought.
 
-## Production build
-
-```bash
-npm run build
-npm run preview
+## Structure
+```
+src/
+  domain/      portable game-domain contracts (engine-agnostic)
+  physics/     physics adapter implementing the domain contract
+  render/      Three.js-specific visuals
+  world/       Genesis graybox proving ground
+  camera/      chase-camera candidate(s)
+  telemetry/   debug HUD
+  input/       PC + mobile input
+tests/         automated validation (node --test)
+AI/            constitution, execution prompt, ADRs, handoff
+Docs/          environment audit and other design docs
+Benchmarks/Genesis/   reserved for six-speed-band benchmark data
 ```
 
-## Multiplayer
-
-Multiplayer requires a free Supabase project.
-
-1. Copy `.env.example` to `.env`.
-2. Set `VITE_SUPABASE_URL`.
-3. Set `VITE_SUPABASE_ANON_KEY`.
-4. Run the SQL in `supabase_schema.sql`.
-5. Build and deploy.
-
-The multiplayer transport uses Supabase Realtime Broadcast/Presence. The race now sends live transforms and renders connected racers as real 3D cars.
-
-## Controls
-
-- W / Arrow Up — throttle
-- S / Arrow Down — brake/reverse
-- A/D or Arrow Left/Right — steering
-- Space — handbrake
-- Shift — nitro
-- C — camera
-- H — horn
-- Esc — pause
-
-## Git push
-
-```bash
-git add .
-git commit -m "RYDASH 2026 live racing rebuild"
-git push
-```
-
-## Credits
-
-**RYDASH — Created by Urvashi Chandan**
+## Status
+See `AI/HANDOFF.md` for exactly what is implemented, tested, and still
+outstanding (this is Candidate-A-only physics and camera; Candidates B/C,
+the six-speed-band validation pass, and independent review are still
+pending — do not treat this as a finished evaluation).

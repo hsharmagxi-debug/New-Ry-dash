@@ -1,0 +1,101 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Spatial",
+"class": "CombatArena",
+"language": "GDScript",
+"path": "res://scripts/CombatArena.gd"
+}, {
+"base": "Control",
+"class": "CombatHUD",
+"language": "GDScript",
+"path": "res://scripts/ui/CombatHUD.gd"
+}, {
+"base": "Spatial",
+"class": "EnemyShip",
+"language": "GDScript",
+"path": "res://scripts/EnemyShip.gd"
+}, {
+"base": "Node",
+"class": "HealthShield",
+"language": "GDScript",
+"path": "res://scripts/simulation/HealthShield.gd"
+}, {
+"base": "Node",
+"class": "MatchStateSingleton",
+"language": "GDScript",
+"path": "res://scripts/rules/MatchState.gd"
+}, {
+"base": "Spatial",
+"class": "PlayerShip",
+"language": "GDScript",
+"path": "res://scripts/PlayerShip.gd"
+}, {
+"base": "KinematicBody",
+"class": "Projectile",
+"language": "GDScript",
+"path": "res://scripts/simulation/Projectile.gd"
+}, {
+"base": "KinematicBody",
+"class": "ShipController",
+"language": "GDScript",
+"path": "res://scripts/simulation/ShipController.gd"
+}, {
+"base": "Resource",
+"class": "ShipStats",
+"language": "GDScript",
+"path": "res://scripts/data/ShipStats.gd"
+}, {
+"base": "Resource",
+"class": "WeaponStats",
+"language": "GDScript",
+"path": "res://scripts/data/WeaponStats.gd"
+}, {
+"base": "Node",
+"class": "WeaponSystem",
+"language": "GDScript",
+"path": "res://scripts/simulation/WeaponSystem.gd"
+} ]
+_global_script_class_icons={
+"CombatArena": "",
+"CombatHUD": "",
+"EnemyShip": "",
+"HealthShield": "",
+"MatchStateSingleton": "",
+"PlayerShip": "",
+"Projectile": "",
+"ShipController": "",
+"ShipStats": "",
+"WeaponStats": "",
+"WeaponSystem": ""
+}
+
+[application]
+
+config/name="Nitro Dust"
+run/main_scene="res://scenes/CombatArena.tscn"
+
+[autoload]
+
+MatchState="*res://scripts/rules/MatchState.gd"
+
+[display]
+
+window/size/width=1280
+window/size/height=800
+
+[physics]
+
+common/enable_pause_aware_picking=true
+
+[rendering]
+
+quality/driver/driver_name="GLES2"

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ShipStats" load_steps=2 format=2]
+
+[ext_resource path="res://scripts/data/ShipStats.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource(1)
+role_id = "interceptor"
+display_name = "Genesis Interceptor (prototype)"
+max_thrust_accel = 42.0
+max_speed = 220.0
+strafe_accel = 28.0
+pitch_rate = 2.6
+yaw_rate = 2.2
+roll_rate = 3.4
+boost_accel_bonus = 24.0
+boost_max_energy = 1.0
+boost_drain_per_second = 0.45
+boost_regen_per_second = 0.14
+max_hull = 100.0
+max_shield = 60.0
+shield_regen_per_second = 4.0
+shield_regen_delay = 2.5
+sensor_range = 800.0
+cargo_capacity = 0.0

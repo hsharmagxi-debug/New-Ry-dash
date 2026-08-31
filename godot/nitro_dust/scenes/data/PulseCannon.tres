@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WeaponStats" load_steps=2 format=2]
+
+[ext_resource path="res://scripts/data/WeaponStats.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource(1)
+weapon_id = "pulse_cannon"
+display_name = "Pulse Cannon"
+damage = 8.0
+fire_rate = 6.0
+projectile_speed = 340.0
+range_m = 500.0
+energy_cost = 0.0

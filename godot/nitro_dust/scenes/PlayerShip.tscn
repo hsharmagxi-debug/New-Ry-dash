@@ -1,0 +1,69 @@
+[gd_scene load_steps=12 format=2]
+
+[ext_resource path="res://scripts/PlayerShip.gd" type="Script" id=1]
+[ext_resource path="res://scripts/simulation/ShipController.gd" type="Script" id=2]
+[ext_resource path="res://scripts/simulation/WeaponSystem.gd" type="Script" id=3]
+[ext_resource path="res://scripts/simulation/HealthShield.gd" type="Script" id=4]
+[ext_resource path="res://scenes/data/PlayerShipStats.tres" type="Resource" id=5]
+[ext_resource path="res://scenes/data/PulseCannon.tres" type="Resource" id=6]
+[ext_resource path="res://scenes/Projectile.tscn" type="PackedScene" id=7]
+
+[sub_resource type="PrismMesh" id=1]
+size = Vector3(1.6, 0.9, 3.2)
+
+[sub_resource type="SpatialMaterial" id=2]
+albedo_color = Color(0.82, 0.87, 0.93, 1)
+metallic = 0.35
+roughness = 0.35
+
+[sub_resource type="BoxShape" id=3]
+extents = Vector3(0.8, 0.45, 1.6)
+
+[sub_resource type="SpatialMaterial" id=4]
+flags_unshaded = true
+emission_enabled = true
+emission = Color(0.35, 1, 0.88, 1)
+albedo_color = Color(0.35, 1, 0.88, 1)
+
+[node name="PlayerShip" type="Spatial"]
+script = ExtResource(1)
+team = 0
+
+[node name="ShipController" type="KinematicBody" parent="."]
+collision_layer = 1
+collision_mask = 6
+script = ExtResource(2)
+stats = ExtResource(5)
+team = 0
+
+[node name="CollisionShape" type="CollisionShape" parent="ShipController"]
+shape = SubResource(3)
+
+[node name="Hull" type="MeshInstance" parent="ShipController"]
+transform = Transform(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource(1)
+material/0 = SubResource(2)
+
+[node name="EngineGlow" type="MeshInstance" parent="ShipController"]
+transform = Transform(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.15, 0, 0, 1.5)
+mesh = SubResource(1)
+material/0 = SubResource(4)
+
+[node name="PrimaryWeapon" type="Node" parent="ShipController"]
+script = ExtResource(3)
+stats = ExtResource(6)
+muzzle_path = NodePath("Muzzle")
+projectile_scene = ExtResource(7)
+owner_team = 0
+
+[node name="Muzzle" type="Position3D" parent="ShipController/PrimaryWeapon"]
+transform = Transform(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.7)
+
+[node name="Camera" type="Camera" parent="ShipController"]
+transform = Transform(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 2.2, 6.5)
+current = true
+fov = 78.0
+
+[node name="HealthShield" type="Node" parent="."]
+script = ExtResource(4)
+stats = ExtResource(5)

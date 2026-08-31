@@ -19,6 +19,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://scripts/ui/CombatHUD.gd"
 }, {
+"base": "Control",
+"class": "CornerFrame",
+"language": "GDScript",
+"path": "res://scripts/ui/CornerFrame.gd"
+}, {
 "base": "Spatial",
 "class": "EnemyShip",
 "language": "GDScript",
@@ -67,6 +72,7 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "CombatArena": "",
 "CombatHUD": "",
+"CornerFrame": "",
 "EnemyShip": "",
 "HealthShield": "",
 "MatchStateSingleton": "",
